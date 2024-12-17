@@ -1,8 +1,11 @@
 package com.gantenx.service;
 
 import com.gantenx.model.RSI;
+import com.gantenx.model.response.DataConverter;
 import com.gantenx.model.response.KlineModel;
 import com.gantenx.retrofit.QuoteApi;
+import com.gantenx.retrofit.RetrofitClient;
+import com.gantenx.retrofit.RetrofitUtils;
 import com.gantenx.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

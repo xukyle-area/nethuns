@@ -1,6 +1,5 @@
-package com.gantenx.util;
+package com.gantenx.model.response;
 
-import com.gantenx.model.response.KlineModel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
