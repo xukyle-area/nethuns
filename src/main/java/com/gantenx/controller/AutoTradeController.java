@@ -28,6 +28,7 @@ public class AutoTradeController {
     public List<KlineModel> btcusdt() {
         long begin = DateUtils.getTimestamp("20241101");
         long end = DateUtils.getTimestamp("20241201");
+        log.info("{}, {}", begin, end);
         return quoteService.getKline("BTCUSDT", "1d", begin, end, 500);
     }
 }

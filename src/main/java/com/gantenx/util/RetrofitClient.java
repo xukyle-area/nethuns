@@ -4,7 +4,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    private static final String BASE_URL = "https://fapi.binance.com";
+    private static final String BASE_URL = "https://data-api.binance.vision";
 
     private static Retrofit retrofit;
 

@@ -13,11 +13,11 @@ public class DateUtils {
 
     public static long getTimestamp(String dateStr) {
         LocalDate localDate = LocalDate.parse(dateStr, formatter);
-        return localDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();  // 使用毫秒时间戳
     }
 
     public static String getDate(long timestamp) {
-        LocalDate date = Instant.ofEpochSecond(timestamp).atZone(ZoneOffset.UTC).toLocalDate();
+        LocalDate date = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate();  // 使用毫秒时间戳
         return date.format(formatter);
     }
 }

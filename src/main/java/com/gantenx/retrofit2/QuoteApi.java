@@ -18,7 +18,7 @@ public interface QuoteApi {
      * @param limit     返回条目数，默认 500，最大 1500，可选
      * @return K线数据列表
      */
-    @GET("/fapi/v1/klines")
+    @GET("api/v3/klines")
     Call<List<List<Object>>> getKlines(
             @Query("symbol") String symbol,
             @Query("interval") String interval,
