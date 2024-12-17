@@ -1,96 +1,130 @@
 package com.gantenx.util;
 
+import com.gantenx.model.Kline;
+import com.gantenx.model.KlineWithRSI;
 import com.gantenx.model.Order;
-import com.gantenx.model.RSI;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.XYPointerAnnotation;
+import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RefineryUtilities;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static com.gantenx.util.DateUtils.SIMPLE_DATE_FORMAT;
 public class TradingChart extends ApplicationFrame {
+    private static final String TIME = "Time";
+    private static final String PRICE = "Price";
+    private static final String K_LINE = "K-Line";
 
-    public TradingChart(String title, List<RSI> rsiList, List<Order> orderList) {
-        super(title);
+    public TradingChart(List<KlineWithRSI> qqqList, List<Kline> tqqqList, List<Order> orderList) {
+        super("Trading Line");
+        XYSeriesCollection qqqKlineDataset = createKlineDataset("QQQ K-Line", qqqList);
+        XYSeriesCollection tqqqKlineDataset = createKlineDataset("TQQQ K-Line", tqqqList);
+        XYSeriesCollection qqqRsiDataset = createRsiDataset("QQQ RSI", qqqList);
 
-        // Create the RSI series
-        XYSeries rsiSeries = new XYSeries("RSI");
-        for (RSI rsi : rsiList) {
-            rsiSeries.add(rsi.getOpenTime(), rsi.getRsi());
-        }
-
-        // Create the K-line (price) series
-        XYSeries kLineSeries = new XYSeries("K Line");
-        for (RSI rsi : rsiList) {
-            kLineSeries.add(rsi.getOpenTime(), Double.parseDouble(rsi.getClosePrice()));
-        }
-
-        // Create the series collection
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(kLineSeries);
-
-        // Create the RSI dataset
-        XYSeriesCollection rsiDataset = new XYSeriesCollection();
-        rsiDataset.addSeries(rsiSeries);
-
-        // Create the chart for K-Line
-        JFreeChart chart = ChartFactory.createXYLineChart(
-                "K-Line and RSI Chart",
-                "Time",
-                "Price",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true, true, false
-        );
-
-        // Get the plot and configure the time axis
+        // 创建主图表
+        JFreeChart chart = ChartFactory.createXYLineChart(K_LINE, TIME, PRICE, qqqKlineDataset, PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
         XYPlot plot = chart.getXYPlot();
 
-        // Create a DateAxis for the time axis
-        DateAxis timeAxis = new DateAxis("Time");
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        timeAxis.setDateFormatOverride(format);
-        plot.setDomainPannable(true); // Make it pannable
-        plot.setDomainCrosshairVisible(true);
-        plot.setDomainPannable(true);
-        plot.setRangePannable(true);
-
+        // 设置时间轴
+        DateAxis timeAxis = new DateAxis(TIME);
+        timeAxis.setDateFormatOverride(SIMPLE_DATE_FORMAT);
         plot.setDomainAxis(timeAxis);
 
-        // Create and add the secondary axis for RSI using NumberAxis
+        // QQQ 使用左轴
+        NumberAxis qqqPriceAxis = new NumberAxis("QQQ Price");
+        plot.setRangeAxis(0, qqqPriceAxis);
+        plot.setDataset(0, qqqKlineDataset);
+        plot.mapDatasetToRangeAxis(0, 0);
+
+        // TQQQ 使用右轴
+        NumberAxis tqqqPriceAxis = new NumberAxis("TQQQ Price");
+        tqqqPriceAxis.setRange(0, 150); // 设置范围
+        plot.setRangeAxis(1, tqqqPriceAxis);
+        plot.setDataset(1, tqqqKlineDataset);
+        plot.mapDatasetToRangeAxis(1, 1);
+
+        // 添加 QQQ 的 RSI 数据和对应的 RSI 轴
         NumberAxis rsiAxis = new NumberAxis("RSI");
-        rsiAxis.setRange(0.0, 600.0);  // RSI range between 0 and 100
-        plot.setRangeAxis(1, rsiAxis);
-        plot.setDataset(1, rsiDataset);
-        plot.mapDatasetToRangeAxis(1, 1); // Map RSI dataset to the second Y axis
+        rsiAxis.setRange(0.0, 100.0);
+        XYPlot rsiPlot = new XYPlot(qqqRsiDataset, null, rsiAxis, null);
+        rsiPlot.setDataset(0, qqqRsiDataset);
 
-        // Customize the chart to add order markers
-        for (Order order : orderList) {
-            // Place markers for buy/sell orders
-            Color color = order.getType().equals("buy") ? Color.GREEN : Color.RED;
-            XYPointerAnnotation xyPointerAnnotation = new XYPointerAnnotation(
-                    order.getType() + ":" + order.getPrice(),
-                    order.getTimestamp(),
-                    order.getPrice(),
-                    0.0
-            );
-            xyPointerAnnotation.setPaint(color);
-            plot.addAnnotation(xyPointerAnnotation);
-        }
+        XYLineAndShapeRenderer qqqRenderer = new XYLineAndShapeRenderer();
+        qqqRenderer.setSeriesPaint(0, Color.BLUE); // QQQ K-Line 颜色
+        qqqRenderer.setSeriesShapesVisible(0, false);
+        plot.setRenderer(0, qqqRenderer);
 
-        // Set chart panel
-        ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension(800, 600));
+        XYLineAndShapeRenderer tqqqRenderer = new XYLineAndShapeRenderer();
+        tqqqRenderer.setSeriesPaint(0, Color.RED); // TQQQ K-Line 颜色
+        tqqqRenderer.setSeriesShapesVisible(0, false);
+        plot.setRenderer(1, tqqqRenderer);
+
+        XYLineAndShapeRenderer rsiRenderer = new XYLineAndShapeRenderer();
+        rsiRenderer.setSeriesPaint(0, Color.GREEN); // QQQ RSI 颜色
+        rsiRenderer.setSeriesShapesVisible(0, false);
+        rsiPlot.setRenderer(0, rsiRenderer);
+
+
+        orderList.stream().map(Order::getTimestamp).distinct().forEach(timestamp -> {
+            XYLineAnnotation lineAnnotation = new XYLineAnnotation(
+                    timestamp, 0, timestamp, 540,
+                    new BasicStroke(1.0f), Color.BLACK);
+            plot.addAnnotation(lineAnnotation);
+            rsiPlot.addAnnotation(lineAnnotation);
+        });
+
+        // 创建组合图
+        CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
+        combinedPlot.add(plot, 3);
+        combinedPlot.add(rsiPlot, 1);
+
+        // 设置组合图表
+        JFreeChart combinedChart = new JFreeChart("Trading Chart", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
+        ChartPanel panel = new ChartPanel(combinedChart);
+        panel.setPreferredSize(new Dimension(1600, 1200));
         setContentPane(panel);
     }
+
+    // 创建 K 线数据集
+    private <T extends Kline> XYSeriesCollection createKlineDataset(String name, List<T> klineList) {
+        XYSeries series = new XYSeries(name);
+        for (T k : klineList) {
+            series.add(k.getTime(), Double.parseDouble(k.getClose()));
+        }
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+        return dataset;
+    }
+
+    // 创建 RSI 数据集
+    private XYSeriesCollection createRsiDataset(String name, List<KlineWithRSI> klineWithRsiList) {
+        XYSeries series = new XYSeries(name);
+        for (KlineWithRSI klineWithRsi : klineWithRsiList) {
+            series.add(klineWithRsi.getTime(), klineWithRsi.getRsi());
+        }
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+        return dataset;
+    }
+
+    public static void show(List<KlineWithRSI> qqqList, List<Kline> tqqqList, List<Order> orderList) {
+        TradingChart chart = new TradingChart(qqqList, tqqqList, orderList);
+        chart.pack();
+        RefineryUtilities.centerFrameOnScreen(chart);
+        chart.setVisible(true);
+    }
 }
+
+

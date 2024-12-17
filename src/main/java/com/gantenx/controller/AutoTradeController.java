@@ -1,9 +1,10 @@
 package com.gantenx.controller;
 
-import com.gantenx.model.RSI;
-import com.gantenx.model.response.KlineModel;
-import com.gantenx.service.QuoteService;
+import com.gantenx.model.KlineWithRSI;
+import com.gantenx.model.Kline;
+import com.gantenx.service.BinanceQuoteService;
 import com.gantenx.util.DateUtils;
+import com.gantenx.util.RsiCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ import static com.gantenx.constant.Constants.ONE_DAY;
 public class AutoTradeController {
 
     @Autowired
-    private QuoteService quoteService;
+    private BinanceQuoteService binanceQuoteService;
 
     @GetMapping("/hello")
     public String hello() {
@@ -29,16 +30,19 @@ public class AutoTradeController {
     }
 
     @GetMapping("/kline")
-    public List<KlineModel> kline(@RequestParam("symbol") String symbol,
-                                    @RequestParam("begin") String beginStr,
-                                    @RequestParam("end") String endStr,
-                                    @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
-        return quoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
+    public List<Kline> kline(@RequestParam("symbol") String symbol,
+                             @RequestParam("begin") String beginStr,
+                             @RequestParam("end") String endStr,
+                             @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
+        return binanceQuoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
     }
 
     @GetMapping("/rsi")
-    public List<RSI> rsi(@RequestParam("symbol") String symbol,
-                         @RequestParam("begin") String beginStr, @RequestParam("end") String endStr) {
-        return quoteService.getRsiList(symbol.toUpperCase(), beginStr, endStr);
+    public List<KlineWithRSI> rsi(@RequestParam("symbol") String symbol,
+                                  @RequestParam("begin") String beginStr, @RequestParam("end") String endStr) {
+        long startTime = DateUtils.getTimestamp(beginStr);
+        long endTime = DateUtils.getTimestamp(endStr);
+        List<Kline> kline = binanceQuoteService.getKline(symbol.toUpperCase(), ONE_DAY, startTime, endTime, 1500);
+        return RsiCalculator.calculateAndAttachRSI(kline, 6);
     }
 }

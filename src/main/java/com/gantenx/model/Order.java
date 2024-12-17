@@ -5,8 +5,10 @@ public class Order {
     private final double price;      // 价格
     private final double quantity;   // 数量
     private final long timestamp;    // 时间戳
+    private final String symbol;    // 标的符号
 
-    public Order(String type, double price, double quantity, long timestamp) {
+    public Order(String symbol, String type, double price, double quantity, long timestamp) {
+        this.symbol = symbol;
         this.type = type;
         this.price = price;
         this.quantity = quantity;
@@ -28,6 +30,11 @@ public class Order {
     public long getTimestamp() {
         return timestamp;
     }
+
+    public String getSymbol() {
+        return this.symbol;
+    }
+
 
     @Override
     public String toString() {

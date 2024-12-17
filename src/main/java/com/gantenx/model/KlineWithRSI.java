@@ -1,8 +1,6 @@
 package com.gantenx.model;
 
-import com.gantenx.model.response.KlineModel;
-
-public class RSI extends KlineModel {
+public class KlineWithRSI extends Kline {
     private Double rsi;
 
     public Double getRsi() {
