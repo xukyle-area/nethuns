@@ -11,6 +11,7 @@ import java.util.List;
 @Slf4j
 public class TradeMocker {
     private double balance;
+    private final double initialBalance;
     private double position;
     private final double fee;
     private double feeCount;
@@ -19,6 +20,7 @@ public class TradeMocker {
     private final List<Order> orders;
 
     public TradeMocker(double initialBalance, double fee) {
+        this.initialBalance = initialBalance;
         this.balance = initialBalance;
         this.fee = fee;
         this.position = 0.0;
@@ -42,7 +44,7 @@ public class TradeMocker {
         if (balance >= totalCost) {
             balance -= totalCost;
             position += quantity;
-            log.info("{} - buy, quantity:{}, price:{}，fee:{}，position: {}", DateUtils.getDate(ts), format(quantity), format(price), format(curFee), format(position));
+            log.info("{} - buy, quantity:{}, price:{}，fee:{}, balance: {}, position: {}", DateUtils.getDate(ts), format(quantity), format(price), format(curFee), format(balance), format(position));
 
             // 存储买入订单
             orders.add(new Order("buy", price, quantity, ts));
@@ -69,7 +71,7 @@ public class TradeMocker {
         position -= quantity;
         feeCount += curFee;
         balance += totalRevenue;
-        log.info("{} - sell, quantity:{}, price:{}，fee:{}，balance: {}", DateUtils.getDate(ts), format(quantity), format(price), format(curFee), format(balance));
+        log.info("{} - sell, quantity:{}, price:{}，fee:{}，balance: {}, position: {}", DateUtils.getDate(ts), format(quantity), format(price), format(curFee), format(balance), format(position));
 
         // 存储卖出订单
         orders.add(new Order("sell", price, quantity, ts));
@@ -82,8 +84,11 @@ public class TradeMocker {
      * @param ts    时间戳
      */
     public void buyAll(double price, long ts) {
+        if (balance < initialBalance * 0.001) {
+            return;
+        }
         // 根据余额计算可购买数量
-        double maxQuantity = balance / (price * (1 + 2 * fee));
+        double maxQuantity = balance / (price * (1 + 1.5 * fee));
         if (maxQuantity > 0) {
             buy(price, maxQuantity, ts);
         }
@@ -126,6 +131,13 @@ public class TradeMocker {
      */
     public double getFeeCount() {
         return feeCount;
+    }
+
+    public double exit(double price, long ts) {
+        sellAll(price, ts);
+        double v = (this.balance - this.initialBalance) / this.initialBalance;
+        log.info("收益率: {}", format(v));
+        return v;
     }
 
     /**

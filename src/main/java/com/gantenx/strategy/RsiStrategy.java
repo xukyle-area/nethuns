@@ -10,26 +10,26 @@ import java.util.List;
 public class RsiStrategy {
 
     public List<Order> process(List<RSI> rsiList) {
+        double benifit = 0;
         TradeMocker tradeMocker = new TradeMocker(10000.0, 0.001);
-        for (RSI kLineWithRsi : rsiList) {
+        for (int i = 0; i < rsiList.size(); i++) {
+            RSI kLineWithRsi = rsiList.get(i);
             Double rsi = kLineWithRsi.getRsi();
             if (rsi == null) {
                 continue;
             }
             double price = Double.parseDouble(kLineWithRsi.getClosePrice());
-            double position = tradeMocker.getPosition();
-            double balance = tradeMocker.getBalance();
             long closeTime = kLineWithRsi.getCloseTime();
-            if (rsi > 70 && position * price > 0.1) {
+            if (rsi > 70) {
                 tradeMocker.sellAll(price, closeTime);
             }
-            if (rsi < 30 && balance > 0.1 * price) {
+            if (rsi < 30) {
                 tradeMocker.buyAll(price, closeTime);
             }
+            if (i == rsiList.size() - 1) {
+                benifit = tradeMocker.exit(price, closeTime);
+            }
         }
-        RSI rsi = rsiList.get(rsiList.size() - 1);
-        double closePrice = Double.parseDouble(rsi.getClosePrice());
-        tradeMocker.sellAll(closePrice, rsi.getCloseTime());
         return tradeMocker.getOrders();
     }
 }

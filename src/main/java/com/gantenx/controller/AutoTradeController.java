@@ -38,9 +38,7 @@ public class AutoTradeController {
 
     @GetMapping("/rsi")
     public List<RSI> rsi(@RequestParam("symbol") String symbol,
-                         @RequestParam("begin") String beginStr,
-                         @RequestParam("end") String endStr,
-                         @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
-        return quoteService.getRsi(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
+                         @RequestParam("begin") String beginStr, @RequestParam("end") String endStr) {
+        return quoteService.getRsiList(symbol.toUpperCase(), beginStr, endStr);
     }
 }
