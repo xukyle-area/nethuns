@@ -7,9 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static com.gantenx.constant.Constants.ONE_DAY;
 
 @Slf4j
 @RestController
@@ -24,11 +27,11 @@ public class AutoTradeController {
         return "hello";
     }
 
-    @GetMapping("/btcusdt")
-    public List<KlineModel> btcusdt() {
-        long begin = DateUtils.getTimestamp("20241101");
-        long end = DateUtils.getTimestamp("20241201");
-        log.info("{}, {}", begin, end);
-        return quoteService.getKline("BTCUSDT", "1d", begin, end, 500);
+    @GetMapping("/kline")
+    public List<KlineModel> kline(@RequestParam("symbol") String symbol,
+                                    @RequestParam("begin") String beginStr,
+                                    @RequestParam("end") String endStr,
+                                    @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
+        return quoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
     }
 }
