@@ -26,10 +26,8 @@ public class RetrofitUtils {
                 T body = response.body();
                 if (response.isSuccessful() && body != null) {
                     try {
-                        // 使用提供的转换器将响应数据转换为目标类型
-                        log.info("请求结果:{}", body);
                         R result = successHandler.apply(body);
-                        future.complete(result);  // 返回转换后的结果
+                        future.complete(result);
                     } catch (Exception e) {
                         future.completeExceptionally(new RuntimeException("转换失败", e));
                     }
@@ -41,7 +39,7 @@ public class RetrofitUtils {
             @Override
             public void onFailure(@NotNull Call<T> call, @NotNull Throwable t) {
                 errorHandler.accept(t.getMessage());
-                future.completeExceptionally(t);  // 请求错误，返回异常
+                future.completeExceptionally(t);
             }
         });
 

@@ -1,4 +1,4 @@
-package com.gantenx.retrofit2;
+package com.gantenx.retrofit;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
