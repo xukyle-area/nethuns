@@ -72,10 +72,19 @@ public class TradeMocker {
             return;
         }
 
+        // 计算本次卖出的总收入（扣除手续费后）
         double revenue = calculateTotalRevenue(price, quantity);
+        double profit = revenue - position.getAveragePrice() * quantity; // 本次交易的盈利
+
+        // 更新余额
         balance += revenue;
+
+        log.info("Sold {} {} at price {}, revenue: {}, profit: {}, new balance: {}", quantity, symbol, price, revenue, profit, balance);
+
+        // 更新仓位
         updatePosition(symbol, price, quantity, "sell");
-        log.info("Sold {} {} at price {}, revenue: {}, new balance: {}", quantity, symbol, price, revenue, balance);
+
+        // 记录订单
         orders.add(new Order(symbol, "sell", price, quantity, ts));
     }
 

@@ -26,8 +26,8 @@ public class Main {
     }
 
     private static void testForQQQ() {
-        String start = "20211101"; //384
-        String end = "20230103"; //264
+        String start = "20230101"; //384
+        String end = "20241203"; //264
         List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv("data/QQQ.csv", start, end);
         List<Kline> tqqqKlineList = CsvUtils.getKLineFromCsv("data/TQQQ.csv", start, end);
         List<KlineWithRSI> klineWithRsiList = RsiCalculator.calculateAndAttachRSI(qqqKlineList, 6);
@@ -45,9 +45,7 @@ public class Main {
             String symbol = order.getSymbol();
             String type = order.getType();
             Double rsi = klineWithRSI.getRsi();
-            if (symbol.equals("TQQQ")) {
-                log.info("{}: {} {}, {} * {} = {}, QQQ_RSI: {}", date, type, symbol, price, quantity, price * quantity, rsi);
-            }
+            log.info("{}: {} {}, {} * {} = {}, QQQ_RSI: {}", date, type, symbol, price, quantity, price * quantity, rsi);
         }
 
         Map<String, OrderCalculator.Result> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
