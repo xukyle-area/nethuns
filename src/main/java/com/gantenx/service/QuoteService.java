@@ -1,5 +1,6 @@
 package com.gantenx.service;
 
+import com.gantenx.model.RSI;
 import com.gantenx.model.response.KlineModel;
 import com.gantenx.retrofit2.QuoteApi;
 import com.gantenx.util.*;
@@ -19,5 +20,12 @@ public class QuoteService {
         Call<List<List<Object>>> call = quoteApi.getKlines(symbol, interval, startTime, endTime, limit);
         CompletableFuture<List<KlineModel>> future = RetrofitUtils.enqueueRequest(call, DataConverter::convertToKlineModels, log::error);
         return FutureUtils.get(future);
+    }
+
+    public List<RSI> getRsi(String symbol, String interval, Long startTime, Long endTime, Integer limit) {
+        Call<List<List<Object>>> call = quoteApi.getKlines(symbol, interval, startTime, endTime, limit);
+        CompletableFuture<List<KlineModel>> future = RetrofitUtils.enqueueRequest(call, DataConverter::convertToKlineModels, log::error);
+        List<KlineModel> klineModels = FutureUtils.get(future);
+        return RsiCalculator.calculateAndAttachRSI(klineModels, 6);
     }
 }

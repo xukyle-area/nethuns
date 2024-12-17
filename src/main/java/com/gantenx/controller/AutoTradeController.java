@@ -1,5 +1,6 @@
 package com.gantenx.controller;
 
+import com.gantenx.model.RSI;
 import com.gantenx.model.response.KlineModel;
 import com.gantenx.service.QuoteService;
 import com.gantenx.util.DateUtils;
@@ -33,5 +34,13 @@ public class AutoTradeController {
                                     @RequestParam("end") String endStr,
                                     @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
         return quoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
+    }
+
+    @GetMapping("/rsi")
+    public List<RSI> rsi(@RequestParam("symbol") String symbol,
+                         @RequestParam("begin") String beginStr,
+                         @RequestParam("end") String endStr,
+                         @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
+        return quoteService.getRsi(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
     }
 }
