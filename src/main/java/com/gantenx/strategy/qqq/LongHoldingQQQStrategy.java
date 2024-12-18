@@ -9,7 +9,7 @@ import java.util.*;
 public class LongHoldingQQQStrategy extends BaseStrategy {
 
     public LongHoldingQQQStrategy(double initialBalance, double fee) {
-        super(initialBalance, fee, "long-holding");
+        super(initialBalance, fee, "long-holding-qqq");
     }
 
     @Override
