@@ -1,5 +1,7 @@
 package com.gantenx.model;
 
+import com.gantenx.calculator.IndexCalculator;
+import com.gantenx.util.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -28,11 +30,12 @@ public class TradingChart extends ApplicationFrame {
     private static final String K_LINE = "K-Line";
     JFreeChart combinedChart;
 
-    public TradingChart(List<Kline> qqqList, List<Kline> tqqqList, Map<Long, Double> rsiMap, List<Order> orderList) {
+    public TradingChart(List<Kline> qqqList, List<Kline> tqqqList, List<Order> orderList) {
         super("Trading Line");
+        Map<Long, Double> rsiOfQQQ = IndexCalculator.calculateRSI(CollectionUtils.toTimeMap(qqqList), 6);
         XYSeriesCollection qqqKlineDataset = createKlineDataset("QQQ K-Line", qqqList);
         XYSeriesCollection tqqqKlineDataset = createKlineDataset("TQQQ K-Line", tqqqList);
-        XYSeriesCollection qqqRsiDataset = createRsiDataset("QQQ RSI", rsiMap);
+        XYSeriesCollection qqqRsiDataset = createRsiDataset("QQQ RSI", rsiOfQQQ);
 
         // 创建主图表
         JFreeChart chart = ChartFactory.createXYLineChart(K_LINE, TIME, PRICE, qqqKlineDataset, PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);

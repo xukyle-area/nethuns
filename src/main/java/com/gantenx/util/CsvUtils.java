@@ -9,9 +9,7 @@ import java.util.List;
 
 @Slf4j
 public class CsvUtils {
-    public static List<Kline> getKLineFromCsv(String csvFile, String start, String end) {
-        long startTime = DateUtils.getTimestamp(start);
-        long endTime = DateUtils.getTimestamp(end);
+    public static List<Kline> getKLineFromCsv(String csvFile, long startTime, long endTime) {
         List<Kline> klineList = new ArrayList<>();
 
         try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream(csvFile)) {

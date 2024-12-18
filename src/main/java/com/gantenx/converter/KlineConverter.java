@@ -1,7 +1,6 @@
 package com.gantenx.converter;
 
 import com.gantenx.model.Kline;
-import com.gantenx.util.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +12,7 @@ import static com.gantenx.util.DateUtils.MS_OF_ONE_DAY;
 public class KlineConverter {
 
     // 返回转换后的 A/B 的 Kline 列表
-    public static List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, String beginStr, String endStr) {
-        long begin = DateUtils.getTimestamp(beginStr);
-        long end = DateUtils.getTimestamp(endStr);
+    public static List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, long begin, long end) {
         List<Kline> resultList = new ArrayList<>();
 
         // 遍历时间戳区间
