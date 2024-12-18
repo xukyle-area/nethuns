@@ -1,10 +1,8 @@
 package com.gantenx.controller;
 
-import com.gantenx.model.KlineWithRSI;
 import com.gantenx.model.Kline;
 import com.gantenx.service.BinanceQuoteService;
 import com.gantenx.util.DateUtils;
-import com.gantenx.util.RsiCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,14 +33,5 @@ public class AutoTradeController {
                              @RequestParam("end") String endStr,
                              @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
         return binanceQuoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
-    }
-
-    @GetMapping("/rsi")
-    public List<KlineWithRSI> rsi(@RequestParam("symbol") String symbol,
-                                  @RequestParam("begin") String beginStr, @RequestParam("end") String endStr) {
-        long startTime = DateUtils.getTimestamp(beginStr);
-        long endTime = DateUtils.getTimestamp(endStr);
-        List<Kline> kline = binanceQuoteService.getKline(symbol.toUpperCase(), ONE_DAY, startTime, endTime, 1500);
-        return RsiCalculator.calculateAndAttachRSI(kline, 6);
     }
 }

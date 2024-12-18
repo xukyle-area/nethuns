@@ -1,7 +1,7 @@
 package com.gantenx.util;
 
 import com.gantenx.model.Kline;
-import com.gantenx.model.KlineWithRSI;
+import com.gantenx.model.Index;
 import com.gantenx.model.Order;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -20,18 +20,20 @@ import org.jfree.ui.RefineryUtilities;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 import static com.gantenx.util.DateUtils.SIMPLE_DATE_FORMAT;
+
 public class TradingChart extends ApplicationFrame {
     private static final String TIME = "Time";
     private static final String PRICE = "Price";
     private static final String K_LINE = "K-Line";
 
-    public TradingChart(List<KlineWithRSI> qqqList, List<Kline> tqqqList, List<Order> orderList) {
+    public TradingChart(List<Kline> qqqList, List<Kline> tqqqList, Map<Long, Double> rsiMap, List<Order> orderList) {
         super("Trading Line");
         XYSeriesCollection qqqKlineDataset = createKlineDataset("QQQ K-Line", qqqList);
         XYSeriesCollection tqqqKlineDataset = createKlineDataset("TQQQ K-Line", tqqqList);
-        XYSeriesCollection qqqRsiDataset = createRsiDataset("QQQ RSI", qqqList);
+        XYSeriesCollection qqqRsiDataset = createRsiDataset("QQQ RSI", rsiMap);
 
         // 创建主图表
         JFreeChart chart = ChartFactory.createXYLineChart(K_LINE, TIME, PRICE, qqqKlineDataset, PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
@@ -101,7 +103,7 @@ public class TradingChart extends ApplicationFrame {
     private <T extends Kline> XYSeriesCollection createKlineDataset(String name, List<T> klineList) {
         XYSeries series = new XYSeries(name);
         for (T k : klineList) {
-            series.add(k.getTime(), Double.parseDouble(k.getClose()));
+            series.add(k.getTimestamp(), Double.parseDouble(k.getClose()));
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
@@ -109,18 +111,18 @@ public class TradingChart extends ApplicationFrame {
     }
 
     // 创建 RSI 数据集
-    private XYSeriesCollection createRsiDataset(String name, List<KlineWithRSI> klineWithRsiList) {
+    private XYSeriesCollection createRsiDataset(String name, Map<Long, Double> rsiMap) {
         XYSeries series = new XYSeries(name);
-        for (KlineWithRSI klineWithRsi : klineWithRsiList) {
-            series.add(klineWithRsi.getTime(), klineWithRsi.getRsi());
+        for (Map.Entry<Long, Double> entry : rsiMap.entrySet()) {
+            series.add(entry.getKey(), entry.getValue());
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
         return dataset;
     }
 
-    public static void show(List<KlineWithRSI> qqqList, List<Kline> tqqqList, List<Order> orderList) {
-        TradingChart chart = new TradingChart(qqqList, tqqqList, orderList);
+    public static void show(List<Kline> qqqList, List<Kline> tqqqList, Map<Long, Double> rsiMap, List<Order> orderList) {
+        TradingChart chart = new TradingChart(qqqList, tqqqList, rsiMap, orderList);
         chart.pack();
         RefineryUtilities.centerFrameOnScreen(chart);
         chart.setVisible(true);

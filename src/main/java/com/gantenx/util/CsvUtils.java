@@ -21,12 +21,11 @@ public class CsvUtils {
                 br.readLine();
                 while ((line = br.readLine()) != null) {
                     String[] values = line.split(",");
-                    Kline kline = new Kline();
                     long timestamp = DateUtils.getTimestamp(values[0]);
                     if (timestamp < startTime || timestamp > endTime) {
                         continue;
                     }
-                    kline.setTime(timestamp);
+                    Kline kline = new Kline(timestamp);
                     kline.setOpen(values[1]);
                     kline.setHigh(values[2]);
                     kline.setLow(values[3]);

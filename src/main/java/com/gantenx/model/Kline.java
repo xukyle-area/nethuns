@@ -1,20 +1,24 @@
 package com.gantenx.model;
 
-public class Kline {
-    // date,open,high,low,close,adjclose,volume
-    private long time;
+public class Kline extends Time {
     private String open;
     private String high;
     private String low;
     private String close;
     private String volume;
 
-    public long getTime() {
-        return time;
+
+    public Kline(long timestamp, String open, String high, String low, String close, String volume) {
+        super(timestamp);
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.volume = volume;
     }
 
-    public void setTime(long time) {
-        this.time = time;
+    public Kline(long timestamp) {
+        super(timestamp);
     }
 
     public String getOpen() {

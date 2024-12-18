@@ -1,7 +1,11 @@
 package com.gantenx.model;
 
-public class KlineWithRSI extends Kline {
+public class Index extends Time {
     private Double rsi;
+
+    public Index(long timestamp) {
+        super(timestamp);
+    }
 
     public Double getRsi() {
         return rsi;

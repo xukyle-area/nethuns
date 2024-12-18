@@ -13,8 +13,7 @@ public class DataConverter {
     public static List<Kline> convertToKlineModels(List<List<Object>> klinesData) {
         List<Kline> klines = new ArrayList<>();
         for (List<Object> kline : klinesData) {
-            Kline model = new Kline();
-            model.setTime((long) ((double) kline.get(0)));
+            Kline model = new Kline((long) ((double) kline.get(0)));
             model.setOpen((String) kline.get(1));
             model.setHigh((String) kline.get(2));
             model.setLow((String) kline.get(3));
