@@ -3,15 +3,14 @@ package com.gantenx.strategy;
 import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.calculator.OrderCalculator;
 import com.gantenx.calculator.TradeCalculator;
+import com.gantenx.converter.KlineConverter;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Order;
 import com.gantenx.model.ProfitResult;
 import com.gantenx.model.TradeDetail;
-import com.gantenx.util.CollectionUtils;
-import com.gantenx.util.CsvUtils;
-import com.gantenx.util.DateUtils;
-import com.gantenx.util.TradingChart;
+import com.gantenx.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.HashMap;
 import java.util.List;
@@ -117,25 +116,30 @@ public class QQQStrategy {
         // 从 CSV 文件中获取历史数据
         List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv("data/QQQ.csv", start, end);
         List<Kline> tqqqKlineList = CsvUtils.getKLineFromCsv("data/TQQQ.csv", start, end);
+        List<Kline> sqqqKlineList = CsvUtils.getKLineFromCsv("data/SQQQ.csv", start, end);
         // 转换成 map 格式
         Map<Long, Kline> tqqqKlineMap = CollectionUtils.toTimeMap(tqqqKlineList);
+        Map<Long, Kline> sqqqKlineMap = CollectionUtils.toTimeMap(sqqqKlineList);
         Map<Long, Kline> qqqKlineMap = CollectionUtils.toTimeMap(qqqKlineList);
-        Map<Long, Double> rsiMap = IndexCalculator.calculateRSI(qqqKlineMap, 6);
+
+        List<Kline> tqqqToQQQKline = KlineConverter.getKline(tqqqKlineMap, qqqKlineMap, start, end);
+        Map<Long, Kline> tqqqToQQQKlineMap = CollectionUtils.toTimeMap(qqqKlineList);
+        Map<Long, Double> rsiMap = IndexCalculator.calculateRSI(tqqqToQQQKlineMap, 6);
         // 执行对应的策略，输出交易的结果
         log.info("------------------------------------策略------------------------------------------------------------");
         TradeDetail td = process(start, end, tqqqKlineMap, qqqKlineMap, rsiMap);
-        printTradeDetail(td);
+        printTradeDetail(td, "strategy");
         log.info("-----------------------------------长期持有QQQ-------------------------------------------------------");
         TradeDetail longQQQ = longTermHolding(start, end, qqqKlineMap);
-        printTradeDetail(longQQQ);
+        printTradeDetail(longQQQ, "holding-qqq");
         log.info("-----------------------------------长期持有TQQQ------------------------------------------------------");
         TradeDetail longTQQQ = longTermHolding(start, end, tqqqKlineMap);
-        printTradeDetail(longTQQQ);
+        printTradeDetail(longTQQQ, "holding-tqqq");
 
         TradingChart.show(qqqKlineList, tqqqKlineList, rsiMap, td.getOrders());
     }
 
-    private static void printTradeDetail(TradeDetail td) {
+    private static void printTradeDetail(TradeDetail td, String name) {
         List<Order> orders = td.getOrders();
         for (Order order : orders) {
             long timestamp = order.getTimestamp();
@@ -146,6 +150,8 @@ public class QQQStrategy {
             String type = order.getType();
             log.info("{}: {} {}, {} * {} = {}", date, type, symbol, price, quantity, price * quantity);
         }
+        Workbook workbook = ExcelUtils.singleSheet(orders, "order-list");
+        ExcelUtils.exportWorkbook(workbook, "export/orders-" + name + ".xlsx");
 
         Map<String, ProfitResult> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
         for (Map.Entry<String, ProfitResult> entry : results.entrySet()) {

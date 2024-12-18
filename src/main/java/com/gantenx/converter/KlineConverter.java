@@ -13,7 +13,7 @@ import static com.gantenx.util.DateUtils.MS_OF_ONE_DAY;
 public class KlineConverter {
 
     // 返回转换后的 A/B 的 Kline 列表
-    public List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, String beginStr, String endStr) {
+    public static List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, String beginStr, String endStr) {
         long begin = DateUtils.getTimestamp(beginStr);
         long end = DateUtils.getTimestamp(endStr);
         List<Kline> resultList = new ArrayList<>();
@@ -25,7 +25,7 @@ public class KlineConverter {
 
             // 如果基准数据和目标数据都存在，则进行转换
             if (Objects.nonNull(baseKline) && Objects.nonNull(quoteKline)) {
-                resultList.add(this.converter(baseKline, quoteKline));
+                resultList.add(converter(baseKline, quoteKline));
             }
         }
 
@@ -33,7 +33,7 @@ public class KlineConverter {
     }
 
     // 转换 A/USD 和 B/USD Kline 为 A/B Kline
-    private Kline converter(Kline base, Kline quote) {
+    private static Kline converter(Kline base, Kline quote) {
         // 1. 时间戳保持一致
         Kline kline = new Kline(base.getTimestamp());
 

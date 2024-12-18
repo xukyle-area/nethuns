@@ -1,7 +1,10 @@
 package com.gantenx.model;
 
+import com.gantenx.annotation.ExcelColumn;
+
 public class Time {
 
+    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
     private long timestamp;
 
     public Time(long timestamp) {
