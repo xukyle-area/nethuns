@@ -20,6 +20,16 @@ public class Main {
     private static final RsiStrategy rsiStrategy = new RsiStrategy();
     private static final BinanceQuoteService QUOTE_SERVICE = new BinanceQuoteService();
 
+    @Deprecated
+    private static void testForCrypto(String symbol) {
+        long startTime = DateUtils.getTimestamp("20200103");
+        long endTime = DateUtils.getTimestamp("20241203");
+        List<Kline> kline = QUOTE_SERVICE.getKline(symbol.toUpperCase(), ONE_DAY, startTime, endTime, 1500);
+        List<KlineWithRSI> klineWithRsiList = RsiCalculator.calculateAndAttachRSI(kline, 6);
+        TradeDetail tradeDetail = rsiStrategy.process(klineWithRsiList);
+        //TradingChart.show(klineWithRsiList, tradeDetail.getOrders());
+    }
+
     public static void main(String[] args) {
         // testForCrypto("BTCUSDT");
         testForQQQ();
@@ -33,7 +43,7 @@ public class Main {
         List<KlineWithRSI> klineWithRsiList = RsiCalculator.calculateAndAttachRSI(qqqKlineList, 6);
         Map<Long, Kline> klineMap = toMap(tqqqKlineList);
         Map<Long, KlineWithRSI> rsiMap = toMap(klineWithRsiList);
-        TradeDetail td = rsiStrategy.processForQQQ(start, end, klineMap, rsiMap);
+        TradeDetail td = rsiStrategy.processA(start, end, klineMap, rsiMap);
         List<Order> orders = td.getOrders();
         TradingChart.show(klineWithRsiList, tqqqKlineList, orders);
         for (Order order : orders) {
@@ -59,15 +69,5 @@ public class Main {
 
     private static <T extends Kline> Map<Long, T> toMap(List<T> klineList) {
         return klineList.stream().collect(Collectors.toMap(Kline::getTime, kline -> kline));
-    }
-
-    @Deprecated
-    private static void testForCrypto(String symbol) {
-        long startTime = DateUtils.getTimestamp("20200103");
-        long endTime = DateUtils.getTimestamp("20241203");
-        List<Kline> kline = QUOTE_SERVICE.getKline(symbol.toUpperCase(), ONE_DAY, startTime, endTime, 1500);
-        List<KlineWithRSI> klineWithRsiList = RsiCalculator.calculateAndAttachRSI(kline, 6);
-        TradeDetail tradeDetail = rsiStrategy.process(klineWithRsiList);
-        //TradingChart.show(klineWithRsiList, tradeDetail.getOrders());
     }
 }
