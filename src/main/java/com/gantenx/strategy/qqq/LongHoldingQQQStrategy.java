@@ -1,4 +1,4 @@
-package com.gantenx.strategy;
+package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.calculator.TradeCalculator;
@@ -6,10 +6,10 @@ import com.gantenx.model.Kline;
 
 import java.util.*;
 
-public class LongHoldingQQQStrategy extends AbstractQQQStrategy {
+public class LongHoldingQQQStrategy extends BaseStrategy {
 
     public LongHoldingQQQStrategy(double initialBalance, double fee) {
-        super(initialBalance, fee, "long holding QQQ");
+        super(initialBalance, fee, "long-holding");
     }
 
     @Override
