@@ -4,18 +4,12 @@ import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.calculator.OrderCalculator;
 import com.gantenx.calculator.TradeCalculator;
 import com.gantenx.converter.KlineConverter;
-import com.gantenx.model.Kline;
-import com.gantenx.model.Order;
-import com.gantenx.model.ProfitResult;
-import com.gantenx.model.TradeDetail;
+import com.gantenx.model.*;
 import com.gantenx.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.gantenx.util.DateUtils.MS_OF_ONE_DAY;
 
@@ -31,7 +25,7 @@ public class QQQStrategy {
      * @return 策略执行过后的订单列表，盈利信息等
      */
     private static TradeDetail longTermHolding(String startStr,
-                                               String endStr,
+                                               String endStr, String symbol,
                                                Map<Long, Kline> kline) {
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
@@ -50,11 +44,11 @@ public class QQQStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (!tradeCalculator.hasPosition()) {
-                tradeCalculator.buyAll("X", qqqPrice, ts);
+                tradeCalculator.buyAll(symbol, qqqPrice, ts);
             }
         }
         HashMap<String, Double> priceMap = new HashMap<>();
-        priceMap.put("X", qqqLastCandle.getClose());
+        priceMap.put(symbol, qqqLastCandle.getClose());
         return tradeCalculator.exit(priceMap, lastTs);
     }
 
@@ -130,13 +124,14 @@ public class QQQStrategy {
         TradeDetail td = process(start, end, tqqqKlineMap, qqqKlineMap, rsiMap);
         printTradeDetail(td, "strategy");
         log.info("-----------------------------------长期持有QQQ-------------------------------------------------------");
-        TradeDetail longQQQ = longTermHolding(start, end, qqqKlineMap);
+        TradeDetail longQQQ = longTermHolding(start, end, "QQQ", qqqKlineMap);
         printTradeDetail(longQQQ, "holding-qqq");
         log.info("-----------------------------------长期持有TQQQ------------------------------------------------------");
-        TradeDetail longTQQQ = longTermHolding(start, end, tqqqKlineMap);
+        TradeDetail longTQQQ = longTermHolding(start, end, "TQQQ", tqqqKlineMap);
         printTradeDetail(longTQQQ, "holding-tqqq");
-
-        TradingChart.show(qqqKlineList, tqqqKlineList, rsiMap, td.getOrders());
+        TradingChart tradingChart = new TradingChart(qqqKlineList, tqqqKlineList, rsiMap, td.getOrders());
+        ChartUtils.saveJFreeChartAsImage(tradingChart.getCombinedChart(), "export/trading-chart.png", 1600, 1200);
+        ChartUtils.show(tradingChart);
     }
 
     private static void printTradeDetail(TradeDetail td, String name) {
@@ -150,8 +145,10 @@ public class QQQStrategy {
             String type = order.getType();
             log.info("{}: {} {}, {} * {} = {}", date, type, symbol, price, quantity, price * quantity);
         }
-        Workbook workbook = ExcelUtils.singleSheet(orders, "order-list");
-        ExcelUtils.exportWorkbook(workbook, "export/orders-" + name + ".xlsx");
+        Workbook tradeDetailWorkbook = ExcelUtils.singleSheet(Collections.singletonList(td), "order-list");
+        ExcelUtils.exportWorkbook(tradeDetailWorkbook, "export/trade-detail-" + name + ".xlsx");
+        Workbook orderWorkbook = ExcelUtils.singleSheet(orders, "order-list");
+        ExcelUtils.exportWorkbook(orderWorkbook, "export/orders-" + name + ".xlsx");
 
         Map<String, ProfitResult> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
         for (Map.Entry<String, ProfitResult> entry : results.entrySet()) {

@@ -1,8 +1,6 @@
-package com.gantenx.util;
+package com.gantenx.model;
 
-import com.gantenx.model.Kline;
-import com.gantenx.model.Index;
-import com.gantenx.model.Order;
+import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -16,7 +14,6 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 
 import java.awt.*;
 import java.util.List;
@@ -24,10 +21,12 @@ import java.util.Map;
 
 import static com.gantenx.util.DateUtils.SIMPLE_DATE_FORMAT;
 
+@Slf4j
 public class TradingChart extends ApplicationFrame {
     private static final String TIME = "Time";
     private static final String PRICE = "Price";
     private static final String K_LINE = "K-Line";
+    JFreeChart combinedChart;
 
     public TradingChart(List<Kline> qqqList, List<Kline> tqqqList, Map<Long, Double> rsiMap, List<Order> orderList) {
         super("Trading Line");
@@ -93,10 +92,14 @@ public class TradingChart extends ApplicationFrame {
         combinedPlot.add(rsiPlot, 1);
 
         // 设置组合图表
-        JFreeChart combinedChart = new JFreeChart("Trading Chart", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
+        combinedChart = new JFreeChart("Trading Chart", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
         ChartPanel panel = new ChartPanel(combinedChart);
         panel.setPreferredSize(new Dimension(1600, 1200));
         setContentPane(panel);
+    }
+
+    public JFreeChart getCombinedChart() {
+        return combinedChart;
     }
 
     // 创建 K 线数据集
@@ -119,13 +122,6 @@ public class TradingChart extends ApplicationFrame {
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
         return dataset;
-    }
-
-    public static void show(List<Kline> qqqList, List<Kline> tqqqList, Map<Long, Double> rsiMap, List<Order> orderList) {
-        TradingChart chart = new TradingChart(qqqList, tqqqList, rsiMap, orderList);
-        chart.pack();
-        RefineryUtilities.centerFrameOnScreen(chart);
-        chart.setVisible(true);
     }
 }
 

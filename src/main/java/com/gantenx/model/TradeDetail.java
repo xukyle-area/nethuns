@@ -1,5 +1,6 @@
 package com.gantenx.model;
 
+import com.gantenx.annotation.ExcelColumn;
 import org.springframework.data.util.Pair;
 
 import java.util.List;
@@ -9,7 +10,9 @@ public class TradeDetail {
     private double balance;
     private double initialBalance;
     private double feeCount;
+    @ExcelColumn(need = false)
     private Map<String, Pair<Double, Double>> positionMap;
+    @ExcelColumn(need = false)
     private List<Order> orders;
 
     public TradeDetail() {
