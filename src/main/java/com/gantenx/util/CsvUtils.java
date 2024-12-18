@@ -26,11 +26,11 @@ public class CsvUtils {
                         continue;
                     }
                     Kline kline = new Kline(timestamp);
-                    kline.setOpen(values[1]);
-                    kline.setHigh(values[2]);
-                    kline.setLow(values[3]);
-                    kline.setClose(values[4]);
-                    kline.setVolume(values[6]);
+                    kline.setOpen(Double.parseDouble(values[1]));
+                    kline.setHigh(Double.parseDouble(values[2]));
+                    kline.setLow(Double.parseDouble(values[3]));
+                    kline.setClose(Double.parseDouble(values[4]));
+                    kline.setVolume(Double.parseDouble(values[6]));
                     klineList.add(kline);
                 }
             }

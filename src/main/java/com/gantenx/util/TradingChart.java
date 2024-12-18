@@ -103,7 +103,7 @@ public class TradingChart extends ApplicationFrame {
     private <T extends Kline> XYSeriesCollection createKlineDataset(String name, List<T> klineList) {
         XYSeries series = new XYSeries(name);
         for (T k : klineList) {
-            series.add(k.getTimestamp(), Double.parseDouble(k.getClose()));
+            series.add(k.getTimestamp(), k.getClose());
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);

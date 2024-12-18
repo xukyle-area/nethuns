@@ -1,6 +1,6 @@
 package com.gantenx.service;
 
-import com.gantenx.util.DataConverter;
+import com.gantenx.converter.DataConverter;
 import com.gantenx.model.Kline;
 import com.gantenx.retrofit.QuoteApi;
 import com.gantenx.retrofit.RetrofitClient;

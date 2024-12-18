@@ -1,6 +1,7 @@
-package com.gantenx.util;
+package com.gantenx.converter;
 
 import com.gantenx.model.Kline;
+import com.gantenx.util.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,24 +38,24 @@ public class KlineConverter {
         Kline kline = new Kline(base.getTimestamp());
 
         // 2. 开盘价：A/USD 的开盘价 / B/USD 的开盘价
-        double baseOpen = Double.parseDouble(base.getOpen());
-        double quoteOpen = Double.parseDouble(quote.getOpen());
-        kline.setOpen(String.valueOf(baseOpen / quoteOpen));
+        double baseOpen = base.getOpen();
+        double quoteOpen = quote.getOpen();
+        kline.setOpen(baseOpen / quoteOpen);
 
         // 3. 最高价：A/USD 的最高价 / B/USD 的最高价
-        double baseHigh = Double.parseDouble(base.getHigh());
-        double quoteHigh = Double.parseDouble(quote.getHigh());
-        kline.setHigh(String.valueOf(baseHigh / quoteHigh));
+        double baseHigh = base.getHigh();
+        double quoteHigh = quote.getHigh();
+        kline.setHigh(baseHigh / quoteHigh);
 
         // 4. 最低价：A/USD 的最低价 / B/USD 的最低价
-        double baseLow = Double.parseDouble(base.getLow());
-        double quoteLow = Double.parseDouble(quote.getLow());
-        kline.setLow(String.valueOf(baseLow / quoteLow));
+        double baseLow = base.getLow();
+        double quoteLow = quote.getLow();
+        kline.setLow(baseLow / quoteLow);
 
         // 5. 收盘价：A/USD 的收盘价 / B/USD 的收盘价
-        double baseClose = Double.parseDouble(base.getClose());
-        double quoteClose = Double.parseDouble(quote.getClose());
-        kline.setClose(String.valueOf(baseClose / quoteClose));
+        double baseClose = base.getClose();
+        double quoteClose = quote.getClose();
+        kline.setClose(baseClose / quoteClose);
 
         // 6. 成交量：可以选择使用 base 或 quote 的成交量，这里我们选择 base 的成交量
         kline.setVolume(base.getVolume());

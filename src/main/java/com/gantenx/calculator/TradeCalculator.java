@@ -1,6 +1,7 @@
-package com.gantenx.strategy;
+package com.gantenx.calculator;
 
 import com.gantenx.model.Order;
+import com.gantenx.model.Position;
 import com.gantenx.model.TradeDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -8,7 +9,7 @@ import org.springframework.data.util.Pair;
 import java.util.*;
 
 @Slf4j
-public class TradeMocker {
+public class TradeCalculator {
     private double balance;
     private final double initialBalance;
     private final double fee;
@@ -25,7 +26,7 @@ public class TradeMocker {
     // 余额阈值，用于全仓买入时的限制
     private static final double BALANCE_THRESHOLD = 0.001;
 
-    public TradeMocker(double initialBalance, double fee) {
+    public TradeCalculator(double initialBalance, double fee) {
         this.initialBalance = initialBalance;
         this.balance = initialBalance;
         this.fee = fee;

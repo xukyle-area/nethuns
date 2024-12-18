@@ -1,4 +1,4 @@
-package com.gantenx.util;
+package com.gantenx.calculator;
 
 
 import com.gantenx.model.Kline;
@@ -25,7 +25,7 @@ public class RsiCalculator {
         // 提取收盘价
         List<Double> closePrices = new ArrayList<>();
         for (Kline kline : klineList) {
-            closePrices.add(Double.parseDouble(kline.getClose()));
+            closePrices.add(kline.getClose());
         }
 
         double avgGain = 0.0;

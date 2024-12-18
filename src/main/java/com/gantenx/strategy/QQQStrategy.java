@@ -1,7 +1,11 @@
 package com.gantenx.strategy;
 
+import com.gantenx.calculator.OrderCalculator;
+import com.gantenx.calculator.RsiCalculator;
+import com.gantenx.calculator.TradeCalculator;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Order;
+import com.gantenx.model.ProfitResult;
 import com.gantenx.model.TradeDetail;
 import com.gantenx.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +36,7 @@ public class QQQStrategy {
         Kline qqqLastCandle = null;
         long lastTs = 0;
 
-        TradeMocker tradeMocker = new TradeMocker(10000.0, 0.001);
+        TradeCalculator tradeCalculator = new TradeCalculator(10000.0, 0.001);
         for (long ts = start; ts <= end; ts += MS_OF_ONE_DAY) {
             Kline qqqCandle = kline.get(ts);
             qqqLastCandle = qqqCandle;
@@ -41,15 +45,15 @@ public class QQQStrategy {
                 continue;
             }
             lastTs = ts;
-            double qqqPrice = Double.parseDouble(qqqCandle.getClose());
+            double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
-            if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll("X", qqqPrice, ts);
+            if (!tradeCalculator.hasPosition()) {
+                tradeCalculator.buyAll("X", qqqPrice, ts);
             }
         }
         HashMap<String, Double> priceMap = new HashMap<>();
-        priceMap.put("X", Double.parseDouble(qqqLastCandle.getClose()));
-        return tradeMocker.exit(priceMap, lastTs);
+        priceMap.put("X", qqqLastCandle.getClose());
+        return tradeCalculator.exit(priceMap, lastTs);
     }
 
     /**
@@ -71,7 +75,7 @@ public class QQQStrategy {
         Kline qqqLastCandle = null;
         long lastTs = 0;
 
-        TradeMocker tradeMocker = new TradeMocker(10000.0, 0.001);
+        TradeCalculator tradeCalculator = new TradeCalculator(10000.0, 0.001);
         for (long ts = start; ts <= end; ts += MS_OF_ONE_DAY) {
             Double rsi = qqqRsiMap.get(ts);
             Kline tqqqCandle = tqqqKlineMap.get(ts);
@@ -83,27 +87,27 @@ public class QQQStrategy {
                 continue;
             }
             lastTs = ts;
-            double tqqqPrice = Double.parseDouble(tqqqCandle.getClose());
-            double qqqPrice = Double.parseDouble(qqqCandle.getClose());
+            double tqqqPrice = tqqqCandle.getClose();
+            double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
-            if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll("QQQ", qqqPrice, ts);
+            if (!tradeCalculator.hasPosition()) {
+                tradeCalculator.buyAll("QQQ", qqqPrice, ts);
             }
             //认为 QQQ 原始标的价格到达高点，抛售 TQQQ，进行长期持有 QQQ
             if (rsi > 70) {
-                tradeMocker.sellAll("TQQQ", tqqqPrice, ts);
-                tradeMocker.buyAll("QQQ", qqqPrice, ts);
+                tradeCalculator.sellAll("TQQQ", tqqqPrice, ts);
+                tradeCalculator.buyAll("QQQ", qqqPrice, ts);
             }
             //认为 QQQ 原始标的价格到达低点，抛售 QQQ，进行短期期持有 TQQQ
             if (rsi < 30) {
-                tradeMocker.sellAll("QQQ", qqqPrice, ts);
-                tradeMocker.buyAll("TQQQ", tqqqPrice, ts);
+                tradeCalculator.sellAll("QQQ", qqqPrice, ts);
+                tradeCalculator.buyAll("TQQQ", tqqqPrice, ts);
             }
         }
         HashMap<String, Double> priceMap = new HashMap<>();
-        priceMap.put("QQQ", Double.parseDouble(qqqLastCandle.getClose()));
-        priceMap.put("TQQQ", Double.parseDouble(tqqqLastCandle.getClose()));
-        return tradeMocker.exit(priceMap, lastTs);
+        priceMap.put("QQQ", qqqLastCandle.getClose());
+        priceMap.put("TQQQ", tqqqLastCandle.getClose());
+        return tradeCalculator.exit(priceMap, lastTs);
     }
 
     public static void replay(String start, String end) {
@@ -140,10 +144,10 @@ public class QQQStrategy {
             log.info("{}: {} {}, {} * {} = {}", date, type, symbol, price, quantity, price * quantity);
         }
 
-        Map<String, OrderCalculator.Result> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
-        for (Map.Entry<String, OrderCalculator.Result> entry : results.entrySet()) {
-            OrderCalculator.Result result = entry.getValue();
-            log.info("{}: holding days:{}, profit:{}", entry.getKey(), result.getTotalHoldingDays(), result.getProfit());
+        Map<String, ProfitResult> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
+        for (Map.Entry<String, ProfitResult> entry : results.entrySet()) {
+            ProfitResult profitResult = entry.getValue();
+            log.info("{}: holding days:{}, profit:{}", entry.getKey(), profitResult.getTotalHoldingDays(), profitResult.getProfit());
         }
         log.info("init balance:{}, finish balance:{}", td.getInitialBalance(), td.getBalance());
         log.info("fee:{}", td.getFeeCount());
