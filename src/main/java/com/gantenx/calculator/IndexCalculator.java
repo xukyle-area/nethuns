@@ -1,10 +1,26 @@
-package com.gantenx.util;
+package com.gantenx.calculator;
 
+import com.gantenx.model.Index;
 import com.gantenx.model.Kline;
 
 import java.util.*;
 
-public class KlineIndexUtils {
+public class IndexCalculator {
+
+    public Map<Long, Index> calculateIndex(Map<Long, Kline> klineMap) {
+        HashMap<Long, Index> map = new HashMap<>();
+        Map<Long, Double> smaMap = calculateSMA(klineMap, 6);
+        Map<Long, double[]> bollingerBandsMap = calculateBollingerBands(smaMap, klineMap, 6);
+        Map<Long, Double> rsiMap = calculateRSI(klineMap, 6);
+        for (Long ts : klineMap.keySet()) {
+            Index index = new Index(ts);
+            index.setSma(smaMap.get(ts));
+            index.setRsi(rsiMap.get(ts));
+            index.setCalculateBollingerBands(bollingerBandsMap.get(ts));
+            map.put(ts, index);
+        }
+        return map;
+    }
 
     // Calculate SMA (Simple Moving Average)
     public static Map<Long, Double> calculateSMA(Map<Long, Kline> klineMap, int period) {
@@ -32,8 +48,7 @@ public class KlineIndexUtils {
     }
 
     // Calculate Bollinger Bands
-    public static Map<Long, double[]> calculateBollingerBands(Map<Long, Kline> klineMap, int period) {
-        Map<Long, Double> smaMap = calculateSMA(klineMap, period);
+    public static Map<Long, double[]> calculateBollingerBands(Map<Long, Double> smaMap, Map<Long, Kline> klineMap, int period) {
         Map<Long, double[]> bollingerMap = new TreeMap<>();
 
         List<Long> timestamps = new ArrayList<>(klineMap.keySet());

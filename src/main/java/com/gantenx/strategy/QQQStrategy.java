@@ -1,13 +1,16 @@
 package com.gantenx.strategy;
 
+import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.calculator.OrderCalculator;
-import com.gantenx.calculator.RsiCalculator;
 import com.gantenx.calculator.TradeCalculator;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Order;
 import com.gantenx.model.ProfitResult;
 import com.gantenx.model.TradeDetail;
-import com.gantenx.util.*;
+import com.gantenx.util.CollectionUtils;
+import com.gantenx.util.CsvUtils;
+import com.gantenx.util.DateUtils;
+import com.gantenx.util.TradingChart;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -115,9 +118,9 @@ public class QQQStrategy {
         List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv("data/QQQ.csv", start, end);
         List<Kline> tqqqKlineList = CsvUtils.getKLineFromCsv("data/TQQQ.csv", start, end);
         // 转换成 map 格式
-        Map<Long, Double> rsiMap = RsiCalculator.calculateAndAttachRSI(qqqKlineList, 6);
         Map<Long, Kline> tqqqKlineMap = CollectionUtils.toTimeMap(tqqqKlineList);
         Map<Long, Kline> qqqKlineMap = CollectionUtils.toTimeMap(qqqKlineList);
+        Map<Long, Double> rsiMap = IndexCalculator.calculateRSI(qqqKlineMap, 6);
         // 执行对应的策略，输出交易的结果
         log.info("------------------------------------策略------------------------------------------------------------");
         TradeDetail td = process(start, end, tqqqKlineMap, qqqKlineMap, rsiMap);
