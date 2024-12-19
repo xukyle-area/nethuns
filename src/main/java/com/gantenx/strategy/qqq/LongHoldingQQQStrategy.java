@@ -3,8 +3,11 @@ package com.gantenx.strategy.qqq;
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.calculator.TradeMocker;
 import com.gantenx.model.Kline;
+import com.gantenx.model.RSIChart;
+import com.gantenx.model.WeightScoreChart;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
+import org.jfree.chart.JFreeChart;
 
 import java.util.List;
 import java.util.Map;
@@ -36,5 +39,11 @@ public class LongHoldingQQQStrategy extends BaseStrategy {
                 tradeMocker.buyAll("QQQ", qqqPrice, ts);
             }
         }
+    }
+
+    @Override
+    protected JFreeChart getChart() {
+        RSIChart chart = new RSIChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
+        return chart.getCombinedChart();
     }
 }

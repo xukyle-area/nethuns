@@ -9,6 +9,7 @@ import com.gantenx.utils.ExcelUtils;
 import com.gantenx.utils.ExportUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.jfree.chart.JFreeChart;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,8 +55,14 @@ public abstract class BaseStrategy {
     }
 
     public void saveImage() {
-        TradingChart tradingChart = new TradingChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
-        ExportUtils.saveJFreeChartAsImage(tradingChart.getCombinedChart(), strategyName, "lines", 1600, 1200);
+        JFreeChart chart = getChart();
+        if (chart != null) {
+            ExportUtils.saveJFreeChartAsImage(chart, strategyName, "lines", 1600, 1200);
+        }
+    }
+
+    protected JFreeChart getChart() {
+        return null;
     }
 
     public void process() {

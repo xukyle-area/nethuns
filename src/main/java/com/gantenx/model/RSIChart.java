@@ -22,13 +22,13 @@ import java.util.Map;
 
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT;
 
-public class TradingChart extends ApplicationFrame {
+public class RSIChart extends ApplicationFrame {
     private static final String TIME = "Time";
     private static final String PRICE = "Price";
     private static final String K_LINE = "K-Line";
     private final JFreeChart combinedChart;
 
-    public TradingChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, List<Order> orderMap) {
+    public RSIChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, List<Order> orderMap) {
         super("Trading Line");
 
         // 1. 创建数据集

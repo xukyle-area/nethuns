@@ -104,30 +104,56 @@ public class IndexTechnicalIndicators {
         return rsiMap;
     }
 
-    // 计算EMA（指数移动平均）
-    public static Map<Long, Double> calculateEMA(Map<Long, Kline> klineMap, int period) {
-        Map<Long, Double> emaMap = new LinkedHashMap<>();
-        List<Long> sortedTimestamps = CollectionUtils.getTimestamps(klineMap);
+    // MACD计算
+    public static Map<String, Map<Long, Double>> calculateMACDWithSignal(Map<Long, Kline> klineMap) {
+        Map<Long, Double> shortEMA = calculateEMA(klineMap, 12);  // 12日EMA
+        Map<Long, Double> longEMA = calculateEMA(klineMap, 26);   // 26日EMA
 
-        if (sortedTimestamps.size() >= period) {
-            double k = 2.0 / (period + 1);
-
-            // 初始 EMA 使用前 period 天的简单移动平均值
-            double initialEMA = 0.0;
-            for (int i = 0; i < period; i++) {
-                initialEMA += klineMap.get(sortedTimestamps.get(i)).getClose();
+        // 计算MACD线（DIF）
+        Map<Long, Double> macdLine = new HashMap<>();
+        for (Long timestamp : klineMap.keySet()) {
+            if (shortEMA.containsKey(timestamp) && longEMA.containsKey(timestamp)) {
+                double shortValue = shortEMA.get(timestamp);
+                double longValue = longEMA.get(timestamp);
+                macdLine.put(timestamp, shortValue - longValue);
             }
-            initialEMA /= period;
+        }
 
-            // 保存初始 EMA
-            emaMap.put(sortedTimestamps.get(period - 1), initialEMA);
+        // 计算信号线（DEA）- 9日EMA
+        Map<Long, Double> signalLine = calculateEMA(macdLine, 9);
 
-            // 计算后续的 EMA
-            double previousEMA = initialEMA;
-            for (int i = period; i < sortedTimestamps.size(); i++) {
-                long timestamp = sortedTimestamps.get(i);
-                double currentClose = klineMap.get(timestamp).getClose();
-                double currentEMA = currentClose * k + previousEMA * (1 - k);
+        Map<String, Map<Long, Double>> result = new HashMap<>();
+        result.put("macd", macdLine);
+        result.put("signal", signalLine);
+
+        return result;
+    }
+
+    // 计算EMA
+    public static Map<Long, Double> calculateEMA(Map<Long, ?> data, int period) {
+        Map<Long, Double> emaMap = new TreeMap<>();
+        List<Long> timestamps = new ArrayList<>(data.keySet());
+        Collections.sort(timestamps);
+
+        // 初始化EMA（使用前period天的SMA作为第一个EMA值）
+        if (timestamps.size() >= period) {
+            double sum = 0;
+            for (int i = 0; i < period; i++) {
+                Long timestamp = timestamps.get(i);
+                double value = getValue(data.get(timestamp));
+                sum += value;
+            }
+            double firstEMA = sum / period;
+            emaMap.put(timestamps.get(period - 1), firstEMA);
+
+            // 计算后续的EMA
+            double multiplier = 2.0 / (period + 1);
+            double previousEMA = firstEMA;
+
+            for (int i = period; i < timestamps.size(); i++) {
+                Long timestamp = timestamps.get(i);
+                double currentValue = getValue(data.get(timestamp));
+                double currentEMA = (currentValue - previousEMA) * multiplier + previousEMA;
                 emaMap.put(timestamp, currentEMA);
                 previousEMA = currentEMA;
             }
@@ -136,24 +162,13 @@ public class IndexTechnicalIndicators {
         return emaMap;
     }
 
-    // 计算MACD（平滑异同移动平均）
-    public static Map<Long, Double> calculateMACD(Map<Long, Kline> klineMap) {
-        List<Long> sortedTimestamps = CollectionUtils.getTimestamps(klineMap);
-
-        Map<Long, Double> macdMap = new LinkedHashMap<>();
-        if (sortedTimestamps.size() >= 26) {
-            // 计算短期 (12 日) 和长期 (26 日) 的 EMA
-            Map<Long, Double> shortEMA = calculateEMA(klineMap, 12);
-            Map<Long, Double> longEMA = calculateEMA(klineMap, 26);
-
-            // 计算 MACD，只有当 26 日 EMA 可用时才计算
-            for (int i = 25; i < sortedTimestamps.size(); i++) {
-                long timestamp = sortedTimestamps.get(i);
-                double macd = shortEMA.get(timestamp) - longEMA.get(timestamp);
-                macdMap.put(timestamp, macd);
-            }
+    // 辅助方法：获取值
+    private static double getValue(Object obj) {
+        if (obj instanceof Number) {
+            return ((Number) obj).doubleValue();
+        } else if (obj instanceof Kline) {
+            return ((Kline) obj).getClose();
         }
-
-        return macdMap;
+        throw new IllegalArgumentException("Unsupported data type");
     }
 }

@@ -1,13 +1,22 @@
 package com.gantenx.model;
 
-import java.util.List;
-
 public class Index extends Time {
     private Double rsi;
     private Double sma;
-    private double[] calculateBollingerBands;
+    private Double ema;
+    private double[] bollingerBands;
     private double weightedScore;
     private double macd;
+    private Double macdSignal;  // 新增字段
+    private String signalStrength;
+
+    public Double getMacdSignal() {
+        return macdSignal;
+    }
+
+    public void setMacdSignal(Double macdSignal) {
+        this.macdSignal = macdSignal;
+    }
 
     public Index(long timestamp) {
         super(timestamp);
@@ -21,20 +30,36 @@ public class Index extends Time {
         this.rsi = rsi;
     }
 
+    public Double getEma() {
+        return ema;
+    }
+
+    public void setEma(Double ema) {
+        this.ema = ema;
+    }
+
     public Double getSma() {
         return sma;
+    }
+
+    public String getSignalStrength() {
+        return signalStrength;
+    }
+
+    public void setSignalStrength(String signalStrength) {
+        this.signalStrength = signalStrength;
     }
 
     public void setSma(Double sma) {
         this.sma = sma;
     }
 
-    public double[] getCalculateBollingerBands() {
-        return calculateBollingerBands;
+    public double[] getBollingerBands() {
+        return bollingerBands;
     }
 
-    public void setCalculateBollingerBands(double[] calculateBollingerBands) {
-        this.calculateBollingerBands = calculateBollingerBands;
+    public void setBollingerBands(double[] bollingerBands) {
+        this.bollingerBands = bollingerBands;
     }
 
     public double getWeightedScore() {

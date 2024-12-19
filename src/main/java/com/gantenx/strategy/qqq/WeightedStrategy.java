@@ -1,16 +1,15 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexCalculator;
-import com.gantenx.calculator.TradeMocker;
-import com.gantenx.model.Index;
-import com.gantenx.model.IndexPeriod;
-import com.gantenx.model.IndexWeights;
-import com.gantenx.model.Kline;
+import com.gantenx.constant.Constants;
+import com.gantenx.model.*;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
+import com.gantenx.utils.ExcelUtils;
+import com.gantenx.utils.ExportUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jfree.chart.JFreeChart;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,10 +25,10 @@ public class WeightedStrategy extends BaseStrategy {
     @Override
     protected void openTrade() {
         // 计算 QQQ 的 k 线加权参数
-        IndexPeriod indexPeriod = new IndexPeriod(6, 9, 6);
-        IndexWeights indexWeights = new IndexWeights(0.4, 0.3, 0.3);
-        Map<Long, Index> indexMap = IndexCalculator.getIndexMap(qqqKlineMap, indexWeights, indexPeriod);
+        Map<Long, Index> indexMap = IndexCalculator.getIndexMap(qqqKlineMap, Constants.INDEX_WEIGHTS, Constants.INDEX_PERIOD);
         List<Long> timestamps = CollectionUtils.getTimestamps(indexMap);
+        String name = "index-data";
+        ExportUtils.exportWorkbook(ExcelUtils.singleSheet(CollectionUtils.toList(indexMap), name), strategyName, name);
 
         // 开启模拟交易
         for (long ts : timestamps) {
@@ -46,5 +45,12 @@ public class WeightedStrategy extends BaseStrategy {
                 tradeMocker.buyAll("QQQ", qqqPrice, ts);
             }
         }
+    }
+
+
+    @Override
+    protected JFreeChart getChart() {
+        WeightScoreChart weightScoreChart = new WeightScoreChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
+        return weightScoreChart.getCombinedChart();
     }
 }

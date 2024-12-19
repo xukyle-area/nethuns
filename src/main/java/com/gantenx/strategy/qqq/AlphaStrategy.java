@@ -2,9 +2,11 @@ package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.model.Kline;
+import com.gantenx.model.RSIChart;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jfree.chart.JFreeChart;
 
 import java.util.List;
 import java.util.Map;
@@ -47,5 +49,11 @@ public class AlphaStrategy extends BaseStrategy {
                 tradeMocker.buyAll("TQQQ", tqqqPrice, ts);
             }
         }
+    }
+
+    @Override
+    protected JFreeChart getChart() {
+        RSIChart chart = new RSIChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
+        return chart.getCombinedChart();
     }
 }

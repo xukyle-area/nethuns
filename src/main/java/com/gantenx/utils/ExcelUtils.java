@@ -1,25 +1,52 @@
 package com.gantenx.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gantenx.annotation.ExcelColumn;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 public class ExcelUtils {
+
+    private static final ObjectMapper objectMapper = configureObjectMapper();
+
+    // 如果需要更多自定义配置
+    private static ObjectMapper configureObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 设置日期格式
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+        // 忽略空bean错误
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+        // 设置时间格式为ISO-8601
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        // 忽略未知属性
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // 注册模块（如果需要）
+        mapper.registerModule(new JavaTimeModule());
+
+        return mapper;
+    }
 
     /**
      * 生成一个包含一个 sheet 的工作簿
@@ -72,8 +99,10 @@ public class ExcelUtils {
             cell.setCellStyle(createHeaderCellStyle(workbook));
         }
 
+
         // Fill data rows
         int rowNum = 1;
+
         for (T item : dataList) {
             Row row = sheet.createRow(rowNum++);
             headerIndex = 0;
@@ -90,9 +119,20 @@ public class ExcelUtils {
                     if (value != null) {
                         if (excelColumn != null && !excelColumn.dateFormat().isEmpty() &&
                                 (field.getType() == Long.class || field.getType() == long.class)) {
-                            // Format the value as a date
+                            // 处理日期格式
                             String formattedValue = formatDate((Long) value, excelColumn.dateFormat());
                             cell.setCellValue(formattedValue);
+                        } else if (field.getType().isArray() ||
+                                isCollectionOrMap(field.getType()) ||
+                                isCustomObject(field.getType())) {
+                            // 使用JSON序列化处理数组、集合、Map和自定义对象
+                            try {
+                                String jsonValue = objectMapper.writeValueAsString(value);
+                                cell.setCellValue(jsonValue);
+                            } catch (JsonProcessingException e) {
+                                cell.setCellValue("Error: Failed to serialize to JSON");
+                                log.error("Failed to serialize field {} to JSON", field.getName(), e);
+                            }
                         } else {
                             cell.setCellValue(value.toString());
                         }
@@ -102,6 +142,22 @@ public class ExcelUtils {
                 }
             }
         }
+
+    }
+
+
+    // 辅助方法：检查是否为集合或Map类型
+    private static boolean isCollectionOrMap(Class<?> type) {
+        return Collection.class.isAssignableFrom(type) ||
+                Map.class.isAssignableFrom(type);
+    }
+
+    // 辅助方法：检查是否为自定义对象（非基本类型和包装类）
+    private static boolean isCustomObject(Class<?> type) {
+        return !type.isPrimitive() &&
+                !type.getName().startsWith("java.lang") &&
+                !type.getName().startsWith("java.time") &&
+                !Number.class.isAssignableFrom(type);
     }
 
     // Helper method to recursively get all fields, including from superclasses
