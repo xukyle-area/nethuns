@@ -5,7 +5,7 @@ import com.gantenx.model.Kline;
 import com.gantenx.retrofit.QuoteApi;
 import com.gantenx.retrofit.RetrofitClient;
 import com.gantenx.retrofit.RetrofitUtils;
-import com.gantenx.util.*;
+import com.gantenx.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;

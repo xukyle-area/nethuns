@@ -1,4 +1,4 @@
-package com.gantenx.util;
+package com.gantenx.utils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

@@ -1,11 +1,13 @@
-package com.gantenx.util;
+package com.gantenx.utils;
 
+import com.gantenx.constant.SymbolType;
 import com.gantenx.model.Kline;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class CsvUtils {
@@ -37,5 +39,10 @@ public class CsvUtils {
         }
 
         return klineList;
+    }
+
+    public static Map<Long, Kline> getKLineMap(SymbolType symbolType, long startTime, long endTime) {
+        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(symbolType.getPath(), startTime, endTime);
+        return CollectionUtils.toTimeMap(qqqKlineList);
     }
 }

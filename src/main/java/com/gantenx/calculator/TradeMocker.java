@@ -1,5 +1,6 @@
 package com.gantenx.calculator;
 
+import com.gantenx.model.Kline;
 import com.gantenx.model.Order;
 import com.gantenx.model.Position;
 import com.gantenx.model.TradeDetail;
@@ -9,7 +10,7 @@ import org.springframework.data.util.Pair;
 import java.util.*;
 
 @Slf4j
-public class TradeCalculator {
+public class TradeMocker {
     private double balance;
     private final double initialBalance;
     private final double fee;
@@ -26,7 +27,7 @@ public class TradeCalculator {
     // 余额阈值，用于全仓买入时的限制
     private static final double BALANCE_THRESHOLD = 0.001;
 
-    public TradeCalculator(double initialBalance, double fee) {
+    public TradeMocker(double initialBalance, double fee) {
         this.initialBalance = initialBalance;
         this.balance = initialBalance;
         this.fee = fee;
@@ -107,8 +108,8 @@ public class TradeCalculator {
         }
     }
 
-    public TradeDetail exit(Map<String, Double> priceMap, long ts) {
-        priceMap.forEach((a, b) -> this.sellAll(a, b, ts));
+    public TradeDetail exit(Map<String, Kline> priceMap, long ts) {
+        priceMap.forEach((a, b) -> this.sellAll(a, b.getClose(), ts));
         TradeDetail tradeDetail = new TradeDetail();
         tradeDetail.setBalance(balance);
         tradeDetail.setOrders(new ArrayList<>(orders));

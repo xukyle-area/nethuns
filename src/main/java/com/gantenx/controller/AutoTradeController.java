@@ -2,7 +2,7 @@ package com.gantenx.controller;
 
 import com.gantenx.model.Kline;
 import com.gantenx.service.BinanceQuoteService;
-import com.gantenx.util.DateUtils;
+import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

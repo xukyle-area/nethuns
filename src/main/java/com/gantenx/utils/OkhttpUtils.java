@@ -1,4 +1,4 @@
-package com.gantenx.util;
+package com.gantenx.utils;
 
 
 import com.google.gson.reflect.TypeToken;

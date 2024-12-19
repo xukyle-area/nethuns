@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.util.DateUtils.MS_OF_ONE_DAY;
+import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 public class KlineConverter {
 

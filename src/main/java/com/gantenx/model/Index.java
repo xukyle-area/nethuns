@@ -6,6 +6,8 @@ public class Index extends Time {
     private Double rsi;
     private Double sma;
     private double[] calculateBollingerBands;
+    private double weightedScore;
+    private double macd;
 
     public Index(long timestamp) {
         super(timestamp);
@@ -33,5 +35,21 @@ public class Index extends Time {
 
     public void setCalculateBollingerBands(double[] calculateBollingerBands) {
         this.calculateBollingerBands = calculateBollingerBands;
+    }
+
+    public double getWeightedScore() {
+        return weightedScore;
+    }
+
+    public void setWeightedScore(double weightedScore) {
+        this.weightedScore = weightedScore;
+    }
+
+    public double getMacd() {
+        return macd;
+    }
+
+    public void setMacd(double macd) {
+        this.macd = macd;
     }
 }

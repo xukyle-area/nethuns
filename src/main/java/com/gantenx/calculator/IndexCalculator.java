@@ -1,126 +1,133 @@
 package com.gantenx.calculator;
 
+import com.gantenx.model.IndexPeriod;
+import com.gantenx.model.IndexWeights;
 import com.gantenx.model.Index;
 import com.gantenx.model.Kline;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IndexCalculator {
+    private final Map<Long, Kline> klineMap;
+    private Map<Long, Double> smaMap;
+    private Map<Long, double[]> bollingerBandsMap;
+    private Map<Long, Double> rsiMap;
+    private Map<Long, Double> emaMap;
+    private Map<Long, Double> macdMap;
+    private final IndexWeights indexWeights;
+    private final IndexPeriod indexPeriod;
 
-    public Map<Long, Index> calculateIndex(Map<Long, Kline> klineMap) {
-        HashMap<Long, Index> map = new HashMap<>();
-        Map<Long, Double> smaMap = calculateSMA(klineMap, 6);
-        Map<Long, double[]> bollingerBandsMap = calculateBollingerBands(smaMap, klineMap, 6);
-        Map<Long, Double> rsiMap = calculateRSI(klineMap, 6);
-        for (Long ts : klineMap.keySet()) {
-            Index index = new Index(ts);
-            index.setSma(smaMap.get(ts));
-            index.setRsi(rsiMap.get(ts));
-            index.setCalculateBollingerBands(bollingerBandsMap.get(ts));
-            map.put(ts, index);
-        }
-        return map;
+    public IndexCalculator(Map<Long, Kline> klineMap, IndexWeights indexWeights, IndexPeriod indexPeriod) {
+        this.klineMap = klineMap;
+        this.indexPeriod = indexPeriod;
+        this.indexWeights = indexWeights;
     }
 
-    // Calculate SMA (Simple Moving Average)
-    public static Map<Long, Double> calculateSMA(Map<Long, Kline> klineMap, int period) {
-        Map<Long, Double> smaMap = new TreeMap<>();
-        List<Long> timestamps = new ArrayList<>(klineMap.keySet());
-        Collections.sort(timestamps);
-
-        Queue<Double> window = new LinkedList<>();
-        double sum = 0.0;
-
-        for (Long timestamp : timestamps) {
-            double close = klineMap.get(timestamp).getClose();
-            window.add(close);
-            sum += close;
-
-            if (window.size() > period) {
-                sum -= window.poll();
-            }
-
-            if (window.size() == period) {
-                smaMap.put(timestamp, sum / period);
-            }
-        }
-        return smaMap;
+    public Map<Long, Index> calculate() {
+        calculateIndicators();
+        return createIndexMap();
     }
 
-    // Calculate Bollinger Bands
-    public static Map<Long, double[]> calculateBollingerBands(Map<Long, Double> smaMap, Map<Long, Kline> klineMap, int period) {
-        Map<Long, double[]> bollingerMap = new TreeMap<>();
-
-        List<Long> timestamps = new ArrayList<>(klineMap.keySet());
-        Collections.sort(timestamps);
-
-        Queue<Double> window = new LinkedList<>();
-
-        for (Long timestamp : timestamps) {
-            double close = klineMap.get(timestamp).getClose();
-            window.add(close);
-
-            if (window.size() > period) {
-                window.poll();
-            }
-
-            if (window.size() == period) {
-                double sma = smaMap.get(timestamp);
-                double variance = 0.0;
-                for (double price : window) {
-                    variance += Math.pow(price - sma, 2);
-                }
-                double stdDev = Math.sqrt(variance / period);
-                bollingerMap.put(timestamp, new double[]{
-                        sma - 2 * stdDev, // Lower Band
-                        sma,              // Middle Band
-                        sma + 2 * stdDev  // Upper Band
-                });
-            }
-        }
-        return bollingerMap;
+    private void calculateIndicators() {
+        smaMap = IndexTechnicalIndicators.calculateSMA(klineMap, indexPeriod.getBollinger());
+        bollingerBandsMap = IndexTechnicalIndicators.calculateBollingerBands(smaMap, klineMap, indexPeriod.getBollinger());
+        rsiMap = IndexTechnicalIndicators.calculateRSI(klineMap, indexPeriod.getRsi());
+        emaMap = IndexTechnicalIndicators.calculateEMA(klineMap, indexPeriod.getEma());
+        macdMap = IndexTechnicalIndicators.calculateMACD(klineMap);
     }
 
-    // Calculate RSI
-    public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap, int period) {
-        Map<Long, Double> rsiMap = new TreeMap<>();
-        List<Long> timestamps = new ArrayList<>(klineMap.keySet());
-        Collections.sort(timestamps);
+    private Map<Long, Index> createIndexMap() {
+        Map<Long, Index> resultMap = new HashMap<>(klineMap.size());
 
-        double gain = 0.0;
-        double loss = 0.0;
-        boolean initialized = false;
-
-        for (int i = 1; i < timestamps.size(); i++) {
-            long currentTimestamp = timestamps.get(i);
-            long previousTimestamp = timestamps.get(i - 1);
-
-            double currentClose = klineMap.get(currentTimestamp).getClose();
-            double previousClose = klineMap.get(previousTimestamp).getClose();
-
-            double change = currentClose - previousClose;
-            double currentGain = Math.max(0, change);
-            double currentLoss = Math.max(0, -change);
-
-            if (!initialized) {
-                gain += currentGain;
-                loss += currentLoss;
-                if (i == period) {
-                    initialized = true;
-                    gain /= period;
-                    loss /= period;
-                }
-                continue;
+        klineMap.forEach((ts, kline) -> {
+            Index index = createIndex(ts, kline);
+            if (index != null) {
+                resultMap.put(ts, index);
             }
+        });
 
-            gain = (gain * (period - 1) + currentGain) / period;
-            loss = (loss * (period - 1) + currentLoss) / period;
+        return resultMap;
+    }
 
-            double rs = gain / loss;
-            double rsi = 100 - (100 / (1 + rs));
-            rsiMap.put(currentTimestamp, rsi);
+    private Index createIndex(Long ts, Kline kline) {
+        if (!allIndicatorsAvailable(ts)) {
+            return null;
         }
-        return rsiMap;
+
+        Index index = new Index(ts);
+        setIndicatorValues(index, ts, kline);
+        return index;
+    }
+
+    private boolean allIndicatorsAvailable(Long ts) {
+        return smaMap.containsKey(ts) &&
+                bollingerBandsMap.containsKey(ts) &&
+                rsiMap.containsKey(ts) &&
+                macdMap.containsKey(ts);
+    }
+
+    private void setIndicatorValues(Index index, Long ts, Kline kline) {
+        index.setSma(smaMap.get(ts));
+        index.setRsi(rsiMap.get(ts));
+        index.setCalculateBollingerBands(bollingerBandsMap.get(ts));
+        index.setMacd(macdMap.get(ts));
+
+        double score = calculateWeightedScore(ts, kline.getClose());
+        index.setWeightedScore(score);
+    }
+
+    private double calculateWeightedScore(Long ts, double closePrice) {
+        double rsi = rsiMap.get(ts);
+        double macd = macdMap.get(ts);
+        double ema = emaMap.get(ts);
+        double[] bollingerBands = bollingerBandsMap.get(ts);
+
+        return weightedScore(rsi, macd, ema, bollingerBands, closePrice);
+    }
+
+    public static Map<Long, Index> getIndexMap(Map<Long, Kline> klineMap, IndexWeights indexWeights, IndexPeriod indexPeriod) {
+        IndexCalculator calculator = new IndexCalculator(klineMap, indexWeights, indexPeriod);
+        return calculator.calculate();
+    }
+
+    private double weightedScore(double rsi, double macd, double ema,
+                                 double[] bollingerBands, double closePrice) {
+        return calculateRSIScore(rsi) * indexWeights.getRsi() +
+                calculateMACDScore(macd, ema) * indexWeights.getMacd() +
+                calculateBollingerScore(closePrice, bollingerBands[2]) * indexWeights.getBollinger();
+    }
+
+    // 计算RSI得分
+    private double calculateRSIScore(double rsi) {
+        if (rsi < 30) {
+            return 1; // RSI 低于 30 是强烈超卖
+        } else if (rsi >= 30 && rsi < 50) {
+            return (50 - rsi) / 20; // RSI 介于 30 到 50 之间，给一个递减的得分
+        } else {
+            return 0; // RSI 大于 50，表示强势市场
+        }
+    }
+
+    // 计算MACD得分
+    private double calculateMACDScore(double macd, double signal) {
+        double macdDiff = macd - signal;
+        if (macdDiff > 0.05) {
+            return 1; // MACD 强烈超越信号线
+        } else if (macdDiff > 0) {
+            return macdDiff / 0.05; // MACD 轻微超越信号线
+        } else {
+            return 0; // MACD 低于信号线
+        }
+    }
+
+    // 计算布林带得分
+    private double calculateBollingerScore(double closePrice, double lowerBand) {
+        double distance = closePrice - lowerBand;
+        if (distance <= 0) {
+            return 1; // 收盘价接近或低于下轨，强烈超卖
+        } else {
+            return Math.max(0, 1 - distance / lowerBand); // 收盘价离下轨越远，得分越低
+        }
     }
 }
-

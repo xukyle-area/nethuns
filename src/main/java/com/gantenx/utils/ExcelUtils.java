@@ -1,4 +1,4 @@
-package com.gantenx.util;
+package com.gantenx.utils;
 
 import com.gantenx.annotation.ExcelColumn;
 import com.google.common.base.Strings;
@@ -150,34 +150,7 @@ public class ExcelUtils {
         return new XSSFWorkbook();
     }
 
-    /**
-     * 导出工作簿
-     *
-     * @param workbook   工作簿
-     * @param exportPath 导出路径
-     */
-    public static void exportWorkbook(Workbook workbook, String exportPath) {
-        try {
-            // 确保文件所在的目录存在
-            File file = new File(exportPath);
-            File parentDir = file.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                boolean dirsCreated = parentDir.mkdirs();
-                if (!dirsCreated) {
-                    throw new IOException("Failed to create directories for export path: " + parentDir.getAbsolutePath());
-                }
-            }
 
-            // 写入文件
-            try (FileOutputStream fileOut = new FileOutputStream(file)) {
-                workbook.write(fileOut);
-            } finally {
-                workbook.close();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to export workbook.", e);
-        }
-    }
     /**
      * 创建表头样式
      *
