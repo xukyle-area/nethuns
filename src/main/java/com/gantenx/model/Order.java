@@ -1,10 +1,12 @@
 package com.gantenx.model;
 
+import com.gantenx.annotation.ExcelColumn;
 import com.gantenx.constant.SymbolType;
 
 public class Order extends Time {
     private final String type;       // "buy" or "sell"
     private final double price;      // 价格
+    @ExcelColumn(need = false)
     private final double quantity;   // 数量
     private final String symbol;    // 标的符号
 

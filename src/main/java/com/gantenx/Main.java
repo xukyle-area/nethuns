@@ -7,17 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {
     public static void main(String[] args) {
-        String startStr = "20231106";
-        String endStr = "20241210";
-        long initialBalance = 10000L;
-        double fee = 0.00001;
-        RsiStrategy rsiStrategy = new RsiStrategy(initialBalance, fee, startStr, endStr);
+        start("20230101", "20240101");
+        start("20240101", "20250101");
+        start("20220101", "20230101");
+    }
+
+    public static void start(String startStr, String endStr) {
+        RsiStrategy rsiStrategy = new RsiStrategy(startStr, endStr);
         rsiStrategy.process();
-        rsiStrategy.printTradeDetail();
-        rsiStrategy.saveImage();
-        LongHoldingStrategy longHoldingStrategy = new LongHoldingStrategy(initialBalance, fee, startStr, endStr);
+        LongHoldingStrategy longHoldingStrategy = new LongHoldingStrategy(startStr, endStr);
         longHoldingStrategy.process();
-        longHoldingStrategy.printTradeDetail();
-        longHoldingStrategy.saveImage();
     }
 }

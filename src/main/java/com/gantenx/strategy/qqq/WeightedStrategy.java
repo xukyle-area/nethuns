@@ -20,8 +20,8 @@ import static com.gantenx.constant.SymbolType.QQQ;
 @Slf4j
 public class WeightedStrategy extends BaseStrategy {
 
-    public WeightedStrategy(double initialBalance, double fee, String startStr, String endStr) {
-        super(initialBalance, fee, WeightedStrategy.class.getSimpleName(), DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
+    public WeightedStrategy(String startStr, String endStr) {
+        super(WeightedStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class WeightedStrategy extends BaseStrategy {
         Map<Long, Index> indexMap = IndexCalculator.getIndexMap(qqqKlineMap, Constants.INDEX_WEIGHTS, Constants.INDEX_PERIOD);
         List<Long> timestamps = CollectionUtils.getTimestamps(indexMap);
         String name = "index-data";
-        ExportUtils.exportWorkbook(ExcelUtils.singleSheet(CollectionUtils.toList(indexMap), name), strategyName, name);
+        ExportUtils.exportWorkbook(ExcelUtils.singleSheet(CollectionUtils.toList(indexMap), name), startStr, endStr, strategyName, name);
 
         // 开启模拟交易
         for (long ts : timestamps) {

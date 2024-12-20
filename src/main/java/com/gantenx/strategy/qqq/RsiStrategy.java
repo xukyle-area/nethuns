@@ -1,10 +1,9 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.model.Kline;
 import com.gantenx.chart.RSIChart;
+import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 
@@ -17,8 +16,8 @@ import static com.gantenx.constant.SymbolType.*;
 @Slf4j
 public class RsiStrategy extends BaseStrategy {
 
-    public RsiStrategy(double initialBalance, double fee, String startStr, String endStr) {
-        super(initialBalance, fee, RsiStrategy.class.getSimpleName(), DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
+    public RsiStrategy(String startStr, String endStr) {
+        super(RsiStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override
@@ -47,14 +46,14 @@ public class RsiStrategy extends BaseStrategy {
             tradeMocker.buyAll(QQQ, qqqPrice, ts);
         }
 
-        if (rsi < 30) {
+        if (rsi < 25) {
             this.allinTQQQ(tqqqPrice, qqqPrice, ts);
             return;
-        } else if (rsi > 70) {
+        } else if (rsi > 85) {
             this.allinSQQQ(sqqqPrice, qqqPrice, ts);
             return;
         }
-        if (tradeMocker.hasPosition(SQQQ) && rsi <= 40) {
+        if (tradeMocker.hasPosition(SQQQ) && rsi <= 60) {
             this.alloutSQQQ(sqqqPrice, qqqPrice, ts);
         } else if (tradeMocker.hasPosition(TQQQ) && rsi >= 60) {
             this.alloutTQQQ(tqqqPrice, qqqPrice, ts);

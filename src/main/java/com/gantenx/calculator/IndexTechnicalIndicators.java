@@ -63,44 +63,65 @@ public class IndexTechnicalIndicators {
         return bollingerMap;
     }
 
-    // 计算RSI（相对强弱指数）
     public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap, int period) {
         Map<Long, Double> rsiMap = new TreeMap<>();
         List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
 
-        double gain = 0.0;
-        double loss = 0.0;
-        boolean initialized = false;
-
-        for (int i = 1; i < timestamps.size(); i++) {
-            long currentTimestamp = timestamps.get(i);
-            long previousTimestamp = timestamps.get(i - 1);
-
-            double currentClose = klineMap.get(currentTimestamp).getClose();
-            double previousClose = klineMap.get(previousTimestamp).getClose();
-
-            double change = currentClose - previousClose;
-            double currentGain = Math.max(0, change);
-            double currentLoss = Math.max(0, -change);
-
-            if (!initialized) {
-                gain += currentGain;
-                loss += currentLoss;
-                if (i == period) {
-                    initialized = true;
-                    gain /= period;
-                    loss /= period;
-                }
-                continue;
-            }
-
-            gain = (gain * (period - 1) + currentGain) / period;
-            loss = (loss * (period - 1) + currentLoss) / period;
-
-            double rs = gain / loss;
-            double rsi = 100 - (100 / (1 + rs));
-            rsiMap.put(currentTimestamp, rsi);
+        if (timestamps.size() < period + 1) {
+            return rsiMap; // 返回空Map如果数据不足
         }
+
+        // 第一步：计算价格变化
+        List<Double> changes = new ArrayList<>();
+        for (int i = 1; i < timestamps.size(); i++) {
+            double currentClose = klineMap.get(timestamps.get(i)).getClose();
+            double previousClose = klineMap.get(timestamps.get(i - 1)).getClose();
+            changes.add(currentClose - previousClose);
+        }
+
+        // 第二步：计算初始平均涨跌
+        double avgGain = 0;
+        double avgLoss = 0;
+
+        // 计算第一个RSI值的平均涨跌
+        for (int i = 0; i < period; i++) {
+            double change = changes.get(i);
+            if (change > 0) {
+                avgGain += change;
+            } else {
+                avgLoss += -change;
+            }
+        }
+
+        avgGain = avgGain / period;
+        avgLoss = avgLoss / period;
+
+        // 第三步：使用Wilder's smoothing计算后续的RSI值
+        // 添加第一个RSI值
+        double rs = avgGain / (avgLoss == 0 ? 1 : avgLoss);
+        double rsi = 100 - (100 / (1 + rs));
+        rsiMap.put(timestamps.get(period), rsi);
+
+        // 计算剩余的RSI值
+        for (int i = period; i < changes.size(); i++) {
+            double change = changes.get(i);
+            double gain = Math.max(0, change);
+            double loss = Math.max(0, -change);
+
+            // Wilder's smoothing
+            avgGain = ((avgGain * (period - 1)) + gain) / period;
+            avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+
+            // 避免除以零
+            rs = avgGain / (avgLoss == 0 ? 1e-10 : avgLoss);
+            rsi = 100 - (100 / (1 + rs));
+
+            // 确保RSI在0-100范围内
+            rsi = Math.min(100, Math.max(0, rsi));
+
+            rsiMap.put(timestamps.get(i + 1), rsi);
+        }
+
         return rsiMap;
     }
 

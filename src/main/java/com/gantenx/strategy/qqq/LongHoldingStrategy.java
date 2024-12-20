@@ -16,8 +16,8 @@ import static com.gantenx.constant.SymbolType.QQQ;
 
 public class LongHoldingStrategy extends BaseStrategy {
 
-    public LongHoldingStrategy(double initialBalance, double fee, String startStr, String endStr) {
-        super(initialBalance, fee, LongHoldingStrategy.class.getSimpleName(), DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
+    public LongHoldingStrategy(String startStr, String endStr) {
+        super(LongHoldingStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override

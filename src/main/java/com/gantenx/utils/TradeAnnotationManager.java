@@ -7,9 +7,11 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ui.TextAnchor;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT_WITHOUT_TIME;
 
 public class TradeAnnotationManager {
     private static final int FONT_SIZE = 10;
@@ -53,28 +55,6 @@ public class TradeAnnotationManager {
         });
     }
 
-    private void processOrderGroup(Long timestamp, List<Order> orders) {
-        // 添加竖直线
-        XYLineAnnotation line = new XYLineAnnotation(
-                timestamp, 0,
-                timestamp, LINE_LENGTH,
-                createDashedStroke(),
-                Color.GRAY
-        );
-        mainPlot.addAnnotation(line);
-        rsiPlot.addAnnotation(line);
-
-        // 处理订单
-        Map<String, List<Order>> ordersBySymbol = orders.stream()
-                .collect(Collectors.groupingBy(Order::getSymbol));
-
-        int symbolIndex = 0;
-        for (Map.Entry<String, List<Order>> entry : ordersBySymbol.entrySet()) {
-            List<Order> symbolOrders = entry.getValue();
-            processSymbolOrders(timestamp, symbolOrders, symbolIndex);
-            symbolIndex += symbolOrders.size();
-        }
-    }
 
     private void processSymbolOrders(Long timestamp, List<Order> orders, int startIndex) {
         for (int i = 0; i < orders.size(); i++) {
@@ -130,5 +110,67 @@ public class TradeAnnotationManager {
                 new float[]{10.0f},
                 0.0f
         );
+    }
+
+
+    // 添加时间标记的常量
+    private static final int TIME_FONT_SIZE = 9;
+    private static final Font TIME_FONT = new Font("SansSerif", Font.PLAIN, TIME_FONT_SIZE);
+    private static final double TIME_Y_OFFSET = 10.0; // 时间标记距离底部的距离
+
+    // ... 其他代码保持不变，直到 processOrderGroup 方法 ...
+
+    private void processOrderGroup(Long timestamp, List<Order> orders) {
+        // 添加竖直线
+        XYLineAnnotation line = new XYLineAnnotation(
+                timestamp, 0,
+                timestamp, LINE_LENGTH,
+                createDashedStroke(),
+                Color.GRAY
+        );
+        mainPlot.addAnnotation(line);
+        rsiPlot.addAnnotation(line);
+
+        // 添加时间标记
+        addTimeAnnotation(timestamp);
+
+        // 处理订单
+        Map<String, List<Order>> ordersBySymbol = orders.stream()
+                .collect(Collectors.groupingBy(Order::getSymbol));
+
+        int symbolIndex = 0;
+        for (Map.Entry<String, List<Order>> entry : ordersBySymbol.entrySet()) {
+            List<Order> symbolOrders = entry.getValue();
+            processSymbolOrders(timestamp, symbolOrders, symbolIndex);
+            symbolIndex += symbolOrders.size();
+        }
+    }
+
+    private void addTimeAnnotation(Long timestamp) {
+        // 格式化时间
+        String timeStr = SIMPLE_DATE_FORMAT_WITHOUT_TIME.format(new Date(timestamp));
+
+        // 创建时间标注
+        XYTextAnnotation timeAnnotation = new XYTextAnnotation(
+                timeStr,
+                timestamp,
+                TIME_Y_OFFSET  // 在底部显示时间
+        );
+
+        // 设置时间标注样式
+        styleTimeAnnotation(timeAnnotation);
+
+        // 添加到主图和RSI图
+        mainPlot.addAnnotation(timeAnnotation);
+        rsiPlot.addAnnotation(timeAnnotation);
+    }
+
+    private void styleTimeAnnotation(XYTextAnnotation annotation) {
+        annotation.setFont(TIME_FONT);
+        annotation.setTextAnchor(TextAnchor.TOP_CENTER); // 文本在线的上方
+        annotation.setPaint(Color.DARK_GRAY);
+        annotation.setBackgroundPaint(new Color(255, 255, 255, 200));
+        annotation.setOutlinePaint(Color.GRAY);
+        annotation.setOutlineVisible(true);
     }
 }
