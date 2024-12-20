@@ -1,6 +1,7 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexCalculator;
+import com.gantenx.chart.WeightScoreChart;
 import com.gantenx.constant.Constants;
 import com.gantenx.model.*;
 import com.gantenx.utils.CollectionUtils;
@@ -16,7 +17,6 @@ import java.util.Objects;
 
 @Slf4j
 public class WeightedStrategy extends BaseStrategy {
-
 
     public WeightedStrategy(double initialBalance, double fee, String startStr, String endStr) {
         super(initialBalance, fee, "weighted-strategy", DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));

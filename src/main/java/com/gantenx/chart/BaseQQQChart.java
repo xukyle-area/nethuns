@@ -1,10 +1,11 @@
-package com.gantenx.model;
+package com.gantenx.chart;
 
-import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.model.Kline;
+import com.gantenx.model.Order;
+import com.gantenx.utils.TradeAnnotationManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -22,20 +23,20 @@ import java.util.Map;
 
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT;
 
-public class RSIChart extends ApplicationFrame {
+public abstract class BaseQQQChart extends ApplicationFrame {
     private static final String TIME = "Time";
     private static final String PRICE = "Price";
     private static final String K_LINE = "K-Line";
     private final JFreeChart combinedChart;
 
-    public RSIChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, List<Order> orderMap) {
+    protected BaseQQQChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, XYSeriesCollection subDataset,
+                           String subDataName, double subDataRange, List<Order> orderList) {
         super("Trading Line");
 
         // 1. 创建数据集
         XYSeriesCollection qqqDataset = createKlineDataset("QQQ", qqqMap);
         XYSeriesCollection tqqqDataset = createKlineDataset("TQQQ", tqqqMap);
         XYSeriesCollection sqqqDataset = createKlineDataset("SQQQ", sqqqMap);
-        XYSeriesCollection rsiDataset = createRsiDataset("RSI", IndexTechnicalIndicators.calculateRSI(qqqMap, 6));
 
         // 2. 创建主图表
         JFreeChart chart = ChartFactory.createXYLineChart(
@@ -90,28 +91,15 @@ public class RSIChart extends ApplicationFrame {
         sqqqRenderer.setSeriesStroke(0, new BasicStroke(2.0f));
         mainPlot.setRenderer(2, sqqqRenderer);
 
-        // RSI部分和其他设置保持不变
-        NumberAxis rsiAxis = new NumberAxis("RSI");
-        rsiAxis.setRange(0.0, 100.0);
-        XYPlot rsiPlot = new XYPlot(rsiDataset, null, rsiAxis, new XYLineAndShapeRenderer(true, false));
+        NumberAxis rsiAxis = new NumberAxis(subDataName);
+        rsiAxis.setRange(0.0, subDataRange);
+        XYPlot rsiPlot = new XYPlot(subDataset, null, rsiAxis, new XYLineAndShapeRenderer(true, false));
 
         XYLineAndShapeRenderer rsiRenderer = (XYLineAndShapeRenderer) rsiPlot.getRenderer();
         rsiRenderer.setSeriesPaint(0, Color.ORANGE);
         rsiRenderer.setSeriesStroke(0, new BasicStroke(2.0f));
 
-        // 交易标记
-        if (orderMap != null) {
-            orderMap.stream()
-                    .map(Order::getTimestamp)
-                    .distinct()
-                    .forEach(timestamp -> {
-                        XYLineAnnotation lineAnnotation = new XYLineAnnotation(
-                                timestamp, 0, timestamp, 540,
-                                new BasicStroke(1.0f), Color.BLACK);
-                        mainPlot.addAnnotation(lineAnnotation);
-                        rsiPlot.addAnnotation(lineAnnotation);
-                    });
-        }
+        TradeAnnotationManager.markOrders(mainPlot, rsiPlot, orderList);
 
         // 创建组合图表
         CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
@@ -131,16 +119,6 @@ public class RSIChart extends ApplicationFrame {
         XYSeries series = new XYSeries(name);
         for (Map.Entry<Long, Kline> entry : klineMap.entrySet()) {
             series.add((double) entry.getKey(), entry.getValue().getClose());
-        }
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(series);
-        return dataset;
-    }
-
-    private XYSeriesCollection createRsiDataset(String name, Map<Long, Double> rsiMap) {
-        XYSeries series = new XYSeries(name);
-        for (Map.Entry<Long, Double> entry : rsiMap.entrySet()) {
-            series.add(entry.getKey(), entry.getValue());
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);

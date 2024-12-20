@@ -1,5 +1,6 @@
 package com.gantenx;
 
+import com.gantenx.strategy.qqq.AlphaStrategy;
 import com.gantenx.strategy.qqq.WeightedStrategy;
 import lombok.extern.slf4j.Slf4j;
 
