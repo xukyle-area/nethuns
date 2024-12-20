@@ -1,53 +1,47 @@
-package com.gantenx.calculator;
+package com.gantenx.engine;
 
-import com.gantenx.constant.SymbolType;
+import com.gantenx.constant.Side;
+import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
-import com.gantenx.model.Order;
-import com.gantenx.model.Position;
-import com.gantenx.model.TradeDetail;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 
 import java.util.*;
 
+import static com.gantenx.constant.Side.BUY;
+import static com.gantenx.constant.Side.SELL;
+
 @Slf4j
-public class TradeMocker {
-    private double balance;
-    private final double initialBalance;
-    private final double fee;
-    private double feeCount;
+public class TradeEngine {
     private static final double EPSILON = 1e-6;
-
-
-    // 仓位管理：标的 -> 仓位
-    private final Map<SymbolType, Position> positionMap = new HashMap<>();
-
-    // 订单记录
-    private final List<Order> orders = new ArrayList<>();
-
-    // 余额阈值，用于全仓买入时的限制
     private static final double BALANCE_THRESHOLD = 0.001;
 
-    public TradeMocker(double initialBalance, double fee) {
+    private final double initialBalance;
+    private final double fee;
+    private final Map<Symbol, Position> positions = new HashMap<>();
+    private final List<Order> orders = new ArrayList<>();
+
+    private long nextOrderId = 0;
+    private long nextTransaction = 0;
+    private double balance;
+    private double feeCount;
+
+    public TradeEngine(double initialBalance, double fee) {
         this.initialBalance = initialBalance;
         this.balance = initialBalance;
         this.fee = fee;
         this.feeCount = 0.0;
     }
 
-    public boolean hasPosition() {
-        return positionMap.values().stream().anyMatch(position -> position.getQuantity() > 0);
+    public boolean hasNoPosition() {
+        return positions.values().stream().noneMatch(position -> position.getQuantity() > 0);
     }
 
-    public boolean hasPosition(SymbolType symbol) {
-        Position position1 = positionMap.get(symbol);
-        if (Objects.nonNull(position1) && position1.getQuantity() > 0) {
-            return true;
-        }
-        return false;
+    public boolean hasPosition(Symbol symbol) {
+        Position position1 = positions.get(symbol);
+        return Objects.nonNull(position1) && position1.getQuantity() > 0;
     }
 
-    public void buy(SymbolType symbol, double price, double quantity, long ts) {
+    public void buy(Symbol symbol, double price, double quantity, long ts) {
         if (quantity <= 0 || price <= 0) {
             log.warn("Invalid buy parameters: price={}, quantity={}", price, quantity);
             return;
@@ -56,9 +50,9 @@ public class TradeMocker {
         double cost = calculateTotalCost(price, quantity);
         if (balance + EPSILON >= cost) {
             balance -= cost;
-            updatePosition(symbol, price, quantity, "buy");
-            log.info("Bought {} {} at price {}, cost: {}, remaining balance: {}", quantity, symbol, price, cost, balance);
-            orders.add(new Order(symbol, "buy", price, quantity, ts));
+            updatePosition(symbol, price, quantity, BUY);
+            // log.info("Bought {} {} at price {}, cost: {}, remaining balance: {}", quantity, symbol, price, cost, balance);
+            orders.add(new Order(symbol, BUY, price, quantity, ts));
         } else {
             log.warn("Insufficient balance to buy {}: cost={}, balance={}", symbol, cost, balance);
         }
@@ -71,13 +65,13 @@ public class TradeMocker {
         return cost + curFee;
     }
 
-    public void sell(SymbolType symbol, double price, double quantity, long ts) {
+    public void sell(Symbol symbol, double price, double quantity, long ts) {
         if (quantity <= 0 || price <= 0) {
             log.warn("Invalid sell parameters: price={}, quantity={}", price, quantity);
             return;
         }
 
-        Position position = positionMap.get(symbol);
+        Position position = positions.get(symbol);
         if (position == null || position.getQuantity() < quantity) {
             log.warn("Insufficient position to sell {}: requested={}, available={}", symbol, quantity, position != null ? position.getQuantity() : 0);
             return;
@@ -90,16 +84,16 @@ public class TradeMocker {
         // 更新余额
         balance += revenue;
 
-        log.info("Sold {} {} at price {}, revenue: {}, profit: {}, new balance: {}", quantity, symbol, price, revenue, profit, balance);
+        // log.info("Sold {} {} at price {}, revenue: {}, profit: {}, new balance: {}", quantity, symbol, price, revenue, profit, balance);
 
         // 更新仓位
-        updatePosition(symbol, price, quantity, "sell");
+        this.updatePosition(symbol, price, quantity, SELL);
 
         // 记录订单
-        orders.add(new Order(symbol, "sell", price, quantity, ts));
+        orders.add(new Order(symbol, SELL, price, quantity, ts));
     }
 
-    public void buyAll(SymbolType symbol, double price, long ts) {
+    public void buyAll(Symbol symbol, double price, long ts) {
         if (balance < initialBalance * BALANCE_THRESHOLD) {
             return;
         }
@@ -110,14 +104,14 @@ public class TradeMocker {
         }
     }
 
-    public void sellAll(SymbolType symbol, double price, long ts) {
-        Position position = positionMap.get(symbol);
+    public void sellAll(Symbol symbol, double price, long ts) {
+        Position position = positions.get(symbol);
         if (position != null && position.getQuantity() > 0) {
             sell(symbol, price, position.getQuantity(), ts);
         }
     }
 
-    public TradeDetail exit(Map<SymbolType, Kline> priceMap, long ts) {
+    public TradeDetail exit(Map<Symbol, Kline> priceMap, long ts) {
         priceMap.forEach((a, b) -> this.sellAll(a, b.getClose(), ts));
         TradeDetail tradeDetail = new TradeDetail();
         tradeDetail.setBalance(balance);
@@ -128,14 +122,14 @@ public class TradeMocker {
         return tradeDetail;
     }
 
-    private void updatePosition(SymbolType symbol, double price, double quantity, String type) {
-        Position position = positionMap.getOrDefault(symbol, new Position(0, 0));
-        if ("buy".equalsIgnoreCase(type)) {
+    private void updatePosition(Symbol symbol, double price, double quantity, Side type) {
+        Position position = positions.getOrDefault(symbol, new Position(0, 0));
+        if (BUY.equals(type)) {
             position.addPosition(price, quantity);
-        } else if ("sell".equalsIgnoreCase(type)) {
+        } else if (SELL.equals(type)) {
             position.reducePosition(quantity);
         }
-        positionMap.put(symbol, position);
+        positions.put(symbol, position);
     }
 
     private double calculateTotalRevenue(double price, double quantity) {
@@ -145,7 +139,19 @@ public class TradeMocker {
         return revenue - curFee;
     }
 
-    private Map<SymbolType, Position> getPositionSnapshot() {
-        return new HashMap<>(positionMap);
+    public Map<Symbol, Position> getPositionSnapshot() {
+        return new HashMap<>(positions);
+    }
+
+    private long nextOrderId() {
+        long curOrderId = nextOrderId;
+        nextOrderId++;
+        return curOrderId;
+    }
+
+    private long nextTranslationId() {
+        long curTransactionId = nextTransaction;
+        nextTransaction++;
+        return curTransactionId;
     }
 }

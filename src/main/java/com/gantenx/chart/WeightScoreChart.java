@@ -4,7 +4,7 @@ import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.constant.Constants;
 import com.gantenx.model.Index;
 import com.gantenx.model.Kline;
-import com.gantenx.model.Order;
+import com.gantenx.engine.Order;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 

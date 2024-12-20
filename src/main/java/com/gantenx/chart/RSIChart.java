@@ -2,7 +2,7 @@ package com.gantenx.chart;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.model.Kline;
-import com.gantenx.model.Order;
+import com.gantenx.engine.Order;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 

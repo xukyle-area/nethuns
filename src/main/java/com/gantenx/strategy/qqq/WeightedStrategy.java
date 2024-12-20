@@ -5,7 +5,6 @@ import com.gantenx.chart.WeightScoreChart;
 import com.gantenx.constant.Constants;
 import com.gantenx.model.*;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.ExcelUtils;
 import com.gantenx.utils.ExportUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.SymbolType.QQQ;
+import static com.gantenx.constant.Symbol.QQQ;
 
 @Slf4j
 public class WeightedStrategy extends BaseStrategy {
@@ -43,8 +42,8 @@ public class WeightedStrategy extends BaseStrategy {
             }
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
-            if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll(QQQ, qqqPrice, ts);
+            if (tradeEngine.hasNoPosition()) {
+                tradeEngine.buyAll(QQQ, qqqPrice, ts);
             }
         }
     }

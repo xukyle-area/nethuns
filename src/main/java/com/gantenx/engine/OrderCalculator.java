@@ -1,29 +1,34 @@
-package com.gantenx.calculator;
+package com.gantenx.engine;
 
-import com.gantenx.model.Order;
-import com.gantenx.model.ProfitResult;
+import com.gantenx.calculator.Profit;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
+import static com.gantenx.constant.Side.BUY;
+import static com.gantenx.constant.Side.SELL;
 
 public class OrderCalculator {
 
-    public static Map<String, ProfitResult> calculateProfitAndHoldingDays(List<Order> orderList) {
-        Map<String, ProfitResult> results = new HashMap<>();
+    public static Map<String, Profit> calculateProfitAndHoldingDays(List<Order> orderList) {
+        Map<String, Profit> results = new HashMap<>();
         Map<String, Stack<Order>> buyOrdersMap = new HashMap<>(); // 用于存储未卖出的买单
 
         for (Order order : orderList) {
             String symbol = order.getSymbol();
 
             if (!results.containsKey(symbol)) {
-                results.put(symbol, new ProfitResult());
+                results.put(symbol, new Profit());
             }
 
             // 处理买入操作
-            if (order.getType().equals("buy")) {
+            if (order.getType().equals(BUY)) {
                 buyOrdersMap.computeIfAbsent(symbol, k -> new Stack<>()).push(order);
             }
             // 处理卖出操作
-            else if (order.getType().equals("sell")) {
+            else if (order.getType().equals(SELL)) {
                 Stack<Order> buyOrders = buyOrdersMap.get(symbol);
                 if (!buyOrders.isEmpty()) {
                     // 计算收益
@@ -34,7 +39,7 @@ public class OrderCalculator {
                     long holdingDays = (order.getTimestamp() - buyOrder.getTimestamp()) / (1000 * 60 * 60 * 24); // 转换为天数
 
                     // 更新结果
-                    ProfitResult profitResult = results.get(symbol);
+                    Profit profitResult = results.get(symbol);
                     profitResult.addProfit(profit);
                     profitResult.addHoldingDays(holdingDays);
                 }

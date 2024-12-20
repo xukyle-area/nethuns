@@ -1,4 +1,4 @@
-package com.gantenx.model;
+package com.gantenx.engine;
 
 public class Position {
     private double averagePrice;

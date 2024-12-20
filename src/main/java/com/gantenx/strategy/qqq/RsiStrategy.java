@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.SymbolType.*;
+import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
 public class RsiStrategy extends BaseStrategy {
@@ -42,8 +42,8 @@ public class RsiStrategy extends BaseStrategy {
      */
     private void dailyTrade(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long ts) {
         // 没有仓位的时候，持有QQQ
-        if (!tradeMocker.hasPosition()) {
-            tradeMocker.buyAll(QQQ, qqqPrice, ts);
+        if (tradeEngine.hasNoPosition()) {
+            tradeEngine.buyAll(QQQ, qqqPrice, ts);
         }
 
         if (rsi < 25) {
@@ -53,31 +53,31 @@ public class RsiStrategy extends BaseStrategy {
             this.allinSQQQ(sqqqPrice, qqqPrice, ts);
             return;
         }
-        if (tradeMocker.hasPosition(SQQQ) && rsi <= 60) {
+        if (tradeEngine.hasPosition(SQQQ) && rsi <= 60) {
             this.alloutSQQQ(sqqqPrice, qqqPrice, ts);
-        } else if (tradeMocker.hasPosition(TQQQ) && rsi >= 60) {
+        } else if (tradeEngine.hasPosition(TQQQ) && rsi >= 60) {
             this.alloutTQQQ(tqqqPrice, qqqPrice, ts);
         }
     }
 
     public void allinTQQQ(double tqqqPrice, double qqqPrice, long ts) {
-        tradeMocker.sellAll(QQQ, qqqPrice, ts);
-        tradeMocker.buyAll(TQQQ, tqqqPrice, ts);
+        tradeEngine.sellAll(QQQ, qqqPrice, ts);
+        tradeEngine.buyAll(TQQQ, tqqqPrice, ts);
     }
 
     public void alloutTQQQ(double tqqqPrice, double qqqPrice, long ts) {
-        tradeMocker.sellAll(TQQQ, tqqqPrice, ts);
-        tradeMocker.buyAll(QQQ, qqqPrice, ts);
+        tradeEngine.sellAll(TQQQ, tqqqPrice, ts);
+        tradeEngine.buyAll(QQQ, qqqPrice, ts);
     }
 
     public void allinSQQQ(double sqqqPrice, double qqqPrice, long ts) {
-        tradeMocker.sellAll(QQQ, qqqPrice, ts);
-        tradeMocker.buyAll(SQQQ, sqqqPrice, ts);
+        tradeEngine.sellAll(QQQ, qqqPrice, ts);
+        tradeEngine.buyAll(SQQQ, sqqqPrice, ts);
     }
 
     public void alloutSQQQ(double sqqqPrice, double qqqPrice, long ts) {
-        tradeMocker.sellAll(SQQQ, sqqqPrice, ts);
-        tradeMocker.buyAll(QQQ, qqqPrice, ts);
+        tradeEngine.sellAll(SQQQ, sqqqPrice, ts);
+        tradeEngine.buyAll(QQQ, qqqPrice, ts);
     }
 
     @Override

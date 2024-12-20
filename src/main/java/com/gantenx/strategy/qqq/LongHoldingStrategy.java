@@ -1,18 +1,16 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.calculator.TradeMocker;
 import com.gantenx.model.Kline;
 import com.gantenx.chart.RSIChart;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.DateUtils;
 import org.jfree.chart.JFreeChart;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.SymbolType.QQQ;
+import static com.gantenx.constant.Symbol.QQQ;
 
 public class LongHoldingStrategy extends BaseStrategy {
 
@@ -34,8 +32,8 @@ public class LongHoldingStrategy extends BaseStrategy {
             }
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
-            if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll(QQQ, qqqPrice, ts);
+            if (tradeEngine.hasNoPosition()) {
+                tradeEngine.buyAll(QQQ, qqqPrice, ts);
             }
         }
     }

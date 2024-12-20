@@ -1,7 +1,7 @@
 package com.gantenx.chart;
 
 import com.gantenx.model.Kline;
-import com.gantenx.model.Order;
+import com.gantenx.engine.Order;
 import com.gantenx.utils.TradeAnnotationManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;

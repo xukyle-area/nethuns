@@ -1,11 +1,11 @@
-package com.gantenx.model;
+package com.gantenx.calculator;
 
-public class ProfitResult {
+public class Profit {
     private double profit;
     private long totalHoldingDays;
 
     // Constructor
-    public ProfitResult() {
+    public Profit() {
         this.profit = 0;
         this.totalHoldingDays = 0;
     }

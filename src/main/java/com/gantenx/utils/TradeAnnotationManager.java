@@ -1,6 +1,7 @@
 package com.gantenx.utils;
 
-import com.gantenx.model.Order;
+import com.gantenx.constant.Side;
+import com.gantenx.engine.Order;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.XYPlot;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT_WITHOUT_TIME;
 
 public class TradeAnnotationManager {
@@ -63,7 +65,7 @@ public class TradeAnnotationManager {
     }
 
     private void addOrderAnnotation(Order order, Long timestamp, int index) {
-        Color orderColor = order.getType().equalsIgnoreCase("buy") ? BUY_COLOR : SELL_COLOR;
+        Color orderColor = order.getType().equals(BUY) ? BUY_COLOR : SELL_COLOR;
         String[] lines = formatOrderInfo(order).split("\n");
         double baseY = calculateYPosition(index);
 
@@ -80,7 +82,7 @@ public class TradeAnnotationManager {
     private String formatOrderInfo(Order order) {
         return String.format("%s %s\n@%.2f",
                 order.getSymbol(),
-                order.getType().toUpperCase(),
+                order.getType().name(),
                 order.getPrice());
     }
 
