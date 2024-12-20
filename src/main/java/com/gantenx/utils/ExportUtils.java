@@ -26,13 +26,6 @@ public class ExportUtils {
         }
     }
 
-    private static String genChartPath(String strategyName, String filePrefix) {
-        String timeWithoutDate = DateUtils.getTimeWithoutDate(System.currentTimeMillis(), ZoneOffset.ofHours(8));
-        return "export/" + strategyName + "/" + filePrefix + "-" +
-                timeWithoutDate +
-                ".png";
-    }
-
     public static void exportWorkbook(Workbook workbook, String strategyName, String filePrefix) {
         try {
             // 确保文件所在的目录存在
@@ -56,10 +49,13 @@ public class ExportUtils {
         }
     }
 
+    private static String genChartPath(String strategyName, String filePrefix) {
+        String timeWithoutDate = DateUtils.getTimeWithoutDate(System.currentTimeMillis(), ZoneOffset.ofHours(8));
+        return "export/" + timeWithoutDate + "/" + strategyName + "/" + filePrefix + ".png";
+    }
+
     private static String genWorkbookPath(String strategyName, String filePrefix) {
         String timeWithoutDate = DateUtils.getTimeWithoutDate(System.currentTimeMillis(), ZoneOffset.ofHours(8));
-        return "export/" + strategyName + "/" + filePrefix + "-" +
-                timeWithoutDate +
-                ".xlsx";
+        return "export/" + timeWithoutDate + "/" + strategyName + "/" + filePrefix +  ".xlsx";
     }
 }

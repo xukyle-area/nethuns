@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.gantenx.constant.SymbolType.QQQ;
+
 @Slf4j
 public class WeightedStrategy extends BaseStrategy {
 
     public WeightedStrategy(double initialBalance, double fee, String startStr, String endStr) {
-        super(initialBalance, fee, "weighted-strategy", DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
+        super(initialBalance, fee, WeightedStrategy.class.getSimpleName(), DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
     }
 
     @Override
@@ -42,7 +44,7 @@ public class WeightedStrategy extends BaseStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll("QQQ", qqqPrice, ts);
+                tradeMocker.buyAll(QQQ, qqqPrice, ts);
             }
         }
     }

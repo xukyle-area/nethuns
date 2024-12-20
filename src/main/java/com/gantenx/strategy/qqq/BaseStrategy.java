@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.gantenx.constant.SymbolType.*;
+
 @Slf4j
 public abstract class BaseStrategy {
 
@@ -33,9 +35,9 @@ public abstract class BaseStrategy {
         this.fee = fee;
         this.strategyName = strategyName;
         tradeMocker = new TradeMocker(initialBalance, fee);
-        tqqqKlineMap = CsvUtils.getKLineMap(SymbolType.TQQQ, start, end);
-        sqqqKlineMap = CsvUtils.getKLineMap(SymbolType.SQQQ, start, end);
-        qqqKlineMap = CsvUtils.getKLineMap(SymbolType.QQQ, start, end);
+        tqqqKlineMap = CsvUtils.getKLineMap(TQQQ, start, end);
+        sqqqKlineMap = CsvUtils.getKLineMap(SQQQ, start, end);
+        qqqKlineMap = CsvUtils.getKLineMap(QQQ, start, end);
     }
 
     public void printTradeDetail() {
@@ -67,10 +69,10 @@ public abstract class BaseStrategy {
 
     public void process() {
         openTrade();
-        HashMap<String, Kline> map = new HashMap<>();
-        map.put(SymbolType.TQQQ.name(), findLatestKline(tqqqKlineMap));
-        map.put(SymbolType.QQQ.name(), findLatestKline(qqqKlineMap));
-        map.put(SymbolType.SQQQ.name(), findLatestKline(sqqqKlineMap));
+        HashMap<SymbolType, Kline> map = new HashMap<>();
+        map.put(TQQQ, findLatestKline(tqqqKlineMap));
+        map.put(QQQ, findLatestKline(qqqKlineMap));
+        map.put(SQQQ, findLatestKline(sqqqKlineMap));
         tradeDetail = tradeMocker.exit(map, findLatestTime(qqqKlineMap));
     }
 

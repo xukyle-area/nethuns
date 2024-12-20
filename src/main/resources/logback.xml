@@ -21,7 +21,7 @@
     <!-- 设置根日志级别为 INFO，同时引用 STDOUT 和 FILE appender -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
+        <!--<appender-ref ref="FILE"/>-->
     </root>
 
     <!-- 针对 Kafka 客户端的日志级别设置为 WARN -->

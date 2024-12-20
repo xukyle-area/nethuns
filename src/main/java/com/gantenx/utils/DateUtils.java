@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class DateUtils {
     private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter DATE_TIME_FORMATTER_WITHOUT_DATE = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER_WITHOUT_DATE = DateTimeFormatter.ofPattern("HH:mm");
 
     public static final Long MS_OF_ONE_DAY = 1000L * 3600 * 24;
 

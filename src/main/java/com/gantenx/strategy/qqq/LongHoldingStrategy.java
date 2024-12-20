@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class LongHoldingQQQStrategy extends BaseStrategy {
+import static com.gantenx.constant.SymbolType.QQQ;
 
-    public LongHoldingQQQStrategy(double initialBalance, double fee, String startStr, String endStr) {
-        super(initialBalance, fee, "long-holding-qqq", DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
+public class LongHoldingStrategy extends BaseStrategy {
+
+    public LongHoldingStrategy(double initialBalance, double fee, String startStr, String endStr) {
+        super(initialBalance, fee, LongHoldingStrategy.class.getSimpleName(), DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
     }
 
     @Override
     public void openTrade() {
         Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(qqqKlineMap, 6);
         List<Long> timestamps =  CollectionUtils.getTimestamps(rsiOfQQQ);
-
-        TradeMocker tradeMocker = new TradeMocker(super.initialBalance, super.fee);
         for (long ts : timestamps) {
             Double rsi = rsiOfQQQ.get(ts);
             Kline tqqqCandle = tqqqKlineMap.get(ts);
@@ -35,7 +35,7 @@ public class LongHoldingQQQStrategy extends BaseStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (!tradeMocker.hasPosition()) {
-                tradeMocker.buyAll("QQQ", qqqPrice, ts);
+                tradeMocker.buyAll(QQQ, qqqPrice, ts);
             }
         }
     }

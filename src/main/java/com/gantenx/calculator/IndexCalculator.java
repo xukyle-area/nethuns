@@ -22,9 +22,6 @@ public class IndexCalculator {
     private final IndexWeights indexWeights;
     private final IndexPeriod indexPeriod;
 
-    // MACD计算的阈值常量
-    private static final double MACD_THRESHOLD = 2.0;
-
     public IndexCalculator(Map<Long, Kline> klineMap, IndexWeights indexWeights, IndexPeriod indexPeriod) {
         this.klineMap = klineMap;
         this.indexPeriod = indexPeriod;
@@ -116,9 +113,6 @@ public class IndexCalculator {
         double rsiScore = calculateRSIScore(rsi) * indexWeights.getRsi();
         double macdScore = calculateMACDScore(macd, signal) * indexWeights.getMacd();
         double bollingerScore = calculateBollingerScore(closePrice, bollingerBands[2]) * indexWeights.getBollinger();
-
-        log.info("Scores - RSI: {}, MACD: {}, Bollinger: {}", rsiScore, macdScore, bollingerScore);
-
         return rsiScore + macdScore + bollingerScore;
     }
 

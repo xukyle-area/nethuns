@@ -1,6 +1,7 @@
 package com.gantenx.model;
 
 import com.gantenx.annotation.ExcelColumn;
+import com.gantenx.constant.SymbolType;
 import org.springframework.data.util.Pair;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class TradeDetail {
     private double initialBalance;
     private double feeCount;
     @ExcelColumn(need = false)
-    private Map<String, Pair<Double, Double>> positionMap;
+    private Map<SymbolType, Position> positionMap;
     @ExcelColumn(need = false)
     private List<Order> orders;
 
@@ -50,11 +51,11 @@ public class TradeDetail {
         this.orders = orders;
     }
 
-    public Map<String, Pair<Double, Double>> getPositionMap() {
+    public Map<SymbolType, Position> getPositionMap() {
         return positionMap;
     }
 
-    public void setPositionMap(Map<String, Pair<Double, Double>> positionMap) {
+    public void setPositionMap(Map<SymbolType, Position> positionMap) {
         this.positionMap = positionMap;
     }
 }

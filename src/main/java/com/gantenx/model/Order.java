@@ -1,14 +1,16 @@
 package com.gantenx.model;
 
+import com.gantenx.constant.SymbolType;
+
 public class Order extends Time {
     private final String type;       // "buy" or "sell"
     private final double price;      // 价格
     private final double quantity;   // 数量
     private final String symbol;    // 标的符号
 
-    public Order(String symbol, String type, double price, double quantity, long timestamp) {
+    public Order(SymbolType symbol, String type, double price, double quantity, long timestamp) {
         super(timestamp);
-        this.symbol = symbol;
+        this.symbol = symbol.name();
         this.type = type;
         this.price = price;
         this.quantity = quantity;
