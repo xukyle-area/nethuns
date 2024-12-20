@@ -2,16 +2,20 @@ package com.gantenx.utils;
 
 import com.gantenx.model.Time;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CollectionUtils {
 
     public static <T extends Time> Map<Long, T> toTimeMap(List<T> klineList) {
         return klineList.stream().collect(Collectors.toMap(Time::getTimestamp, kline -> kline));
+    }
+
+    public static <T> boolean isEmpty(Collection<T> collection) {
+        if (Objects.isNull(collection)) {
+            return true;
+        }
+        return collection.isEmpty();
     }
 
     public static <T> List<T> toList(Map<Long, T> klineMap) {
@@ -26,5 +30,14 @@ public class CollectionUtils {
         List<Long> list = new ArrayList<>(klineMap.keySet());
         Collections.sort(list);
         return list;
+    }
+
+
+    public static <T, U extends Collection<T>> Collection<T> toCollection(Collection<U> dataList) {
+        Collection<T> result = new ArrayList<>();
+        for (U tCollection : dataList) {
+            result.addAll(tCollection);
+        }
+        return result;
     }
 }

@@ -1,19 +1,21 @@
 package com.gantenx.engine;
 
-import com.gantenx.annotation.ExcelColumn;
-import com.gantenx.constant.Symbol;
-
 import java.util.List;
-import java.util.Map;
 
 public class TradeDetail {
     private double balance;
     private double initialBalance;
     private double feeCount;
-    @ExcelColumn(need = false)
-    private Map<Symbol, Position> positionMap;
-    @ExcelColumn(need = false)
     private List<Order> orders;
+    private List<TradeRecord> records;
+
+    public List<TradeRecord> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<TradeRecord> records) {
+        this.records = records;
+    }
 
     public TradeDetail() {
     }
@@ -48,13 +50,5 @@ public class TradeDetail {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
-    }
-
-    public Map<Symbol, Position> getPositionMap() {
-        return positionMap;
-    }
-
-    public void setPositionMap(Map<Symbol, Position> positionMap) {
-        this.positionMap = positionMap;
     }
 }
