@@ -1,5 +1,9 @@
 package com.gantenx.engine;
 
+import java.util.List;
+
+import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY_DOUBLE;
+
 public class Position {
     // 买入的时候的订单id
     private long orderId;
@@ -9,6 +13,7 @@ public class Position {
     private double quantity;
     // 买入时间
     private long timestamp;
+
 
     public long getOrderId() {
         return orderId;
@@ -52,17 +57,56 @@ public class Position {
         return quantity;
     }
 
-    public void addPosition(double price, double quantity) {
-        double totalCost = this.price * this.quantity + price * quantity;
-        this.quantity += quantity;
-        this.price = totalCost / this.quantity;
+
+    /**
+     * 计算持仓的平均价格
+     *
+     * @param positionList 持仓列表
+     * @param timestamp    当前时间戳
+     * @return 平均持仓价格，如果没有持仓返回0
+     */
+    public static double getAveragePrice(List<Position> positionList, long timestamp) {
+        if (positionList == null || positionList.isEmpty()) {
+            return 0;
+        }
+
+        double totalValue = 0;
+        double totalQuantity = 0;
+
+        for (Position position : positionList) {
+            if (position.getQuantity() > 0 && position.getTimestamp() <= timestamp) {
+                totalValue += position.getPrice() * position.getQuantity();
+                totalQuantity += position.getQuantity();
+            }
+        }
+
+        return totalQuantity > 0 ? totalValue / totalQuantity : 0;
     }
 
-    public void reducePosition(double quantity) {
-        this.quantity -= quantity;
-        if (this.quantity < 1e-6) {
-            this.quantity = 0; // Avoid precision errors
-            this.price = 0;
+    /**
+     * 计算平均持仓天数
+     *
+     * @param positionList 持仓列表
+     * @param timestamp    当前时间戳
+     * @return 平均持仓天数，如果没有持仓返回0
+     */
+    public static double getAverageHoldingDays(List<Position> positionList, long timestamp) {
+        if (positionList == null || positionList.isEmpty()) {
+            return 0;
         }
+
+        double totalDays = 0;
+        double totalQuantity = 0;
+
+        for (Position position : positionList) {
+            if (position.getQuantity() > 0 && position.getTimestamp() <= timestamp) {
+                // 将毫秒转换为天
+                double holdingDays = (timestamp - position.getTimestamp()) / (MS_OF_ONE_DAY_DOUBLE);
+                totalDays += holdingDays * position.getQuantity();
+                totalQuantity += position.getQuantity();
+            }
+        }
+
+        return totalQuantity > 0 ? totalDays / totalQuantity : 0;
     }
 }

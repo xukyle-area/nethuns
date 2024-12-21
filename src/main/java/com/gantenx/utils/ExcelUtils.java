@@ -1,8 +1,10 @@
 package com.gantenx.utils;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gantenx.annotation.ExcelColumn;
 import com.google.common.base.Strings;
@@ -10,11 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -26,27 +29,50 @@ public class ExcelUtils {
 
     private static final ObjectMapper objectMapper = configureObjectMapper();
 
-    // 如果需要更多自定义配置
     private static ObjectMapper configureObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-
-        // 设置日期格式
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-
-        // 忽略空bean错误
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-
-        // 设置时间格式为ISO-8601
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-        // 忽略未知属性
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // 注册模块（如果需要）
         mapper.registerModule(new JavaTimeModule());
+        SimpleModule module = new SimpleModule();
+
+        // 配置Double序列化，保留3位小数
+        module.addSerializer(Double.class, new JsonSerializer<Double>() {
+            @Override
+            public void serialize(Double value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                if (value != null) {
+                    gen.writeNumber(new BigDecimal(value).setScale(3, RoundingMode.HALF_UP));
+                }
+            }
+        });
+
+        // 配置枚举序列化，使用name()
+        module.setSerializerModifier(new BeanSerializerModifier() {
+            @Override
+            public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config,
+                                                          JavaType valueType,
+                                                          BeanDescription beanDesc,
+                                                          JsonSerializer<?> serializer) {
+                return new JsonSerializer<Enum<?>>() {
+                    @Override
+                    public void serialize(Enum<?> value,
+                                          JsonGenerator gen,
+                                          SerializerProvider serializers) throws IOException {
+                        if (value != null) {
+                            gen.writeString(value.name());
+                        }
+                    }
+                };
+            }
+        });
+
+        mapper.registerModule(module);
 
         return mapper;
     }
+
 
     /**
      * 生成一个包含一个 sheet 的工作簿
@@ -122,6 +148,13 @@ public class ExcelUtils {
                             // 处理日期格式
                             String formattedValue = formatDate((Long) value, excelColumn.dateFormat());
                             cell.setCellValue(formattedValue);
+                        } else if (field.getType().isEnum()) {
+                            // 处理枚举类型，保存 .name()
+                            cell.setCellValue(((Enum<?>) value).name());
+                        } else if (field.getType() == Double.class || field.getType() == double.class ||
+                                field.getType() == Float.class || field.getType() == float.class) {
+                            // 处理小数，保留两位有效小数
+                            cell.setCellValue(String.format("%.3f", (double) value));
                         } else if (field.getType().isArray() ||
                                 isCollectionOrMap(field.getType()) ||
                                 isCustomObject(field.getType())) {
@@ -137,6 +170,7 @@ public class ExcelUtils {
                             cell.setCellValue(value.toString());
                         }
                     }
+
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     throw new RuntimeException("Failed to access field value.", e);
                 }

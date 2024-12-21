@@ -1,12 +1,9 @@
 package com.gantenx.strategy.qqq;
 
-import com.gantenx.engine.OrderCalculator;
-import com.gantenx.engine.TradeEngine;
+import com.gantenx.engine.*;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
-import com.gantenx.engine.Order;
 import com.gantenx.calculator.Profit;
-import com.gantenx.engine.TradeDetail;
 import com.gantenx.utils.CsvUtils;
 import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.ExcelUtils;
@@ -58,6 +55,10 @@ public abstract class BaseStrategy {
         String orderList = "order-list";
         Workbook orderWorkbook = ExcelUtils.singleSheet(orders, orderList);
         ExportUtils.exportWorkbook(orderWorkbook, startStr, endStr, strategyName, orderList);
+        List<TradeRecord> records = tradeDetail.getRecords();
+        String recordList = "record-list";
+        Workbook recordWorkbook = ExcelUtils.singleSheet(records, recordList);
+        ExportUtils.exportWorkbook(recordWorkbook, startStr, endStr, strategyName, recordList);
 
         Map<String, Profit> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
         for (Map.Entry<String, Profit> entry : results.entrySet()) {

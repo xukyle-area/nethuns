@@ -12,14 +12,20 @@ public class Order extends Time {
     @ExcelColumn(need = false)
     private final double quantity;   // 数量
     private final String symbol;    // 标的符号
+    private final String reason;    // 标的符号
 
-    public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp) {
+    public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp, String reason) {
         super(timestamp);
         this.orderId = orderId;
         this.symbol = symbol.name();
         this.type = side;
         this.price = price;
         this.quantity = quantity;
+        this.reason = reason;
+    }
+
+    public String getReason() {
+        return reason;
     }
 
     public Side getType() {

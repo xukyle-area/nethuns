@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.gantenx.constant.Constants.PROPORTION_OF_100;
 import static com.gantenx.constant.Symbol.QQQ;
 
 public class LongHoldingStrategy extends BaseStrategy {
@@ -33,7 +34,7 @@ public class LongHoldingStrategy extends BaseStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (tradeEngine.hasNoPosition()) {
-                tradeEngine.buyAll(QQQ, qqqPrice, ts);
+                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "没有仓位的时候，持有QQQ");
             }
         }
     }

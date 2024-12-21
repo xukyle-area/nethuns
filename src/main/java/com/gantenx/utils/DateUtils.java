@@ -17,6 +17,7 @@ public class DateUtils {
     private static final DateTimeFormatter DATE_TIME_FORMATTER_WITHOUT_DATE = DateTimeFormatter.ofPattern("HH:mm");
 
     public static final Long MS_OF_ONE_DAY = 1000L * 3600 * 24;
+    public static final double MS_OF_ONE_DAY_DOUBLE = 1000L * 3600 * 24.0;
 
     public static long getTimestamp(String dateStr) {
         LocalDate localDate = LocalDate.parse(dateStr, DATE_TIME_FORMATTER);

@@ -1,14 +1,18 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.chart.RSIChart;
 import com.gantenx.constant.Symbol;
+import com.gantenx.engine.Position;
 import com.gantenx.engine.TradingContext;
 import com.gantenx.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jfree.chart.JFreeChart;
 
 import java.util.*;
 
 import static com.gantenx.constant.Constants.MACD;
+import static com.gantenx.constant.Constants.PROPORTION_OF_100;
 import static com.gantenx.constant.Symbol.*;
 import static com.gantenx.strategy.qqq.ImprovedRsiStrategyTL.*;
 
@@ -25,16 +29,15 @@ public class ImprovedRsiStrategy extends BaseStrategy {
     @Override
     public void openTrade() {
         this.initCache();
-        contextCache.keySet().stream().sorted().forEach(ts -> {
-            TradingContext context = contextCache.get(ts);
-            if (!executeRiskManagement(context)) {
-                executeTradingLogic(context);
-            }
-        });
+        List<Long> longList = CollectionUtils.getTimestamps(contextCache);
+        for (Long timestamp : longList) {
+            TradingContext context = contextCache.get(timestamp);
+            this.executeRiskManagement(context);
+            this.executeTradingLogic(context);
+        }
     }
 
     double prevRsi;
-
     private void initCache() {
         Map<Long, Double> rsiMap = IndexTechnicalIndicators.calculateRSI(qqqKlineMap, RSI_PERIOD);
         Map<Long, Double> emaMap = IndexTechnicalIndicators.calculateEMA(qqqKlineMap, TREND_PERIOD);
@@ -81,76 +84,70 @@ public class ImprovedRsiStrategy extends BaseStrategy {
         return qqqKlineMap.containsKey(ts) && tqqqKlineMap.containsKey(ts) && sqqqKlineMap.containsKey(ts);
     }
 
-
-    private boolean executeRiskManagement(TradingContext context) {
-        return this.checkStopLoss(context) || this.checkHoldingPeriod(context);
-    }
-
-    private boolean checkHoldingPeriod(TradingContext context) {
-        return tradeEngine.getPositions().entrySet().stream().anyMatch(entry -> {
-            if (context.getTimestamp() - entry.getValue().get(0).getTimestamp() >= MAX_LEVERAGED_HOLDING_DAYS) {
-                this.exitToQQQ(context, "Max holding period reached for " + entry.getKey());
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private boolean checkStopLoss(TradingContext context) {
-        return tradeEngine.getPositions().entrySet().stream().anyMatch(entry -> {
+    private void executeRiskManagement(TradingContext context) {
+        long currentTimestamp = context.getTimestamp();
+        Map<Symbol, List<Position>> positionMap = tradeEngine.getPositions();
+        for (Map.Entry<Symbol, List<Position>> entry : positionMap.entrySet()) {
             Symbol symbol = entry.getKey();
-            double currentPrice = getCurrentPrice(symbol, context);
-            double loss = (currentPrice - entry.getValue().get(0).getPrice()) / entry.getValue().get(0).getPrice();
-
-            if (loss < -STOP_LOSS_THRESHOLD) {
-                this.exitToQQQ(context, "Stop loss triggered");
-                return true;
+            List<Position> positions = entry.getValue();
+            double averagePrice = Position.getAveragePrice(positions, currentTimestamp);
+            double averageHoldingDays = Position.getAverageHoldingDays(positions, currentTimestamp);
+            double currentPrice = this.getCurrentPrice(symbol, context);
+            if (symbol.equals(QQQ)) {
+                continue;
             }
-            return false;
-        });
+            if (averageHoldingDays >= MAX_LEVERAGED_HOLDING_DAYS) {
+                tradeEngine.sell(symbol, currentPrice, PROPORTION_OF_100, currentTimestamp, "超过持有天数，卖出");
+            }
+            double lossRate = (currentPrice - averagePrice) / averagePrice;
+            if (lossRate < -STOP_LOSS_THRESHOLD) {
+                tradeEngine.sell(symbol,
+                                 currentPrice,
+                                 PROPORTION_OF_100,
+                                 currentTimestamp,
+                                 "损失达到：" + lossRate + "，止损点已达到");
+            }
+        }
     }
 
     private void executeTradingLogic(TradingContext context) {
         if (tradeEngine.getQuantity(QQQ) == 0 && tradeEngine.getQuantity(TQQQ) == 0 && tradeEngine.getQuantity(SQQQ) == 0) {
-            tradeEngine.buyAll(QQQ, context.getQqqPrice(), context.getTimestamp());
-            this.updateLastTradeTime(context.getTimestamp());
+            tradeEngine.buy(QQQ, context.getQqqPrice(), PROPORTION_OF_100, context.getTimestamp(), "没有持仓，买入 QQQ");
+            lastTradeTime = context.getTimestamp();
         } else if (this.canTrade(context)) {
             this.handleTradeSignals(context);
         }
     }
 
     private boolean canTrade(TradingContext context) {
+        // 最低交易间隔为 1 天
         if (context.getTimestamp() - lastTradeTime < MIN_TRADE_INTERVAL) {
             return false;
         }
 
         double volatility = this.calculateDailyVolatility(context);
+        // 如果当天价格波动太大，不允许交易
         if (volatility > MAX_VOLATILITY_THRESHOLD) {
             log.info("Market volatility too high: {}", volatility);
             return false;
         }
-
-        return isPositionAllowed(context);
-    }
-
-    private boolean isPositionAllowed(TradingContext context) {
 
         return true;
     }
 
     private double calculateDailyVolatility(TradingContext context) {
         // 简单实现：用当日高低价差计算波动率
-        double high = qqqKlineMap.get(context.getTimestamp()).getHigh();
-        double low = qqqKlineMap.get(context.getTimestamp()).getLow();
+        long timestamp = context.getTimestamp();
+        double high = qqqKlineMap.get(timestamp).getHigh();
+        double low = qqqKlineMap.get(timestamp).getLow();
         return (high - low) / low;
     }
 
-
     private void handleTradeSignals(TradingContext context) {
         if (this.isExtremeBuySignal(context)) {
-            this.executeExtremeBuyTrade(context);
+            this.allinBuy(context, TQQQ, "");
         } else if (this.isExtremeSellSignal(context)) {
-            this.executeExtremeSellTrade(context);
+            this.allinBuy(context, SQQQ, "");
         } else {
             this.handleNeutralConditions(context);
         }
@@ -164,38 +161,45 @@ public class ImprovedRsiStrategy extends BaseStrategy {
         return context.getRsi() > EXTREME_OVERBOUGHT && TradingContext.confirmDowntrendReversal(context);
     }
 
-    private void executeExtremeBuyTrade(TradingContext context) {
-        if (tradeEngine.getQuantity(TQQQ) == 0) {
-            tradeEngine.buyAll(TQQQ, context.getTqqqPrice(), context.getTimestamp());
-            tradeEngine.sellAll(QQQ, context.getQqqPrice(), context.getTimestamp());
-            updateLastTradeTime(context.getTimestamp());
+    private void allinBuy(TradingContext context, Symbol symbol, String reason) {
+        if (symbol.equals(QQQ)) {
+            return;
         }
-    }
-
-    private void executeExtremeSellTrade(TradingContext context) {
-        if (tradeEngine.getQuantity(SQQQ) == 0) {
-            tradeEngine.buyAll(SQQQ, context.getSqqqPrice(), context.getTimestamp());
-            tradeEngine.sellAll(QQQ, context.getQqqPrice(), context.getTimestamp());
-            updateLastTradeTime(context.getTimestamp());
-        }
-    }
-
-    private void updateLastTradeTime(long timestamp) {
-        lastTradeTime = timestamp;
+        tradeEngine.sell(QQQ,
+                         context.getQqqPrice(),
+                         PROPORTION_OF_100,
+                         context.getTimestamp(),
+                         "出现了极端的上涨或者下跌趋势，卖出QQQ，买入");
+        tradeEngine.buy(symbol, context.getTqqqPrice(), PROPORTION_OF_100, context.getTimestamp(), reason);
+        lastTradeTime = context.getTimestamp();
     }
 
     private void handleNeutralConditions(TradingContext context) {
         double rsi = context.getRsi();
-        if (rsi >= EXTREME_OVERSOLD && rsi <= EXTREME_OVERBOUGHT && tradeEngine.getQuantity(QQQ) == 0) {
-            tradeEngine.buyAll(QQQ, context.getQqqPrice(), context.getTimestamp());
-        }
-    }
 
-    private void exitToQQQ(TradingContext context, String reason) {
-        tradeEngine.sellAll(TQQQ, context.getTqqqPrice(), context.getTimestamp());
-        tradeEngine.sellAll(SQQQ, context.getSqqqPrice(), context.getTimestamp());
-        tradeEngine.buyAll(QQQ, context.getQqqPrice(), context.getTimestamp());
-        log.info("Exit to QQQ: {}", reason);
+        if (rsi >= EXTREME_OVERSOLD && tradeEngine.getQuantity(TQQQ) > 0) {
+            tradeEngine.sell(TQQQ,
+                             context.getTqqqPrice(),
+                             PROPORTION_OF_100,
+                             context.getTimestamp(),
+                             "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，卖出TQQQ，置换到QQQ");
+            tradeEngine.buy(QQQ,
+                            context.getQqqPrice(),
+                            PROPORTION_OF_100,
+                            context.getTimestamp(),
+                            "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，买入QQQ");
+        }
+
+        tradeEngine.sell(SQQQ,
+                         context.getSqqqPrice(),
+                         PROPORTION_OF_100,
+                         context.getTimestamp(),
+                         "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，卖出SQQQ，置换到QQQ");
+        tradeEngine.buy(QQQ,
+                        context.getQqqPrice(),
+                        PROPORTION_OF_100,
+                        context.getTimestamp(),
+                        "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，买入QQQ");
     }
 
     private double getCurrentPrice(Symbol symbol, TradingContext context) {
@@ -209,5 +213,11 @@ public class ImprovedRsiStrategy extends BaseStrategy {
             default:
                 throw new IllegalArgumentException("Unknown symbol: " + symbol);
         }
+    }
+
+    @Override
+    protected JFreeChart getChart() {
+        RSIChart chart = new RSIChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
+        return chart.getCombinedChart();
     }
 }

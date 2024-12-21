@@ -1,9 +1,9 @@
 package com.gantenx.engine;
 
+import com.gantenx.model.Time;
 import com.gantenx.strategy.qqq.ConsecutiveDays;
 
-public class TradingContext {
-    private long timestamp;
+public class TradingContext extends Time {
     private double rsi;
     private double previousRsi;
     private double ema;
@@ -15,11 +15,8 @@ public class TradingContext {
     private int consecutiveGainDays;
     private int consecutiveLossDays;
 
-    private TradingContext() {
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    private TradingContext(long timestamp) {
+        super(timestamp);
     }
 
     public void setRsi(double rsi) {
@@ -60,11 +57,6 @@ public class TradingContext {
 
     public void setConsecutiveLossDays(int consecutiveLossDays) {
         this.consecutiveLossDays = consecutiveLossDays;
-    }
-
-    // Getters for all fields (optional, based on usage)
-    public long getTimestamp() {
-        return timestamp;
     }
 
     public double getRsi() {
@@ -171,8 +163,7 @@ public class TradingContext {
                                                      double macd,
                                                      double previousRsi,
                                                      ConsecutiveDays consecutiveDays) {
-        TradingContext context = new TradingContext();
-        context.setTimestamp(ts);
+        TradingContext context = new TradingContext(ts);
         context.setPreviousRsi(rsi);
         context.setEma(ema);
         context.setFastEma(fastEma);

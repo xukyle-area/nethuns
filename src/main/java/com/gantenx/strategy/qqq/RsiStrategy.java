@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.gantenx.constant.Constants.PROPORTION_OF_100;
 import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
@@ -43,41 +44,41 @@ public class RsiStrategy extends BaseStrategy {
     private void dailyTrade(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long ts) {
         // 没有仓位的时候，持有QQQ
         if (tradeEngine.hasNoPosition()) {
-            tradeEngine.buyAll(QQQ, qqqPrice, ts);
+            tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "没有任何，卖入QQQ");
         }
 
         if (rsi < 25) {
-            this.allinTQQQ(tqqqPrice, qqqPrice, ts);
+            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，卖出QQQ, 置换到TQQQ");
+            tradeEngine.buy(TQQQ, tqqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，买入TQQQ");
             return;
         } else if (rsi > 85) {
-            this.allinSQQQ(sqqqPrice, qqqPrice, ts);
+            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，卖出QQQ, 置换到SQQQ");
+            tradeEngine.buy(SQQQ, sqqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，买入SQQQ");
             return;
         }
         if (tradeEngine.hasPosition(SQQQ) && rsi <= 60) {
-            this.alloutSQQQ(sqqqPrice, qqqPrice, ts);
+            tradeEngine.sell(SQQQ,
+                             sqqqPrice,
+                             PROPORTION_OF_100,
+                             ts,
+                             "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，卖出SQQQ，置换到QQQ");
+            tradeEngine.buy(QQQ,
+                            qqqPrice,
+                            PROPORTION_OF_100,
+                            ts,
+                            "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，买入QQQ");
         } else if (tradeEngine.hasPosition(TQQQ) && rsi >= 60) {
-            this.alloutTQQQ(tqqqPrice, qqqPrice, ts);
+            tradeEngine.sell(TQQQ,
+                             tqqqPrice,
+                             PROPORTION_OF_100,
+                             ts,
+                             "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，卖出TQQQ，置换到QQQ");
+            tradeEngine.buy(QQQ,
+                            qqqPrice,
+                            PROPORTION_OF_100,
+                            ts,
+                            "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，买入QQQ");
         }
-    }
-
-    public void allinTQQQ(double tqqqPrice, double qqqPrice, long ts) {
-        tradeEngine.sellAll(QQQ, qqqPrice, ts);
-        tradeEngine.buyAll(TQQQ, tqqqPrice, ts);
-    }
-
-    public void alloutTQQQ(double tqqqPrice, double qqqPrice, long ts) {
-        tradeEngine.sellAll(TQQQ, tqqqPrice, ts);
-        tradeEngine.buyAll(QQQ, qqqPrice, ts);
-    }
-
-    public void allinSQQQ(double sqqqPrice, double qqqPrice, long ts) {
-        tradeEngine.sellAll(QQQ, qqqPrice, ts);
-        tradeEngine.buyAll(SQQQ, sqqqPrice, ts);
-    }
-
-    public void alloutSQQQ(double sqqqPrice, double qqqPrice, long ts) {
-        tradeEngine.sellAll(SQQQ, sqqqPrice, ts);
-        tradeEngine.buyAll(QQQ, qqqPrice, ts);
     }
 
     @Override

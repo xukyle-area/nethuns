@@ -1,5 +1,6 @@
 package com.gantenx.engine;
 
+import com.gantenx.annotation.ExcelColumn;
 import com.gantenx.constant.Symbol;
 
 public class TradeRecord {
@@ -10,8 +11,10 @@ public class TradeRecord {
     // 卖出时候的订单id
     private long sellOrderId;
     // 买入时间
+    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
     private long buyTime;
     // 卖出时间
+    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
     private long sellTime;
     // 买入价格
     private double buyPrice;
