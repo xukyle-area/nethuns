@@ -1,15 +1,18 @@
 package com.gantenx.constant;
 
 public enum Symbol {
-    QQQ("data/QQQ.csv"), TQQQ("data/TQQQ.csv"), SQQQ("data/SQQQ.csv");
+    QQQ("data/QQQ.csv"),
+    TQQQ("data/TQQQ.csv"),
+    SQQQ("data/SQQQ.csv");
 
-    private final String path;
+    private final String resources;
 
-    Symbol(String path) {
-        this.path = path;
+    Symbol(String resources) {
+        this.resources = resources;
     }
 
-    public String getPath() {
-        return path;
+    public String getResources() {
+        return resources;
     }
+
 }

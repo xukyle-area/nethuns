@@ -51,7 +51,7 @@ public class WeightedStrategy extends BaseStrategy {
 
 
     @Override
-    protected JFreeChart getChart() {
+    protected JFreeChart getTradingChart() {
         WeightScoreChart weightScoreChart = new WeightScoreChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
         return weightScoreChart.getCombinedChart();
     }

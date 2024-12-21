@@ -2,6 +2,7 @@ package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.chart.RSIChart;
+import com.gantenx.engine.Position;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +18,23 @@ import static com.gantenx.constant.Symbol.*;
 @Slf4j
 public class RsiStrategy extends BaseStrategy {
 
+    // RSI阈值
+    private static final double EXTREME_OVERSOLD = 25.0;
+    private static final double EXTREME_OVERBOUGHT = 85.0;
+    private static final double NEUTRAL_LEVEL = 60.0;
+    private static final int RSI_PERIOD = 6;
+
+    // 风险控制参数
+    private static final double MAX_HOLDING_DAYS = 100.0; // 最大持仓天数（天）
+    private static final double STOP_LOSS_THRESHOLD = -0.03; // 止损阈值（-5%）
+
     public RsiStrategy(String startStr, String endStr) {
         super(RsiStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override
     public void openTrade() {
-        Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(qqqKlineMap, 6);
+        Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(qqqKlineMap, RSI_PERIOD);
         List<Long> timestamps = CollectionUtils.getTimestamps(rsiOfQQQ);
 
         for (long ts : timestamps) {
@@ -31,58 +42,132 @@ public class RsiStrategy extends BaseStrategy {
             Kline tqqqCandle = tqqqKlineMap.get(ts);
             Kline qqqCandle = qqqKlineMap.get(ts);
             Kline sqqqCandle = sqqqKlineMap.get(ts);
+
             if (Objects.isNull(rsi) || Objects.isNull(qqqCandle) || Objects.isNull(tqqqCandle)) {
                 continue;
             }
+
+            // 检查风险控制条件
+            if (checkRiskControl(ts)) {
+                continue;
+            }
+
             this.dailyTrade(tqqqCandle.getClose(), qqqCandle.getClose(), sqqqCandle.getClose(), rsi, ts);
         }
     }
 
-    /**
-     * 策略为，如果
-     */
+    private boolean checkRiskControl(long currentTime) {
+        // 检查TQQQ持仓
+        if (tradeEngine.hasPosition(TQQQ)) {
+            List<Position> tqqqPositions = tradeEngine.getPositions(TQQQ);
+            double avgHoldingDays = Position.getAverageHoldingDays(tqqqPositions, currentTime);
+            double avgPrice = Position.getAveragePrice(tqqqPositions, currentTime);
+            double currentPrice = tqqqKlineMap.get(currentTime).getClose();
+
+            // 检查持仓时间
+            if (avgHoldingDays >= MAX_HOLDING_DAYS) {
+                exitToQQQ(currentTime, String.format("TQQQ平均持仓天数(%.2f)超过阈值", avgHoldingDays));
+                return true;
+            }
+
+            // 检查止损
+            double returnRate = (currentPrice - avgPrice) / avgPrice;
+            if (returnRate <= STOP_LOSS_THRESHOLD) {
+                exitToQQQ(currentTime, String.format("TQQQ跌幅(%.2f%%)触发止损", returnRate * 100));
+                return true;
+            }
+        }
+
+        // 检查SQQQ持仓
+        if (tradeEngine.hasPosition(SQQQ)) {
+            List<Position> sqqqPositions = tradeEngine.getPositions(SQQQ);
+            double avgHoldingDays = Position.getAverageHoldingDays(sqqqPositions, currentTime);
+            double avgPrice = Position.getAveragePrice(sqqqPositions, currentTime);
+            double currentPrice = sqqqKlineMap.get(currentTime).getClose();
+
+            // 检查持仓时间
+            if (avgHoldingDays >= MAX_HOLDING_DAYS) {
+                exitToQQQ(currentTime, String.format("SQQQ平均持仓天数(%.2f)超过阈值", avgHoldingDays));
+                return true;
+            }
+
+            // 检查止损
+            double returnRate = (currentPrice - avgPrice) / avgPrice;
+            if (returnRate <= STOP_LOSS_THRESHOLD) {
+                exitToQQQ(currentTime, String.format("SQQQ跌幅(%.2f%%)触发止损", returnRate * 100));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void exitToQQQ(long timestamp, String reason) {
+        double qqqPrice = qqqKlineMap.get(timestamp).getClose();
+        double tqqqPrice = tqqqKlineMap.get(timestamp).getClose();
+        double sqqqPrice = sqqqKlineMap.get(timestamp).getClose();
+
+        // 清空TQQQ持仓
+        if (tradeEngine.hasPosition(TQQQ)) {
+            tradeEngine.sell(TQQQ, tqqqPrice, PROPORTION_OF_100, timestamp, reason);
+        }
+
+        // 清空SQQQ持仓
+        if (tradeEngine.hasPosition(SQQQ)) {
+            tradeEngine.sell(SQQQ, sqqqPrice, PROPORTION_OF_100, timestamp, reason);
+        }
+
+        // 买入QQQ
+        tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, reason + "，转入QQQ");
+    }
+
     private void dailyTrade(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long ts) {
         // 没有仓位的时候，持有QQQ
         if (tradeEngine.hasNoPosition()) {
-            tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "没有任何，卖入QQQ");
+            tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "无持仓，买入QQQ");
+            return;
         }
 
-        if (rsi < 25) {
-            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，卖出QQQ, 置换到TQQQ");
-            tradeEngine.buy(TQQQ, tqqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，买入TQQQ");
-            return;
-        } else if (rsi > 85) {
-            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，卖出QQQ, 置换到SQQQ");
-            tradeEngine.buy(SQQQ, sqqqPrice, PROPORTION_OF_100, ts, "RSI达到 " + rsi + ": 超卖，买入SQQQ");
+        // RSI超卖，买入TQQQ
+        if (rsi < EXTREME_OVERSOLD) {
+            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts,
+                             String.format("RSI=%.2f 超卖，卖出QQQ换入TQQQ", rsi));
+            tradeEngine.buy(TQQQ, tqqqPrice, PROPORTION_OF_100, ts,
+                            String.format("RSI=%.2f 超卖，买入TQQQ", rsi));
             return;
         }
-        if (tradeEngine.hasPosition(SQQQ) && rsi <= 60) {
-            tradeEngine.sell(SQQQ,
-                             sqqqPrice,
-                             PROPORTION_OF_100,
-                             ts,
-                             "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，卖出SQQQ，置换到QQQ");
-            tradeEngine.buy(QQQ,
-                            qqqPrice,
-                            PROPORTION_OF_100,
-                            ts,
-                            "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，买入QQQ");
-        } else if (tradeEngine.hasPosition(TQQQ) && rsi >= 60) {
-            tradeEngine.sell(TQQQ,
-                             tqqqPrice,
-                             PROPORTION_OF_100,
-                             ts,
-                             "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，卖出TQQQ，置换到QQQ");
-            tradeEngine.buy(QQQ,
-                            qqqPrice,
-                            PROPORTION_OF_100,
-                            ts,
-                            "RSI达到 " + rsi + ": 原先持仓TQQQ，目前判断已经上涨，买入QQQ");
+        // RSI超买，买入SQQQ
+        else if (rsi > EXTREME_OVERBOUGHT) {
+            tradeEngine.sell(QQQ, qqqPrice, PROPORTION_OF_100, ts,
+                             String.format("RSI=%.2f 超买，卖出QQQ换入SQQQ", rsi));
+            tradeEngine.buy(SQQQ, sqqqPrice, PROPORTION_OF_100, ts,
+                            String.format("RSI=%.2f 超买，买入SQQQ", rsi));
+            return;
+        }
+
+        // 处理正常持仓情况
+        handleNormalHolding(tqqqPrice, qqqPrice, sqqqPrice, rsi, ts);
+    }
+
+    private void handleNormalHolding(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long ts) {
+        // 持有SQQQ且RSI回归中性，换回QQQ
+        if (tradeEngine.hasPosition(SQQQ) && rsi <= NEUTRAL_LEVEL) {
+            tradeEngine.sell(SQQQ, sqqqPrice, PROPORTION_OF_100, ts,
+                             String.format("持有SQQQ，RSI=%.2f 回归中性，卖出SQQQ换回QQQ", rsi));
+            tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts,
+                            String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
+        }
+        // 持有TQQQ且RSI回归中性，换回QQQ
+        else if (tradeEngine.hasPosition(TQQQ) && rsi >= NEUTRAL_LEVEL) {
+            tradeEngine.sell(TQQQ, tqqqPrice, PROPORTION_OF_100, ts,
+                             String.format("持有TQQQ，RSI=%.2f 回归中性，卖出TQQQ换回QQQ", rsi));
+            tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts,
+                            String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
         }
     }
 
     @Override
-    protected JFreeChart getChart() {
+    protected JFreeChart getTradingChart() {
         RSIChart chart = new RSIChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
         return chart.getCombinedChart();
     }

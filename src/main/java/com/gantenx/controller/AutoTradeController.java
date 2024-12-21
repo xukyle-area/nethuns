@@ -1,5 +1,8 @@
 package com.gantenx.controller;
 
+import com.gantenx.constant.CryptoCurrency;
+import com.gantenx.constant.CryptoSymbol;
+import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.service.BinanceQuoteService;
 import com.gantenx.utils.DateUtils;
@@ -28,10 +31,12 @@ public class AutoTradeController {
     }
 
     @GetMapping("/kline")
-    public List<Kline> kline(@RequestParam("symbol") String symbol,
+    public List<Kline> kline(@RequestParam("base") CryptoCurrency base,
+                             @RequestParam("quote") CryptoCurrency quote,
                              @RequestParam("begin") String beginStr,
                              @RequestParam("end") String endStr,
                              @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
-        return binanceQuoteService.getKline(symbol.toUpperCase(), ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
+        CryptoSymbol symbol = CryptoSymbol.toSymbol(base, quote);
+        return binanceQuoteService.getKline(symbol, ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
     }
 }

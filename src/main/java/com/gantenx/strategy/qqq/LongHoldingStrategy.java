@@ -40,7 +40,7 @@ public class LongHoldingStrategy extends BaseStrategy {
     }
 
     @Override
-    protected JFreeChart getChart() {
+    protected JFreeChart getTradingChart() {
         RSIChart chart = new RSIChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
         return chart.getCombinedChart();
     }

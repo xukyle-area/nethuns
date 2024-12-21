@@ -213,6 +213,11 @@ public class TradeEngine {
         return new HashMap<>(positions);
     }
 
+    public List<Position> getPositions(Symbol symbol) {
+        List<Position> list = positions.get(symbol);
+        return new ArrayList<>(list);
+    }
+
     public TradeDetail exit(Map<Symbol, Kline> priceMap, long ts) {
         priceMap.forEach((a, b) -> this.sell(a, b.getClose(), 100, ts, "回放时间结束，卖出所有持仓"));
         TradeDetail tradeDetail = new TradeDetail();

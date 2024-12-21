@@ -51,13 +51,13 @@ public abstract class BaseStrategy {
         List<Profit> profitList = OrderCalculator.calculateProfitAndHoldingDays(tradeDetail.getOrders());
         ExcelUtils.addDataToNewSheet(workbook, profitList, "profit-list");
         ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, "result");
-        JFreeChart chart = getChart();
-        if (Objects.nonNull(chart)) {
-            ExportUtils.saveJFreeChartAsImage(chart, startStr, endStr, strategyName, "lines", 3600, 1200);
+        JFreeChart tradingChart = getTradingChart();
+        if (Objects.nonNull(tradingChart)) {
+            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, "lines", 3600, 1200);
         }
     }
 
-    protected JFreeChart getChart() {
+    protected JFreeChart getTradingChart() {
         return null;
     }
 

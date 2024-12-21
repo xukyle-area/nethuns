@@ -42,7 +42,7 @@ public class CsvUtils {
     }
 
     public static Map<Long, Kline> getKLineMap(Symbol symbol, long startTime, long endTime) {
-        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(symbol.getPath(), startTime, endTime);
+        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(symbol.getResources(), startTime, endTime);
         return CollectionUtils.toTimeMap(qqqKlineList);
     }
 }
