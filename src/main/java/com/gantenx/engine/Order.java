@@ -8,7 +8,6 @@ public class Order<T> extends Time {
     private final T symbol;    // 标的符号
     private final Side type;       // "buy" or "sell"
     private final double price;      // 价格
-    @ExcelColumn(need = false)
     private final double quantity;   // 数量
     private long orderId;
     private final String reason;

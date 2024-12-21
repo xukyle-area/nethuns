@@ -1,6 +1,5 @@
 package com.gantenx;
 
-import com.gantenx.strategy.qqq.ImprovedRsiQQQStrategy;
 import com.gantenx.strategy.qqq.LongHoldingQQQStrategy;
 import com.gantenx.strategy.qqq.RsiQQQStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,6 @@ public class QQQMain {
     public static void start(String startStr, String endStr) {
         RsiQQQStrategy rsiStrategy = new RsiQQQStrategy(startStr, endStr);
         rsiStrategy.process();
-        ImprovedRsiQQQStrategy improvedRsiStrategy = new ImprovedRsiQQQStrategy(startStr, endStr);
-        improvedRsiStrategy.process();
         LongHoldingQQQStrategy longHoldingStrategy = new LongHoldingQQQStrategy(startStr, endStr);
         longHoldingStrategy.process();
     }

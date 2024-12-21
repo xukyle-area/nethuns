@@ -54,13 +54,13 @@ public abstract class BaseCryptoChart<T> extends ApplicationFrame {
 
         XYPlot plot = chart.getXYPlot();
         plot.setDomainAxis(ChartUtils.getDateAxis());
-        ChartUtils.setupPriceAxes(plot,
-                                  PRICE,
-                                  ASSET,
-                                  CollectionUtils.getMinValue(klineMap),
-                                  CollectionUtils.getMinValue(assetMap),
-                                  CollectionUtils.getMaxValue(klineMap),
-                                  CollectionUtils.getMaxValue(assetMap));
+        ChartUtils.setupAxes(plot,
+                             PRICE,
+                             ASSET,
+                             CollectionUtils.getMinValue(klineMap),
+                             CollectionUtils.getMinValue(assetMap),
+                             CollectionUtils.getMaxValue(klineMap),
+                             CollectionUtils.getMaxValue(assetMap));
         ChartUtils.setupDatasetsAndRenderers(plot, datasets);
         return plot;
     }

@@ -4,7 +4,8 @@ import com.gantenx.calculator.Profit;
 import com.gantenx.constant.CryptoSymbol;
 import com.gantenx.engine.OrderCalculator;
 import com.gantenx.engine.TradeDetail;
-import com.gantenx.engine.TradeEngine;
+import com.gantenx.engine.TradeEngineGanten;
+import com.gantenx.engine.iface.TradeEngine;
 import com.gantenx.model.Kline;
 import com.gantenx.service.BinanceService;
 import com.gantenx.utils.CollectionUtils;
@@ -37,7 +38,7 @@ public abstract class BaseCryptoStrategy {
         this.symbol = symbol;
         long startTimestamp = DateUtils.getTimestamp(start);
         long endTimestamp = DateUtils.getTimestamp(end);
-        tradeEngine = new TradeEngine<>(initialBalance, fee);
+        tradeEngine = new TradeEngineGanten<>(initialBalance, fee);
         List<Kline> kline = BinanceService.getKline(symbol, startTimestamp, endTimestamp);
         klineMap = CollectionUtils.toTimeMap(kline);
         if (!CollectionUtils.isComplete(klineMap, start, end)) {

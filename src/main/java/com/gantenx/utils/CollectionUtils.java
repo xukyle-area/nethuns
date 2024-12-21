@@ -16,6 +16,11 @@ public class CollectionUtils {
         return dataList.stream().collect(Collectors.toMap(Time::getTimestamp, kline -> kline));
     }
 
+    public static <T extends Time> Map<Long, List<T>> toListMap(List<T> dataList) {
+        return dataList.stream().collect(Collectors.groupingBy(Time::getTimestamp,
+                                                               Collectors.mapping(kline -> kline,
+                                                                                  Collectors.toList())));
+    }
     public static <T extends Time> T getLast(Map<Long, T> klineMap) {
         if (klineMap == null || klineMap.isEmpty()) {
             return null;

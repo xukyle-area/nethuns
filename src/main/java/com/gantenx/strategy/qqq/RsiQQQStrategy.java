@@ -59,7 +59,7 @@ public class RsiQQQStrategy extends BaseQQQStrategy {
 
     private boolean checkRiskControl(long currentTime) {
         // 检查TQQQ持仓
-        if (tradeEngine.hasPosition(TQQQ)) {
+        if (tradeEngine.getQuantity(TQQQ) > 0) {
             List<Position> tqqqPositions = tradeEngine.getPositions(TQQQ);
             double avgHoldingDays = Position.getAverageHoldingDays(tqqqPositions, currentTime);
             double avgPrice = Position.getAveragePrice(tqqqPositions, currentTime);
@@ -80,7 +80,7 @@ public class RsiQQQStrategy extends BaseQQQStrategy {
         }
 
         // 检查SQQQ持仓
-        if (tradeEngine.hasPosition(SQQQ)) {
+        if (tradeEngine.getQuantity(SQQQ) > 0) {
             List<Position> sqqqPositions = tradeEngine.getPositions(SQQQ);
             double avgHoldingDays = Position.getAverageHoldingDays(sqqqPositions, currentTime);
             double avgPrice = Position.getAveragePrice(sqqqPositions, currentTime);
@@ -109,12 +109,12 @@ public class RsiQQQStrategy extends BaseQQQStrategy {
         double sqqqPrice = sqqqKlineMap.get(timestamp).getClose();
 
         // 清空TQQQ持仓
-        if (tradeEngine.hasPosition(TQQQ)) {
+        if (tradeEngine.getQuantity(TQQQ) > 0) {
             tradeEngine.sell(TQQQ, tqqqPrice, PROPORTION_OF_100, timestamp, reason);
         }
 
         // 清空SQQQ持仓
-        if (tradeEngine.hasPosition(SQQQ)) {
+        if (tradeEngine.getQuantity(SQQQ) > 0) {
             tradeEngine.sell(SQQQ, sqqqPrice, PROPORTION_OF_100, timestamp, reason);
         }
 
@@ -124,7 +124,7 @@ public class RsiQQQStrategy extends BaseQQQStrategy {
 
     private void dailyTrade(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long timestamp) {
         // 没有仓位的时候，持有QQQ
-        if (tradeEngine.hasNoPosition()) {
+        if (!tradeEngine.hasPosition()) {
             tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, "无持仓，买入QQQ");
             return;
         }
@@ -152,14 +152,14 @@ public class RsiQQQStrategy extends BaseQQQStrategy {
 
     private void handleNormalHolding(double tqqqPrice, double qqqPrice, double sqqqPrice, double rsi, long timestamp) {
         // 持有SQQQ且RSI回归中性，换回QQQ
-        if (tradeEngine.hasPosition(SQQQ) && rsi <= NEUTRAL_LEVEL) {
+        if (tradeEngine.getQuantity(SQQQ) > 0 && rsi <= NEUTRAL_LEVEL) {
             tradeEngine.sell(SQQQ, sqqqPrice, PROPORTION_OF_100, timestamp,
                              String.format("持有SQQQ，RSI=%.2f 回归中性，卖出SQQQ换回QQQ", rsi));
             tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp,
                             String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
         }
         // 持有TQQQ且RSI回归中性，换回QQQ
-        else if (tradeEngine.hasPosition(TQQQ) && rsi >= NEUTRAL_LEVEL) {
+        else if (tradeEngine.getQuantity(TQQQ) > 0 && rsi >= NEUTRAL_LEVEL) {
             tradeEngine.sell(TQQQ, tqqqPrice, PROPORTION_OF_100, timestamp,
                              String.format("持有TQQQ，RSI=%.2f 回归中性，卖出TQQQ换回QQQ", rsi));
             tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp,

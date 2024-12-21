@@ -51,7 +51,7 @@ public class ChartUtils {
         }
     }
 
-    public static void setupPriceAxes(XYPlot plot,
+    public static void setupAxes(XYPlot plot,
                                  String leftName,
                                  String rightName,
                                  double leftMin,
@@ -59,8 +59,7 @@ public class ChartUtils {
                                  double leftMax,
                                  double rightMax) {
         NumberAxis leftAxis = new NumberAxis(leftName);
-        // 使用值范围的百分比来设置边距
-        double leftPadding = (leftMax - leftMin) * 0.2; // 10%的边距
+        double leftPadding = (leftMax - leftMin) * 0.2;
         leftAxis.setRange(Math.max(0, leftMin - leftPadding), leftMax + leftPadding);
         leftAxis.setAutoRange(false);
         plot.setRangeAxis(0, leftAxis);

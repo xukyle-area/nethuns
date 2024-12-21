@@ -39,8 +39,8 @@ public class RsiCryptoStrategy extends BaseCryptoStrategy {
             }
             Kline kline = klineMap.get(timestamp);
             if (this.lowestOfDays(timestamp) > 5 && RSI < 50) {
-                tradeEngine.buy(symbol, kline.getClose(), PROPORTION_OF_100, timestamp, "rsi:" + RSI);
-            } else if (tradeEngine.hasPosition(symbol) && RSI >= 60) {
+                tradeEngine.buy(symbol, kline.getClose(), PROPORTION_OF_30, timestamp, "rsi:" + RSI);
+            } else if (tradeEngine.getQuantity(symbol) > 0 && RSI >= 60) {
                 tradeEngine.sell(symbol, kline.getClose(), PROPORTION_OF_100, timestamp, "rsi:" + RSI);
             }
         }

@@ -2,6 +2,7 @@ package com.gantenx.strategy.qqq;
 
 import com.gantenx.engine.*;
 import com.gantenx.constant.QQQSymbol;
+import com.gantenx.engine.iface.TradeEngine;
 import com.gantenx.model.Kline;
 import com.gantenx.calculator.Profit;
 import com.gantenx.utils.CsvUtils;
@@ -38,7 +39,7 @@ public abstract class BaseQQQStrategy {
         this.endStr = endStr;
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
-        tradeEngine = new TradeEngine<>(initialBalance, fee);
+        tradeEngine = new TradeEngineGanten<>(initialBalance, fee);
         tqqqKlineMap = CsvUtils.getKLineMap(TQQQ, start, end);
         sqqqKlineMap = CsvUtils.getKLineMap(SQQQ, start, end);
         qqqKlineMap = CsvUtils.getKLineMap(QQQ, start, end);

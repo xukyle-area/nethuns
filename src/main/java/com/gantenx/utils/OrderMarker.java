@@ -149,7 +149,10 @@ public class OrderMarker<T> {
     }
 
     private String formatOrderInfo(Order<T> order) {
-        return String.format("%s %s\n@%.2f", order.getSymbol(), order.getType().name(), order.getPrice());
+        return String.format("%s\n%s@%.2f",
+                             DateUtils.getDate(order.getTimestamp()),
+                             order.getType().name(),
+                             order.getPrice());
     }
 
     private void styleAnnotation(XYTextAnnotation annotation, Color color) {

@@ -33,7 +33,7 @@ public class LongHoldingQQQStrategy extends BaseQQQStrategy {
             }
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
-            if (tradeEngine.hasNoPosition()) {
+            if (!tradeEngine.hasPosition()) {
                 tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, "没有仓位的时候，持有QQQ");
             }
         }

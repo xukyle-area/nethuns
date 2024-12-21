@@ -57,13 +57,13 @@ public abstract class BaseQQQChart<T> extends ApplicationFrame {
 
         XYPlot plot = chart.getXYPlot();
         plot.setDomainAxis(ChartUtils.getDateAxis());
-        ChartUtils.setupPriceAxes(plot,
-                                  PRICE,
-                                  PRICE,
-                                  CollectionUtils.getMinValue(qqqMap),
-                                  CollectionUtils.getMinValue(tqqqMap),
-                                  CollectionUtils.getMaxValue(qqqMap),
-                                  CollectionUtils.getMaxValue(tqqqMap));
+        ChartUtils.setupAxes(plot,
+                             PRICE,
+                             PRICE,
+                             CollectionUtils.getMinValue(qqqMap),
+                             CollectionUtils.getMinValue(tqqqMap),
+                             CollectionUtils.getMaxValue(qqqMap),
+                             CollectionUtils.getMaxValue(tqqqMap));
         ChartUtils.setupDatasetsAndRenderers(plot, datasets);
         return plot;
     }

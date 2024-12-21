@@ -29,25 +29,30 @@ public class AssetCalculator {
         Long startTimestamp = CollectionUtils.getMinKey(klineMap);
         assetMap.put(startTimestamp, currentBalance);
 
-        Map<Long, Order<T>> orderMap = CollectionUtils.toTimeMap(orders);
+        Map<Long, List<Order<T>>> orderMap = CollectionUtils.toListMap(orders);
 
         Long endTimestamp = CollectionUtils.getMaxKey(klineMap);
         for (long i = startTimestamp; i <= endTimestamp; i += MS_OF_ONE_DAY) {
-            Order<T> order = orderMap.get(i);
-            Kline kline = klineMap.get(i);
-            double price = kline.getClose();
-            if (Objects.nonNull(order)) {
-                double quantity = order.getQuantity();
-                if (order.getType() == BUY) {
-                    currentBalance -= price * quantity;
-                    currentPosition += quantity;
-                } else if (order.getType() == SELL) {
-                    currentBalance += price * quantity;
-                    currentPosition -= quantity;
-                }
+            List<Order<T>> orderList = orderMap.get(i);
+            if (CollectionUtils.isEmpty(orderList)) {
+                continue;
             }
-            double asset = currentBalance + currentPosition * price;
-            assetMap.put(i, asset);
+            for (Order<T> order : orderList) {
+                Kline kline = klineMap.get(i);
+                double price = kline.getClose();
+                if (Objects.nonNull(order)) {
+                    double quantity = order.getQuantity();
+                    if (order.getType() == BUY) {
+                        currentBalance -= price * quantity;
+                        currentPosition += quantity;
+                    } else if (order.getType() == SELL) {
+                        currentBalance += price * quantity;
+                        currentPosition -= quantity;
+                    }
+                }
+                double asset = currentBalance + currentPosition * price;
+                assetMap.put(i, asset);
+            }
         }
 
         return assetMap;
