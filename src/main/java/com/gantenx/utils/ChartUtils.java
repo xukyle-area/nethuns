@@ -1,5 +1,6 @@
 package com.gantenx.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT;
 
+@Slf4j
 public class ChartUtils {
 
     private static final String TIME = "Time";
@@ -50,20 +52,28 @@ public class ChartUtils {
     }
 
     public static void setupPriceAxes(XYPlot plot,
-                                      String leftName,
-                                      String rightName,
-                                      double leftMin,
-                                      double rightMin,
-                                      double leftMax,
-                                      double rightMax) {
-        NumberAxis qqqAxis = new NumberAxis(leftName);
-        qqqAxis.setRange(leftMin * 0.95, leftMax * 1.05);
-        plot.setRangeAxis(0, qqqAxis);
+                                 String leftName,
+                                 String rightName,
+                                 double leftMin,
+                                 double rightMin,
+                                 double leftMax,
+                                 double rightMax) {
+        NumberAxis leftAxis = new NumberAxis(leftName);
+        // 使用值范围的百分比来设置边距
+        double leftPadding = (leftMax - leftMin) * 0.2; // 10%的边距
+        leftAxis.setRange(Math.max(0, leftMin - leftPadding), leftMax + leftPadding);
+        leftAxis.setAutoRange(false);
+        plot.setRangeAxis(0, leftAxis);
 
-        NumberAxis leveragedAxis = new NumberAxis(rightName);
-        leveragedAxis.setRange(rightMin * 0.95, rightMax * 1.05);
-        plot.setRangeAxis(1, leveragedAxis);
+        NumberAxis rightAxis = new NumberAxis(rightName);
+        double rightPadding = (rightMax - rightMin) * 0.2;
+        rightAxis.setRange(Math.max(0, rightMin - rightPadding), rightMax + rightPadding);
+        rightAxis.setAutoRange(false);
+        plot.setRangeAxis(1, rightAxis);
         plot.setRangeAxisLocation(1, AxisLocation.BOTTOM_OR_RIGHT);
+
+        log.info("Left Axis Range: {}-{} to {}", leftMin, leftMax, leftAxis.getRange());
+        log.info("Right Axis Range: {}-{} to {}", rightMin, rightMax, rightAxis.getRange());
     }
 
     public static DateAxis getDateAxis() {

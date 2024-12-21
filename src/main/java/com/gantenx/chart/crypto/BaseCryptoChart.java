@@ -4,7 +4,7 @@ import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.ChartUtils;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.TradeAnnotationManager;
+import com.gantenx.utils.OrderMarker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -34,7 +34,7 @@ public abstract class BaseCryptoChart<T> extends ApplicationFrame {
         super("Trading Line");
         XYPlot mainPlot = createMainPlot(CollectionUtils.toPriceMap(priceMap), assetMap);
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);
-        TradeAnnotationManager.markOrders(mainPlot, subPlot, orderList);
+        OrderMarker.markOrders(mainPlot, subPlot, orderList);
 
         DateAxis timeAxis = (DateAxis) mainPlot.getDomainAxis();
         CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);

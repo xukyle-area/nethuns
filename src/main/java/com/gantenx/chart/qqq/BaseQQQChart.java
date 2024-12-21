@@ -4,7 +4,7 @@ import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.ChartUtils;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.TradeAnnotationManager;
+import com.gantenx.utils.OrderMarker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -35,7 +35,7 @@ public abstract class BaseQQQChart<T> extends ApplicationFrame {
                                          CollectionUtils.toPriceMap(tqqqMap),
                                          CollectionUtils.toPriceMap(sqqqMap));
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);
-        TradeAnnotationManager.markOrders(mainPlot, subPlot, orderList);
+        OrderMarker.markOrders(mainPlot, subPlot, orderList);
         DateAxis timeAxis = (DateAxis) mainPlot.getDomainAxis();
         CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
         combinedPlot.add(mainPlot, 3);
