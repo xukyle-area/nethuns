@@ -21,9 +21,6 @@ import static com.gantenx.constant.Constants.ONE_DAY;
 @RequestMapping("/auto-trade")
 public class AutoTradeController {
 
-    @Autowired
-    private BinanceService binanceService;
-
     @GetMapping("/hello")
     public String hello() {
         return "hello";
@@ -32,10 +29,9 @@ public class AutoTradeController {
     @GetMapping("/kline")
     public List<Kline> kline(@RequestParam("base") CryptoCurrency base,
                              @RequestParam("quote") CryptoCurrency quote,
-                             @RequestParam("begin") String beginStr,
-                             @RequestParam("end") String endStr,
-                             @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
+                             @RequestParam("start") String startStr,
+                             @RequestParam("end") String endStr) {
         CryptoSymbol symbol = CryptoSymbol.toSymbol(base, quote);
-        return binanceService.getKline(symbol, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr));
+        return BinanceService.getKline(symbol, DateUtils.getTimestamp(startStr), DateUtils.getTimestamp(endStr));
     }
 }

@@ -33,10 +33,10 @@ public class WeightedQQQStrategy extends BaseQQQStrategy {
         ExportUtils.exportWorkbook(ExcelUtils.singleSheet(CollectionUtils.toList(indexMap), name), startStr, endStr, strategyName, name);
 
         // 开启模拟交易
-        for (long ts : timestamps) {
-            Index index = indexMap.get(ts);
+        for (long timestamp : timestamps) {
+            Index index = indexMap.get(timestamp);
             Double rsi = index.getRsi();
-            Kline qqqCandle = qqqKlineMap.get(ts);
+            Kline qqqCandle = qqqKlineMap.get(timestamp);
             if (Objects.isNull(rsi) || Objects.isNull(qqqCandle)) {
                 // 说明今日美股不开市，或者数据异常
                 continue;
@@ -44,7 +44,7 @@ public class WeightedQQQStrategy extends BaseQQQStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (tradeEngine.hasNoPosition()) {
-                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "没有仓位的时候，持有QQQ");
+                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, "没有仓位的时候，持有QQQ");
             }
         }
     }

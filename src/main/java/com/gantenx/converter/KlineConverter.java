@@ -12,13 +12,13 @@ import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 public class KlineConverter {
 
     // 返回转换后的 A/B 的 Kline 列表
-    public static List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, long begin, long end) {
+    public static List<Kline> getKline(Map<Long, Kline> baseMap, Map<Long, Kline> quoteMap, long start, long end) {
         List<Kline> resultList = new ArrayList<>();
 
         // 遍历时间戳区间
-        for (long ts = begin; ts <= end; ts += MS_OF_ONE_DAY) {
-            Kline baseKline = baseMap.get(ts);  // A/USD Kline
-            Kline quoteKline = quoteMap.get(ts); // B/USD Kline
+        for (long timestamp = start; timestamp <= end; timestamp += MS_OF_ONE_DAY) {
+            Kline baseKline = baseMap.get(timestamp);  // A/USD Kline
+            Kline quoteKline = quoteMap.get(timestamp); // B/USD Kline
 
             // 如果基准数据和目标数据都存在，则进行转换
             if (Objects.nonNull(baseKline) && Objects.nonNull(quoteKline)) {

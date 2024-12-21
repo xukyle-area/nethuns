@@ -23,10 +23,10 @@ public class LongHoldingQQQStrategy extends BaseQQQStrategy {
     public void openTrade() {
         Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(qqqKlineMap, 6);
         List<Long> timestamps =  CollectionUtils.getTimestamps(rsiOfQQQ);
-        for (long ts : timestamps) {
-            Double rsi = rsiOfQQQ.get(ts);
-            Kline tqqqCandle = tqqqKlineMap.get(ts);
-            Kline qqqCandle = qqqKlineMap.get(ts);
+        for (long timestamp : timestamps) {
+            Double rsi = rsiOfQQQ.get(timestamp);
+            Kline tqqqCandle = tqqqKlineMap.get(timestamp);
+            Kline qqqCandle = qqqKlineMap.get(timestamp);
             if (Objects.isNull(rsi) || Objects.isNull(qqqCandle) || Objects.isNull(tqqqCandle)) {
                 // 说明今日美股不开市，或者数据异常
                 continue;
@@ -34,7 +34,7 @@ public class LongHoldingQQQStrategy extends BaseQQQStrategy {
             double qqqPrice = qqqCandle.getClose();
             // 没有仓位的时候，持有QQQ
             if (tradeEngine.hasNoPosition()) {
-                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, ts, "没有仓位的时候，持有QQQ");
+                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, "没有仓位的时候，持有QQQ");
             }
         }
     }

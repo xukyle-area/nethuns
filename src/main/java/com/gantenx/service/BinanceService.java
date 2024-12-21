@@ -20,7 +20,7 @@ public class BinanceService {
     private static final QuoteApi quoteApi = RetrofitClient.getRetrofitInstance().create(QuoteApi.class);
     private static final int MAX_DAY_LIMIT = 1500;
 
-    public static<T> List<Kline> getKline(CryptoSymbol symbol, Long startTime, Long endTime) {
+    public static List<Kline> getKline(CryptoSymbol symbol, long startTime, long endTime) {
         String binanceSymbol = symbol.getBinanceSymbol();
 
         if (DateUtils.getDaysBetween(startTime, endTime) > MAX_DAY_LIMIT) {

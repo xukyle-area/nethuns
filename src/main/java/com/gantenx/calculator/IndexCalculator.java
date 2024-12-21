@@ -58,30 +58,31 @@ public class IndexCalculator {
         return resultMap;
     }
 
-    private Index createIndex(Long ts, Kline kline) {
-        if (!allIndicatorsAvailable(ts)) {
+    private Index createIndex(Long timestamp, Kline kline) {
+        if (!allIndicatorsAvailable(timestamp)) {
             return null;
         }
 
-        Index index = new Index(ts);
-        setIndicatorValues(index, ts, kline);
+        Index index = new Index(timestamp);
+        setIndicatorValues(index, timestamp, kline);
         return index;
     }
 
-    private boolean allIndicatorsAvailable(Long ts) {
-        return smaMap.containsKey(ts) &&
-                bollingerBandsMap.containsKey(ts) && rsiMap.containsKey(ts) && macdMap.containsKey(ts) && macdSignalMap.containsKey(ts);
+    private boolean allIndicatorsAvailable(Long timestamp) {
+        return smaMap.containsKey(timestamp) &&
+                bollingerBandsMap.containsKey(timestamp) && rsiMap.containsKey(timestamp) && macdMap.containsKey(
+                timestamp) && macdSignalMap.containsKey(timestamp);
     }
 
-    private void setIndicatorValues(Index index, Long ts, Kline kline) {
-        index.setSma(smaMap.get(ts));
-        index.setRsi(rsiMap.get(ts));
-        index.setEma(emaMap.get(ts));
-        index.setBollingerBands(bollingerBandsMap.get(ts));
-        index.setMacd(macdMap.get(ts));
-        index.setMacdSignal(macdSignalMap.get(ts));  // 设置MACD信号线值
+    private void setIndicatorValues(Index index, Long timestamp, Kline kline) {
+        index.setSma(smaMap.get(timestamp));
+        index.setRsi(rsiMap.get(timestamp));
+        index.setEma(emaMap.get(timestamp));
+        index.setBollingerBands(bollingerBandsMap.get(timestamp));
+        index.setMacd(macdMap.get(timestamp));
+        index.setMacdSignal(macdSignalMap.get(timestamp));  // 设置MACD信号线值
 
-        double score = calculateWeightedScore(ts, kline.getClose());
+        double score = calculateWeightedScore(timestamp, kline.getClose());
         index.setWeightedScore(score);
         index.setSignalStrength(getSignalStrength(score));
     }
@@ -94,11 +95,11 @@ public class IndexCalculator {
         else return "Strong Sell";
     }
 
-    private double calculateWeightedScore(Long ts, double closePrice) {
-        double rsi = rsiMap.get(ts);
-        double macd = macdMap.get(ts);
-        double signal = macdSignalMap.get(ts);
-        double[] bollingerBands = bollingerBandsMap.get(ts);
+    private double calculateWeightedScore(Long timestamp, double closePrice) {
+        double rsi = rsiMap.get(timestamp);
+        double macd = macdMap.get(timestamp);
+        double signal = macdSignalMap.get(timestamp);
+        double[] bollingerBands = bollingerBandsMap.get(timestamp);
 
         return weightedScore(rsi, macd, signal, bollingerBands, closePrice);
     }

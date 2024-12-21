@@ -85,13 +85,13 @@ public class ImprovedRsiQQQStrategy extends BaseQQQStrategy {
     }
 
     @SafeVarargs
-    private final boolean validateData(long ts, Map<Long, Double>... indicators) {
+    private final boolean validateData(long timestamp, Map<Long, Double>... indicators) {
         for (Map<Long, Double> indicator : indicators) {
-            if (!indicator.containsKey(ts)) {
+            if (!indicator.containsKey(timestamp)) {
                 return false;
             }
         }
-        return qqqKlineMap.containsKey(ts) && tqqqKlineMap.containsKey(ts) && sqqqKlineMap.containsKey(ts);
+        return qqqKlineMap.containsKey(timestamp) && tqqqKlineMap.containsKey(timestamp) && sqqqKlineMap.containsKey(timestamp);
     }
 
     private void executeRiskManagement(TradingContext context) {

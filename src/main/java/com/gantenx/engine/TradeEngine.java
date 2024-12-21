@@ -55,9 +55,9 @@ public class TradeEngine<T> {
      * @param symbol     标的
      * @param price      价格
      * @param proportion 百分比
-     * @param ts         时间戳
+     * @param timestamp  时间戳
      */
-    public void sell(T symbol, double price, long proportion, long ts, String reason) {
+    public void sell(T symbol, double price, long proportion, long timestamp, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             log.warn("No position to sell for {}", symbol);
@@ -72,7 +72,7 @@ public class TradeEngine<T> {
             return;
         }
 
-        sell(symbol, price, sellQuantity, ts, reason);
+        sell(symbol, price, sellQuantity, timestamp, reason);
     }
 
     /**
@@ -81,19 +81,19 @@ public class TradeEngine<T> {
      * @param symbol     标的
      * @param price      价格
      * @param proportion 百分比
-     * @param ts         时间戳
+     * @param timestamp  时间戳
      */
-    public void buy(T symbol, double price, long proportion, long ts, String reason) {
+    public void buy(T symbol, double price, long proportion, long timestamp, String reason) {
         double maxQuantity = (balance * proportion / 100) / (price * (1 + fee));  // 计算可以买入的最大数量
         if (maxQuantity <= 0) {
             log.warn("Insufficient balance to buy {}: balance={}", symbol, balance);
             return;
         }
-        buy(symbol, price, maxQuantity, ts, reason);
+        buy(symbol, price, maxQuantity, timestamp, reason);
     }
 
 
-    private void buy(T symbol, double price, double quantity, long ts, String reason) {
+    private void buy(T symbol, double price, double quantity, long timestamp, String reason) {
         if (quantity <= 0 || price <= 0) {
             log.warn("Invalid buy parameters: price={}, quantity={}", price, quantity);
             return;
@@ -105,12 +105,17 @@ public class TradeEngine<T> {
 
             List<Position> positionList = positions.getOrDefault(symbol, new ArrayList<>());
             long orderId = generateOrderId();
-            positionList.add(new Position(orderId, price, quantity, ts)); // 保存买入记录
+            positionList.add(new Position(orderId, price, quantity, timestamp)); // 保存买入记录
             positions.put(symbol, positionList);
 
-            orders.add(new Order(orderId, symbol, BUY, price, quantity, ts, reason));
+            orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp, reason));
 
-            log.info("Bought {} {} at price {}, cost: {}, remaining balance: {}", quantity, symbol, price, cost, balance);
+            log.info("Bought {} {} at price {}, cost: {}, remaining balance: {}",
+                     quantity,
+                     symbol,
+                     price,
+                     cost,
+                     balance);
         } else {
             log.warn("Insufficient balance to buy {}: cost={}, balance={}", symbol, cost, balance);
         }
@@ -215,8 +220,8 @@ public class TradeEngine<T> {
         return new ArrayList<>(list);
     }
 
-    public TradeDetail<T> exit(Map<T, Kline> priceMap, long ts) {
-        priceMap.forEach((a, b) -> this.sell(a, b.getClose(), 100, ts, "回放时间结束，卖出所有持仓"));
+    public TradeDetail<T> exit(Map<T, Kline> priceMap, long timestamp) {
+        priceMap.forEach((a, b) -> this.sell(a, b.getClose(), 100, timestamp, "回放时间结束，卖出所有持仓"));
         TradeDetail<T> tradeDetail = new TradeDetail<>();
         tradeDetail.setBalance(balance);
         tradeDetail.setOrders(orders);

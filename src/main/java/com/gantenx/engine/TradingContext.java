@@ -153,7 +153,7 @@ public class TradingContext extends Time {
         return confirmationCount >= 3;
     }
 
-    public static TradingContext buildTradingContext(long ts,
+    public static TradingContext buildTradingContext(long timestamp,
                                                      Double rsi,
                                                      double qqqPrice,
                                                      double tqqqPrice,
@@ -163,7 +163,7 @@ public class TradingContext extends Time {
                                                      double macd,
                                                      double previousRsi,
                                                      ConsecutiveDays consecutiveDays) {
-        TradingContext context = new TradingContext(ts);
+        TradingContext context = new TradingContext(timestamp);
         context.setPreviousRsi(rsi);
         context.setEma(ema);
         context.setFastEma(fastEma);
