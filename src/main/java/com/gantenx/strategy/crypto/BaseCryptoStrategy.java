@@ -40,6 +40,9 @@ public abstract class BaseCryptoStrategy {
         tradeEngine = new TradeEngine<>(initialBalance, fee);
         List<Kline> kline = BinanceService.getKline(symbol, startTimestamp, endTimestamp);
         klineMap = CollectionUtils.toTimeMap(kline);
+        if (!CollectionUtils.isComplete(klineMap, start, end)) {
+            throw new IllegalArgumentException("Data missing, please check remote server status, or argument!");
+        }
     }
 
     private void printTradeDetail() {
@@ -51,7 +54,7 @@ public abstract class BaseCryptoStrategy {
         ExportUtils.exportWorkbook(workbook, start, end, strategyName, "result");
         JFreeChart tradingChart = getTradingChart();
         if (Objects.nonNull(tradingChart)) {
-            ExportUtils.saveJFreeChartAsImage(tradingChart, start, end, strategyName, "lines", 3600, 1200);
+            ExportUtils.saveJFreeChartAsImage(tradingChart, start, end, strategyName, "lines", 2400, 1200);
         }
     }
 

@@ -53,7 +53,7 @@ public abstract class BaseQQQStrategy {
         ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, "result");
         JFreeChart tradingChart = getTradingChart();
         if (Objects.nonNull(tradingChart)) {
-            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, "lines", 3600, 1200);
+            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, "lines", 2400, 1200);
         }
     }
 

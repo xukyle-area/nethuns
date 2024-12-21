@@ -19,7 +19,6 @@ public class TradeAnnotationManager<T> {
     private static final float LINE_WIDTH = 1.0f;
     private static final double BASE_Y_POSITION = 530;
     private static final double TEXT_Y_SPACING = 20;
-    private static final double LINE_LENGTH = 530; // 竖直线长度
     private static final Color BUY_COLOR = new Color(0, 150, 0);
     private static final Color SELL_COLOR = new Color(150, 0, 0);
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, FONT_SIZE);
@@ -66,14 +65,21 @@ public class TradeAnnotationManager<T> {
     private void addOrderAnnotation(Order<T> order, Long timestamp, int index) {
         Color orderColor = order.getType().equals(BUY) ? BUY_COLOR : SELL_COLOR;
         String[] lines = formatOrderInfo(order).split("\n");
+
+        // 获取基础 Y 坐标（动态位置）
         double baseY = calculateYPosition(index);
+
+        // 为多行文本添加间距，避免重叠
+        double lineSpacing = mainPlot.getRangeAxis().getRange().getLength() * 0.02; // 行间距占 Y 轴范围的 2%
 
         // 添加每一行文本
         for (int i = 0; i < lines.length; i++) {
-            double yPos = baseY + (i * 10.0); // 行间距为15
+            double yPos = baseY - (i * lineSpacing); // 每行下移固定间距
             XYTextAnnotation annotation = new XYTextAnnotation(lines[i].trim(), timestamp, yPos);
             styleAnnotation(annotation, orderColor);
             mainPlot.addAnnotation(annotation);
+
+            // 存储标注到 annotationMap
             annotationMap.computeIfAbsent(timestamp, k -> new ArrayList<>()).add(annotation);
         }
     }
@@ -86,21 +92,35 @@ public class TradeAnnotationManager<T> {
     }
 
     private double calculateYPosition(int index) {
-        if (isTopPosition) {
-            return BASE_Y_POSITION - (index * TEXT_Y_SPACING);
-        } else {
-            return TEXT_Y_SPACING + (index * TEXT_Y_SPACING);
-        }
+        double yLower = mainPlot.getRangeAxis().getLowerBound();
+        double yUpper = mainPlot.getRangeAxis().getUpperBound();
+        double range = yUpper - yLower;
+
+        // 动态计算基础 Y 坐标
+        double baseY = isTopPosition ? yUpper - (0.05 * range) : yLower + (0.05 * range); // 10% 的上方或下方偏移
+
+        // 动态计算间距
+        double spacing = 0.03 * range; // 3% 的范围作为间距
+
+        // 根据 index 动态调整 Y 坐标
+        return baseY - (index * spacing);
     }
+
 
     private void styleAnnotation(XYTextAnnotation annotation, Color color) {
         annotation.setFont(ANNOTATION_FONT);
         annotation.setTextAnchor(TextAnchor.BOTTOM_CENTER);
         annotation.setPaint(color);
-        annotation.setBackgroundPaint(new Color(255, 255, 255, 200));
+
+        // 根据轴范围调整背景透明度（例如固定透明度的 80%）
+        annotation.setBackgroundPaint(new Color(255, 255, 255, (int) (0.8 * 255)));
+
+        // 动态调整边框宽度（例如字体高度的 10%）
+        annotation.setOutlineStroke(new BasicStroke((float) FONT_SIZE * 0.1f));
         annotation.setOutlinePaint(color);
         annotation.setOutlineVisible(true);
     }
+
 
     private BasicStroke createDashedStroke() {
         return new BasicStroke(
@@ -117,15 +137,14 @@ public class TradeAnnotationManager<T> {
     // 添加时间标记的常量
     private static final int TIME_FONT_SIZE = 9;
     private static final Font TIME_FONT = new Font("SansSerif", Font.PLAIN, TIME_FONT_SIZE);
-    private static final double TIME_Y_OFFSET = 10.0; // 时间标记距离底部的距离
-
-    // ... 其他代码保持不变，直到 processOrderGroup 方法 ...
 
     private void processOrderGroup(Long timestamp, List<Order<T>> orders) {
+        double yLower = mainPlot.getRangeAxis().getLowerBound();
+        double yUpper = mainPlot.getRangeAxis().getUpperBound();
+
         // 添加竖直线
-        XYLineAnnotation line = new XYLineAnnotation(
-                timestamp, 0,
-                timestamp, LINE_LENGTH,
+        XYLineAnnotation line = new XYLineAnnotation(timestamp, 0,
+                                                     timestamp, 1000_000,
                 createDashedStroke(),
                 Color.GRAY
         );
@@ -147,15 +166,17 @@ public class TradeAnnotationManager<T> {
         }
     }
 
+
     private void addTimeAnnotation(Long timestamp) {
         // 格式化时间
         String timeStr = SIMPLE_DATE_FORMAT_WITHOUT_TIME.format(new Date(timestamp));
 
+        // 计算Y轴相对位置
+        double yOffset = mainPlot.getRangeAxis().getLowerBound() * 0.95;
+
         // 创建时间标注
         XYTextAnnotation timeAnnotation = new XYTextAnnotation(
-                timeStr,
-                timestamp,
-                TIME_Y_OFFSET  // 在底部显示时间
+                timeStr, timestamp, yOffset
         );
 
         // 设置时间标注样式

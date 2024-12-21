@@ -14,5 +14,13 @@ public class Constants {
     public static final int PROPORTION_OF_50 = 50;
     public static final int PROPORTION_OF_25 = 25;
 
+    public static final String TIME = "Time";
+    public static final String PRICE = "Price";
+    public static final String ASSET = "Asset";
+    public static final String K_LINE = "K-Line";
+    public static final int CHART_WIDTH = 2400;  // 增加宽度
+    public static final int CHART_HEIGHT = 1200;
+
+
     public static final int RSI_PERIOD = 6;
 }

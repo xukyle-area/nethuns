@@ -1,12 +1,15 @@
 package com.gantenx.strategy.crypto;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.chart.RSICryptoChart;
 import com.gantenx.constant.CryptoSymbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jfree.chart.JFreeChart;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,5 +43,11 @@ public class RsiCryptoStrategy extends BaseCryptoStrategy {
                 tradeEngine.sell(symbol, kline.getClose(), PROPORTION_OF_100, timestamp, "rsi:" + RSI);
             }
         }
+    }
+
+    @Override
+    protected JFreeChart getTradingChart() {
+        RSICryptoChart chart = new RSICryptoChart(klineMap, new HashMap<>(), tradeDetail.getOrders());
+        return chart.getCombinedChart();
     }
 }

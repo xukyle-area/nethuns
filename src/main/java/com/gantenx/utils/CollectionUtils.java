@@ -2,10 +2,14 @@ package com.gantenx.utils;
 
 import com.gantenx.model.Kline;
 import com.gantenx.model.Time;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
+
+@Slf4j
 public class CollectionUtils {
 
     public static <T extends Time> Map<Long, T> toTimeMap(List<T> klineList) {
@@ -19,6 +23,42 @@ public class CollectionUtils {
 
         Long maxTimestamp = Collections.max(klineMap.keySet());
         return klineMap.get(maxTimestamp);
+    }
+
+    public static <T> boolean isComplete(Map<Long, T> dataMap, String start, String end) {
+        long startTimestamp = DateUtils.getTimestamp(start);
+        long endTimestamp = DateUtils.getTimestamp(end);
+        for (long i = startTimestamp; i <= endTimestamp; i += MS_OF_ONE_DAY) {
+            T obj = dataMap.get(i);
+            if (Objects.isNull(obj)) {
+                log.error("Data missing for: {}", DateUtils.getDate(i));
+                return false;
+            }
+            log.error("Data {} for {}", JsonUtils.toJson(obj), DateUtils.getDate(i));
+        }
+        return true;
+    }
+
+    public static double getMaxValue(Map<Long, Double> map) {
+        if (map.isEmpty()) {
+            return 100.0;
+        }
+        return Collections.max(map.values());
+    }
+
+    public static double getMinValue(Map<Long, Double> map) {
+        if (map.isEmpty()) {
+            return 0.0;
+        }
+        return Collections.min(map.values());
+    }
+
+    public static Map<Long, Double> toPriceMap(Map<Long, Kline> klineMap) {
+        HashMap<Long, Double> map = new HashMap<>();
+        for (Map.Entry<Long, Kline> entry : klineMap.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().getClose());
+        }
+        return map;
     }
 
     public static <T extends Time> Long findLatestTime(Map<Long, T> klineMap) {
