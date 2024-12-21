@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Constants.PROPORTION_OF_100;
+import static com.gantenx.constant.Constants.*;
 import static com.gantenx.constant.QQQSymbol.QQQ;
 
 @Slf4j
@@ -26,25 +26,13 @@ public class WeightedQQQStrategy extends BaseQQQStrategy {
 
     @Override
     protected void openTrade() {
-        // 计算 QQQ 的 k 线加权参数
-        Map<Long, Index> indexMap = IndexCalculator.getIndexMap(qqqKlineMap, Constants.INDEX_WEIGHTS, Constants.INDEX_PERIOD);
-        List<Long> timestamps = CollectionUtils.getTimestamps(indexMap);
+        Map<Long, Index> indexMap = IndexCalculator.getIndexMap(klineMap.get(QQQ), INDEX_WEIGHTS, INDEX_PERIOD);
         String name = "index-data";
         ExportUtils.exportWorkbook(ExcelUtils.singleSheet(CollectionUtils.toList(indexMap), name), startStr, endStr, strategyName, name);
-
-        // 开启模拟交易
-        for (long timestamp : timestamps) {
-            Index index = indexMap.get(timestamp);
-            Double rsi = index.getRsi();
-            Kline qqqCandle = qqqKlineMap.get(timestamp);
-            if (Objects.isNull(rsi) || Objects.isNull(qqqCandle)) {
-                // 说明今日美股不开市，或者数据异常
-                continue;
-            }
-            double qqqPrice = qqqCandle.getClose();
-            // 没有仓位的时候，持有QQQ
+        while (tradeEngine.hasNextDay()) {
+            tradeEngine.nextDay();
             if (!tradeEngine.hasPosition()) {
-                tradeEngine.buy(QQQ, qqqPrice, PROPORTION_OF_100, timestamp, "没有仓位的时候，持有QQQ");
+                tradeEngine.buy(QQQ, PROPORTION_OF_100, "没有仓位的时候，持有QQQ");
             }
         }
     }
@@ -52,7 +40,7 @@ public class WeightedQQQStrategy extends BaseQQQStrategy {
 
     @Override
     protected JFreeChart getTradingChart() {
-        WeightScoreChart weightScoreChart = new WeightScoreChart(qqqKlineMap, tqqqKlineMap, sqqqKlineMap, tradeDetail.getOrders());
+        WeightScoreChart weightScoreChart = new WeightScoreChart(klineMap, tradeDetail.getOrders());
         return weightScoreChart.getCombinedChart();
     }
 }

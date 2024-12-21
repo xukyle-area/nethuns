@@ -10,10 +10,13 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.util.List;
 import java.util.Map;
 
+import static com.gantenx.constant.QQQSymbol.QQQ;
+
 public class RSIChart extends BaseQQQChart<QQQSymbol> {
     private static final String RSI = "RSI";
-    public RSIChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, List<Order<QQQSymbol>> orderList) {
-        super(qqqMap, tqqqMap, sqqqMap, RSIChart.subDataset(qqqMap), RSI, 100.0, orderList);
+
+    public RSIChart(Map<QQQSymbol, Map<Long, Kline>> klineMap, List<Order<QQQSymbol>> orderList) {
+        super(klineMap, RSIChart.subDataset(klineMap.get(QQQ)), RSI, 100.0, orderList);
     }
 
     private static XYSeriesCollection subDataset(Map<Long, Kline> qqqMap) {

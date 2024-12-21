@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Slf4j
 public class CsvUtils {
-    public static List<Kline> getKLineFromCsv(String csvFile, long startTime, long endTime) {
+    public static List<Kline> getKLineList(String csvFile, long startTime, long endTime) {
         List<Kline> klineList = new ArrayList<>();
 
         try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream(csvFile)) {
@@ -42,7 +42,7 @@ public class CsvUtils {
     }
 
     public static Map<Long, Kline> getKLineMap(QQQSymbol QQQSymbol, long startTime, long endTime) {
-        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(QQQSymbol.getResources(), startTime, endTime);
+        List<Kline> qqqKlineList = CsvUtils.getKLineList(QQQSymbol.getResources(), startTime, endTime);
         return CollectionUtils.toTimeMap(qqqKlineList);
     }
 }

@@ -21,9 +21,9 @@ public class AssetCalculator {
     // 用于存储每个时间戳对应的资产
     public static <T> Map<Long, Double> calculateAssetMap(Map<Long, Kline> klineMap,
                                                           List<Order<T>> orders,
-                                                          double initialBalance) {
+                                                          double init) {
         Map<Long, Double> assetMap = new TreeMap<>();
-        double currentBalance = initialBalance;
+        double currentBalance = init;
         double currentPosition = 0.0;
 
         Long startTimestamp = CollectionUtils.getMinKey(klineMap);

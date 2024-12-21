@@ -1,6 +1,5 @@
 package com.gantenx.engine;
 
-import com.gantenx.engine.iface.TradeEngine;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
@@ -12,34 +11,66 @@ import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.constant.Side.SELL;
 
 @Slf4j
-public class TradeEngineGanten<T> implements TradeEngine<T> {
+public class TradeEngine<T> {
 
     private static final double EPSILON = 1e-6;
-    private final double initialBalance;
-    private final double fee; // 交易手续费率
+    private static final double INITIAL_BALANCE = 100000;
+    private final static double FEE = 0.001;
+
     private final Map<T, List<Position>> positions = new HashMap<>();
     private final List<Order<T>> orders = new ArrayList<>();
     private final List<TradeRecord<T>> records = new ArrayList<>();
-    private double balance;
-    private double feeCount;
+    private final List<Long> openDays;
+    private final Map<T, Map<Long, Kline>> klineMap;
+
+    private double balance = INITIAL_BALANCE;
+    private double feeCount = 0.0;
     private long orderId = 0;
     private long recordId = 0;
+    private int openDayIndex = -1;
+    private long timestamp;
 
-    public TradeEngineGanten(double initialBalance, double fee) {
-        this.initialBalance = initialBalance;
-        this.balance = initialBalance;
-        this.fee = fee;
-        this.feeCount = 0.0;
+    public Kline getKline(T symbol) {
+        return klineMap.get(symbol).get(timestamp);
     }
 
-    @Override
+    public TradeEngine(List<Long> openDays, Map<T, Map<Long, Kline>> klineMap) {
+        if (openDays == null || openDays.isEmpty()) {
+            throw new IllegalArgumentException("OpenDays cannot be null or empty");
+        }
+        if (klineMap == null || klineMap.isEmpty()) {
+            throw new IllegalArgumentException("KlineMap cannot be null or empty");
+        }
+        this.openDays = openDays;
+        this.klineMap = klineMap;
+    }
+
+    public boolean hasNextDay() {
+        return openDayIndex + 1 < openDays.size();
+    }
+
+    public long nextDay() {
+        if (!this.hasNextDay()) {
+            return -1;
+        }
+        if (openDayIndex + 1 >= openDays.size()) {
+            return -1; // 或抛出异常
+        }
+        openDayIndex++;
+        timestamp = openDays.get(openDayIndex);
+        return timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     public boolean hasPosition() {
         Collection<Position> positionList = CollectionUtils.toCollection(positions.values());
-        return positionList.stream().noneMatch(position -> position.getQuantity() > 0);
+        return positionList.stream().anyMatch(position -> position.getQuantity() > 0);
     }
 
-    @Override
-    public void sell(T symbol, double price, long proportion, long timestamp, String reason) {
+    public void sell(T symbol, long proportion, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             log.warn("{} - No position to sell for {}", DateUtils.getDate(timestamp), symbol);
@@ -57,20 +88,26 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
             return;
         }
 
-        sell(symbol, price, sellQuantity, timestamp, reason);
+        sell(symbol, sellQuantity, reason);
     }
 
-    @Override
-    public void buy(T symbol, double price, long proportion, long timestamp, String reason) {
-        double maxQuantity = (balance * proportion / 100) / (price * (1 + fee));  // 计算可以买入的最大数量
+    public void buy(T symbol, long proportion, String reason) {
+        double price = this.getPrice(symbol);
+        double maxQuantity = (balance * proportion / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
         if (maxQuantity <= 0) {
             log.warn("{} - Insufficient balance to buy {}: balance={}", DateUtils.getDate(timestamp), symbol, balance);
             return;
         }
-        buy(symbol, price, maxQuantity, timestamp, reason);
+        buy(symbol, maxQuantity, reason);
     }
 
-    private void buy(T symbol, double price, double quantity, long timestamp, String reason) {
+    public double getPrice(T symbol) {
+        Map<Long, Kline> map = klineMap.get(symbol);
+        return map.get(timestamp).getClose();
+    }
+
+    private void buy(T symbol, double quantity, String reason) {
+        double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             log.warn("{} - Invalid buy parameters: price={}, quantity={}",
                      DateUtils.getDate(timestamp),
@@ -79,7 +116,7 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
             return;
         }
 
-        double cost = calculateTotalCost(price, quantity);
+        double cost = calculateTotalCost(symbol, quantity);
         if (balance + EPSILON >= cost) {
             balance -= cost;
 
@@ -106,7 +143,8 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
         }
     }
 
-    private void sell(T symbol, double price, double quantity, long timestamp, String reason) {
+    private void sell(T symbol, double quantity, String reason) {
+        double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             log.warn("{} - Invalid sell parameters: price={}, quantity={}",
                      DateUtils.getDate(timestamp),
@@ -131,7 +169,7 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
             double sellQuantity = Math.min(position.getQuantity(), remainingQuantity);
 
             // 计算卖出收益
-            double revenue = calculateTotalRevenue(price, sellQuantity);
+            double revenue = calculateTotalRevenue(symbol, sellQuantity);
             double profit = revenue - position.getPrice() * sellQuantity;
 
             totalRevenue += revenue;
@@ -148,7 +186,7 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
             record.setSellOrderId(orderId);
             record.setSellPrice(price);
             record.setSellTime(timestamp);
-            record.setQuantity(quantity);
+            record.setQuantity(sellQuantity);
             record.setSymbol(symbol);
             record.setProfit(profit);
             record.setProfitRate(price / position.getPrice());
@@ -170,21 +208,21 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
         orders.add(new Order<>(orderId, symbol, SELL, price, quantity, timestamp, reason));
     }
 
-    private double calculateTotalCost(double price, double quantity) {
-        double cost = price * quantity;
-        double curFee = cost * fee;
+    private double calculateTotalCost(T symbol, double quantity) {
+        double cost = this.getPrice(symbol) * quantity;
+        double curFee = cost * FEE;
         feeCount += curFee;
         return cost + curFee;
     }
 
-    private double calculateTotalRevenue(double price, double quantity) {
+    private double calculateTotalRevenue(T symbol, double quantity) {
+        double price = this.getPrice(symbol);
         double revenue = price * quantity;
-        double curFee = revenue * fee;
+        double curFee = revenue * FEE;
         feeCount += curFee;
         return revenue - curFee;
     }
 
-    @Override
     public double getQuantity(T symbol) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
@@ -205,34 +243,32 @@ public class TradeEngineGanten<T> implements TradeEngine<T> {
         return recordId;
     }
 
-    @Override
     public List<Position> getPositions(T symbol) {
         List<Position> list = positions.get(symbol);
-        return new ArrayList<>(list);
+        return list != null ? new ArrayList<>(list) : new ArrayList<>();
     }
 
-    @Override
     public double getBalance() {
         return this.balance;
     }
 
-    @Override
-    public double getPositionAsset(Map<T, Kline> priceMap) {
+    public double getPositionAsset() {
         double asset = 0;
-        for (Map.Entry<T, Kline> entry : priceMap.entrySet()) {
-            double quantity = this.getQuantity(entry.getKey());
-            asset += quantity * entry.getValue().getClose();
+        for (T t : positions.keySet()) {
+            double quantity = this.getQuantity(t);
+            asset += quantity * this.getPrice(t);
         }
         return asset;
     }
 
-    @Override
-    public TradeDetail<T> exit(Map<T, Kline> priceMap, long timestamp) {
-        priceMap.forEach((a, b) -> this.sell(a, b.getClose(), 100, timestamp, "回放时间结束，卖出所有持仓"));
+    public TradeDetail<T> exit() {
+        for (T t : klineMap.keySet()) {
+            this.sell(t, 100, "回放时间结束，卖出所有持仓");
+        }
         TradeDetail<T> tradeDetail = new TradeDetail<>();
         tradeDetail.setBalance(balance);
         tradeDetail.setOrders(orders);
-        tradeDetail.setInitialBalance(initialBalance);
+        tradeDetail.setInitialBalance(INITIAL_BALANCE);
         tradeDetail.setFeeCount(feeCount);
         tradeDetail.setRecords(records);
         return tradeDetail;

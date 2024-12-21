@@ -12,15 +12,15 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.util.List;
 import java.util.Map;
 
+import static com.gantenx.constant.QQQSymbol.QQQ;
+
 public class WeightScoreChart extends BaseQQQChart<QQQSymbol> {
 
     private static final String WEIGHT_SCORE = "WeightScore";
 
-    public WeightScoreChart(Map<Long, Kline> qqqMap,
-                            Map<Long, Kline> tqqqMap,
-                            Map<Long, Kline> sqqqMap,
+    public WeightScoreChart(Map<QQQSymbol, Map<Long, Kline>> klineMap,
                             List<Order<QQQSymbol>> orderList) {
-        super(qqqMap, tqqqMap, sqqqMap, WeightScoreChart.subDataset(qqqMap), WEIGHT_SCORE, 1.0, orderList);
+        super(klineMap, WeightScoreChart.subDataset(klineMap.get(QQQ)), WEIGHT_SCORE, 1.0, orderList);
     }
 
     private static XYSeriesCollection subDataset(Map<Long, Kline> klineMap) {

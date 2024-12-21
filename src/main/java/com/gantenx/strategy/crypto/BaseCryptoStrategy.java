@@ -4,8 +4,7 @@ import com.gantenx.calculator.Profit;
 import com.gantenx.constant.CryptoSymbol;
 import com.gantenx.engine.OrderCalculator;
 import com.gantenx.engine.TradeDetail;
-import com.gantenx.engine.TradeEngineGanten;
-import com.gantenx.engine.iface.TradeEngine;
+import com.gantenx.engine.TradeEngine;
 import com.gantenx.model.Kline;
 import com.gantenx.service.BinanceService;
 import com.gantenx.utils.CollectionUtils;
@@ -18,32 +17,47 @@ import org.jfree.chart.JFreeChart;
 
 import java.util.*;
 
-import static com.gantenx.constant.Constants.fee;
-import static com.gantenx.constant.Constants.initialBalance;
+import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 @Slf4j
 public abstract class BaseCryptoStrategy {
     protected final String strategyName;
     protected String start;
     protected String end;
-    protected CryptoSymbol symbol;
     protected TradeEngine<CryptoSymbol> tradeEngine;
     protected TradeDetail<CryptoSymbol> tradeDetail;
-    protected Map<Long, Kline> klineMap;
+    protected Map<CryptoSymbol, Map<Long, Kline>> klineMap;
 
-    public BaseCryptoStrategy(String strategyName, CryptoSymbol symbol, String start, String end) {
+    public BaseCryptoStrategy(String strategyName, List<CryptoSymbol> symbols, String start, String end) {
         this.strategyName = strategyName;
         this.start = start;
         this.end = end;
-        this.symbol = symbol;
         long startTimestamp = DateUtils.getTimestamp(start);
         long endTimestamp = DateUtils.getTimestamp(end);
-        tradeEngine = new TradeEngineGanten<>(initialBalance, fee);
-        List<Kline> kline = BinanceService.getKline(symbol, startTimestamp, endTimestamp);
-        klineMap = CollectionUtils.toTimeMap(kline);
-        if (!CollectionUtils.isComplete(klineMap, start, end)) {
-            throw new IllegalArgumentException("Data missing, please check remote server status, or argument!");
+        Map<CryptoSymbol, Map<Long, Kline>> klineMap = genKlineMap(symbols, startTimestamp, endTimestamp);
+        this.klineMap = klineMap;
+        tradeEngine = new TradeEngine<>(genTimeList(startTimestamp, endTimestamp), klineMap);
+    }
+
+    public static List<Long> genTimeList(long startTimestamp, long endTimestamp) {
+        List<Long> list = new ArrayList<>();
+        for (long i = startTimestamp; i <= endTimestamp; i += MS_OF_ONE_DAY) {
+            list.add(i);
         }
+        return list;
+    }
+
+
+
+    public static Map<CryptoSymbol, Map<Long, Kline>> genKlineMap(List<CryptoSymbol> list,
+                                                               long startTimestamp,
+                                                               long endTimestamp) {
+        HashMap<CryptoSymbol, Map<Long, Kline>> map = new HashMap<>();
+        for (CryptoSymbol cryptoSymbol : list) {
+            List<Kline> kline = BinanceService.getKline(cryptoSymbol, startTimestamp, endTimestamp);
+            map.put(cryptoSymbol, CollectionUtils.toTimeMap(kline));
+        }
+        return map;
     }
 
     private void printTradeDetail() {
@@ -65,9 +79,7 @@ public abstract class BaseCryptoStrategy {
 
     public void process() {
         this.openTrade();
-        Kline last = CollectionUtils.getLast(klineMap);
-        Long latestTime = CollectionUtils.findLatestTime(klineMap);
-        tradeDetail = tradeEngine.exit(Collections.singletonMap(symbol, last), latestTime);
+        tradeDetail = tradeEngine.exit();
         printTradeDetail();
     }
 

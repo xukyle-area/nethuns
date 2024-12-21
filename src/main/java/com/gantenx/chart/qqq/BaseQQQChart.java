@@ -1,5 +1,6 @@
 package com.gantenx.chart.qqq;
 
+import com.gantenx.constant.QQQSymbol;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.ChartUtils;
@@ -16,24 +17,25 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.gantenx.constant.Constants.*;
+import static com.gantenx.constant.QQQSymbol.*;
 
 public abstract class BaseQQQChart<T> extends ApplicationFrame {
     private final JFreeChart combinedChart;
-    protected BaseQQQChart(Map<Long, Kline> qqqMap,
-                           Map<Long, Kline> tqqqMap,
-                           Map<Long, Kline> sqqqMap,
+
+    protected BaseQQQChart(Map<QQQSymbol, Map<Long, Kline>> klineMap,
                            XYSeriesCollection subDataset,
                            String subDataName,
                            double subDataRange,
                            List<Order<T>> orderList) {
         super("Trading Line");
-        XYPlot mainPlot = createMainPlot(CollectionUtils.toPriceMap(qqqMap),
-                                         CollectionUtils.toPriceMap(tqqqMap),
-                                         CollectionUtils.toPriceMap(sqqqMap));
+        XYPlot mainPlot = createMainPlot(klineMap);
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);
         OrderMarker.markOrders(mainPlot, subPlot, orderList);
         DateAxis timeAxis = (DateAxis) mainPlot.getDomainAxis();
@@ -44,28 +46,41 @@ public abstract class BaseQQQChart<T> extends ApplicationFrame {
         this.setupChartPanel();
     }
 
-    private XYPlot createMainPlot(Map<Long, Double> qqqMap,
-                                  Map<Long, Double> tqqqMap,
-                                  Map<Long, Double> sqqqMap) {
-        XYSeriesCollection qqq = ChartUtils.createDataset("QQQ", qqqMap);
-        XYSeriesCollection tqqq = ChartUtils.createDataset("TQQQ", tqqqMap);
-        XYSeriesCollection sqqq = ChartUtils.createDataset("SQQQ", sqqqMap);
-        XYSeriesCollection[] datasets = {qqq, tqqq, sqqq};
+    private XYPlot createMainPlot(Map<QQQSymbol, Map<Long, Kline>> klineMap) {
+        // 1. 数据准备
+        Map<QQQSymbol, Map<Long, Double>> priceDataMap = Arrays.stream(QQQSymbol.values()).collect(Collectors.toMap(
+                symbol -> symbol,
+                symbol -> CollectionUtils.toPriceMap(klineMap.get(symbol))));
+        // 2. 创建数据集
+        XYSeriesCollection[] datasets = Arrays.stream(QQQSymbol.values())
+                .map(symbol -> ChartUtils.createDataset(symbol.name(), priceDataMap.get(symbol)))
+                .toArray(XYSeriesCollection[]::new);
+        // 3. 创建图表
         JFreeChart chart = ChartFactory.createXYLineChart(
                 K_LINE, TIME, PRICE, null,
                 PlotOrientation.VERTICAL, true, true, false);
 
+        // 4. 配置绘图区域
         XYPlot plot = chart.getXYPlot();
         plot.setDomainAxis(ChartUtils.getDateAxis());
+        setupAxisRanges(plot, priceDataMap);
+        ChartUtils.setupDatasetsAndRenderers(plot, datasets);
+
+        return plot;
+    }
+
+    // 抽取坐标轴设置逻辑
+    private void setupAxisRanges(XYPlot plot, Map<QQQSymbol, Map<Long, Double>> priceDataMap) {
+        Map<Long, Double> qqqData = priceDataMap.get(QQQ);
+        Map<Long, Double> tqqqData = priceDataMap.get(TQQQ);
+
         ChartUtils.setupAxes(plot,
                              PRICE,
                              PRICE,
-                             CollectionUtils.getMinValue(qqqMap),
-                             CollectionUtils.getMinValue(tqqqMap),
-                             CollectionUtils.getMaxValue(qqqMap),
-                             CollectionUtils.getMaxValue(tqqqMap));
-        ChartUtils.setupDatasetsAndRenderers(plot, datasets);
-        return plot;
+                             CollectionUtils.getMinValue(qqqData),
+                             CollectionUtils.getMinValue(tqqqData),
+                             CollectionUtils.getMaxValue(qqqData),
+                             CollectionUtils.getMaxValue(tqqqData));
     }
 
     private void setupChartPanel() {
