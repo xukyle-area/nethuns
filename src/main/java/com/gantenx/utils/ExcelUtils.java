@@ -197,10 +197,22 @@ public class ExcelUtils {
     // Helper method to recursively get all fields, including from superclasses
     private static List<Field> getAllFields(Class<?> clazz) {
         List<Field> fields = new ArrayList<>();
+
+        // 递归获取所有父类
+        List<Class<?>> classes = new ArrayList<>();
         while (clazz != null) {
-            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            classes.add(clazz);
             clazz = clazz.getSuperclass();
         }
+
+        // 反转类列表，从父类开始处理
+        Collections.reverse(classes);
+
+        // 按照父类到子类的顺序添加字段
+        for (Class<?> cls : classes) {
+            fields.addAll(Arrays.asList(cls.getDeclaredFields()));
+        }
+
         return fields;
     }
 

@@ -1,12 +1,16 @@
 package com.gantenx.engine;
 
+import com.gantenx.annotation.ExcelColumn;
+
 import java.util.List;
 
 public class TradeDetail {
     private double balance;
     private double initialBalance;
     private double feeCount;
+    @ExcelColumn(need = false)
     private List<Order> orders;
+    @ExcelColumn(need = false)
     private List<TradeRecord> records;
 
     public List<TradeRecord> getRecords() {

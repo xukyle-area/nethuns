@@ -10,22 +10,41 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 
 @Slf4j
 public class ExportUtils {
 
-    public static void saveJFreeChartAsImage(JFreeChart chart, String startStr, String endStr, String strategyName, String filePrefix, int width, int height) {
-        BufferedImage image = chart.createBufferedImage(width, height);
-        File outputFile = new File(genChartPath(strategyName, startStr, endStr, filePrefix));
+    public static void saveJFreeChartAsImage(JFreeChart chart, String startStr, String endStr,
+                                             String strategyName, String filePrefix,
+                                             int width, int height) {
+        if (chart == null) {
+            throw new IllegalArgumentException("Chart cannot be null");
+        }
 
         try {
-            ImageIO.write(image, "png", outputFile);
-            log.info("Chart saved to: {}", outputFile.getPath());
+            Path filePath = Paths.get(genChartPath(strategyName, startStr, endStr, filePrefix));
+            Files.createDirectories(filePath.getParent());
+            BufferedImage image = chart.createBufferedImage(width, height);
+            if (image == null) {
+                throw new RuntimeException("Failed to create chart image");
+            }
+            ImageIO.write(image, "png", filePath.toFile());
+            String absolutePath = filePath.toAbsolutePath().toString();
+            log.info("Chart saved successfully to: {}", absolutePath);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save chart as image.", e);
+            log.error("Failed to save chart as image. Strategy: {}, Period: {} to {}",
+                      strategyName, startStr, endStr, e);
+            throw new RuntimeException("Failed to save chart as image: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error while saving chart. Strategy: {}", strategyName, e);
+            throw new RuntimeException("Unexpected error while saving chart: " + e.getMessage(), e);
         }
     }
+
 
     public static void exportWorkbook(Workbook workbook, String startStr, String endStr, String strategyName, String filename) {
         try {
@@ -53,14 +72,16 @@ public class ExportUtils {
     private static final Joiner joiner = Joiner.on("/");
 
     private static String genChartPath(String strategyName, String startStr, String endStr, String filename) {
-        String timeWithoutDate = DateUtils.getTimeWithoutDate(System.currentTimeMillis(), ZoneOffset.ofHours(8));
+        String timeWithoutDate = DateUtils.getDateTimeForExport(System.currentTimeMillis(), ZoneOffset.ofHours(8));
         String timeRange = startStr + "-" + endStr;
-        return joiner.join("export", timeWithoutDate, timeRange, strategyName, filename + ".png");
+        String fullName = strategyName + "-" + filename + ".png";
+        return joiner.join("export", timeWithoutDate, timeRange, fullName);
     }
 
     private static String genWorkbookPath(String strategyName, String startStr, String endStr, String filename) {
-        String timeWithoutDate = DateUtils.getTimeWithoutDate(System.currentTimeMillis(), ZoneOffset.ofHours(8));
+        String timeWithoutDate = DateUtils.getDateTimeForExport(System.currentTimeMillis(), ZoneOffset.ofHours(8));
         String timeRange = startStr + "-" + endStr;
-        return joiner.join("export", timeWithoutDate, timeRange, strategyName, filename + ".xlsx");
+        String fullName = strategyName + "-" + filename + ".xlsx";
+        return joiner.join("export", timeWithoutDate, timeRange, fullName);
     }
 }

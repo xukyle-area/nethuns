@@ -6,16 +6,17 @@ import com.gantenx.constant.Symbol;
 public class TradeRecord {
     private long id;
     private Symbol symbol;
-    // 买入时候的订单id
-    private long buyOrderId;
-    // 卖出时候的订单id
-    private long sellOrderId;
     // 买入时间
-    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
+    @ExcelColumn(dateFormat = "yyyy-MM-dd")
     private long buyTime;
     // 卖出时间
-    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
+    @ExcelColumn(dateFormat = "yyyy-MM-dd")
     private long sellTime;
+    // 持有天数
+    @ExcelColumn(name = "days")
+    private long holdDays;
+    // 收益率
+    private double profitRate;
     // 买入价格
     private double buyPrice;
     // 卖出价格
@@ -24,6 +25,10 @@ public class TradeRecord {
     private double quantity;
     // 收益
     private double profit;
+    // 买入时候的订单id
+    private long buyOrderId;
+    // 卖出时候的订单id
+    private long sellOrderId;
 
     public long getId() {
         return id;
@@ -39,6 +44,14 @@ public class TradeRecord {
 
     public void setSymbol(Symbol symbol) {
         this.symbol = symbol;
+    }
+
+    public long getHoldDays() {
+        return holdDays;
+    }
+
+    public void setHoldDays(long holdDays) {
+        this.holdDays = holdDays;
     }
 
     public long getBuyOrderId() {
@@ -103,5 +116,13 @@ public class TradeRecord {
 
     public void setProfit(double profit) {
         this.profit = profit;
+    }
+
+    public double getProfitRate() {
+        return profitRate;
+    }
+
+    public void setProfitRate(double profitRate) {
+        this.profitRate = profitRate;
     }
 }

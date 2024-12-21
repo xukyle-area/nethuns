@@ -1,26 +1,26 @@
 package com.gantenx.engine;
 
 import com.gantenx.calculator.Profit;
+import com.gantenx.constant.Symbol;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.constant.Side.SELL;
 
 public class OrderCalculator {
 
-    public static Map<String, Profit> calculateProfitAndHoldingDays(List<Order> orderList) {
-        Map<String, Profit> results = new HashMap<>();
-        Map<String, Stack<Order>> buyOrdersMap = new HashMap<>(); // 用于存储未卖出的买单
+    public static List<Profit> calculateProfitAndHoldingDays(List<Order> orderList) {
+        Map<Symbol, Profit> results = new HashMap<>();
+        Map<Symbol, Stack<Order>> buyOrdersMap = new HashMap<>(); // 用于存储未卖出的买单
 
         for (Order order : orderList) {
-            String symbol = order.getSymbol();
+            Symbol symbol = order.getSymbol();
 
             if (!results.containsKey(symbol)) {
-                results.put(symbol, new Profit());
+                Profit profit = new Profit();
+                profit.setSymbol(symbol);
+                results.put(symbol, profit);
             }
 
             // 处理买入操作
@@ -45,7 +45,6 @@ public class OrderCalculator {
                 }
             }
         }
-
-        return results;
+        return new ArrayList<>(results.values());
     }
 }

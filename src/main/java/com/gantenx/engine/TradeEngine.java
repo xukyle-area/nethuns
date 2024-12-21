@@ -3,6 +3,7 @@ package com.gantenx.engine;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
+import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -102,7 +103,7 @@ public class TradeEngine {
         }
 
         double cost = calculateTotalCost(price, quantity);
-        if (balance >= cost) {
+        if (balance + EPSILON >= cost) {
             balance -= cost;
 
             List<Position> positionList = positions.getOrDefault(symbol, new ArrayList<>());
@@ -151,6 +152,7 @@ public class TradeEngine {
             TradeRecord record = new TradeRecord();
             record.setId(generateRecordId());
             record.setBuyOrderId(position.getOrderId());
+            record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
             record.setBuyPrice(position.getPrice());
             record.setBuyTime(position.getTimestamp());
             record.setSellOrderId(orderId);
@@ -159,6 +161,7 @@ public class TradeEngine {
             record.setQuantity(quantity);
             record.setSymbol(symbol);
             record.setProfit(profit);
+            record.setProfitRate(price / position.getPrice());
             records.add(record);
 
             // 如果仓位清空，移除该记录

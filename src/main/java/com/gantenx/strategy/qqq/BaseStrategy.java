@@ -12,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jfree.chart.JFreeChart;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.gantenx.constant.Symbol.*;
 
@@ -48,31 +45,14 @@ public abstract class BaseStrategy {
     }
 
     private void printTradeDetail() {
-        List<Order> orders = tradeDetail.getOrders();
-        String detail = "trade-detail";
-        Workbook tradeDetailWorkbook = ExcelUtils.singleSheet(Collections.singletonList(tradeDetail), detail);
-        ExportUtils.exportWorkbook(tradeDetailWorkbook, startStr, endStr, strategyName, detail);
-        String orderList = "order-list";
-        Workbook orderWorkbook = ExcelUtils.singleSheet(orders, orderList);
-        ExportUtils.exportWorkbook(orderWorkbook, startStr, endStr, strategyName, orderList);
-        List<TradeRecord> records = tradeDetail.getRecords();
-        String recordList = "record-list";
-        Workbook recordWorkbook = ExcelUtils.singleSheet(records, recordList);
-        ExportUtils.exportWorkbook(recordWorkbook, startStr, endStr, strategyName, recordList);
-
-        Map<String, Profit> results = OrderCalculator.calculateProfitAndHoldingDays(orders);
-        for (Map.Entry<String, Profit> entry : results.entrySet()) {
-            Profit profit = entry.getValue();
-            log.info("{}: holding days:{}, profit:{}", entry.getKey(), profit.getTotalHoldingDays(), profit.getProfit());
-        }
-        log.info("init balance:{}, finish balance:{}", tradeDetail.getInitialBalance(), tradeDetail.getBalance());
-        log.info("fee: {}", tradeDetail.getFeeCount());
-        this.saveImage();
-    }
-
-    private void saveImage() {
+        Workbook workbook = ExcelUtils.singleSheet(Collections.singletonList(tradeDetail), "trade-detail");
+        ExcelUtils.addDataToNewSheet(workbook, tradeDetail.getOrders(), "order-list");
+        ExcelUtils.addDataToNewSheet(workbook, tradeDetail.getRecords(), "record-list");
+        List<Profit> profitList = OrderCalculator.calculateProfitAndHoldingDays(tradeDetail.getOrders());
+        ExcelUtils.addDataToNewSheet(workbook, profitList, "profit-list");
+        ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, "result");
         JFreeChart chart = getChart();
-        if (chart != null) {
+        if (Objects.nonNull(chart)) {
             ExportUtils.saveJFreeChartAsImage(chart, startStr, endStr, strategyName, "lines", 3600, 1200);
         }
     }

@@ -1,6 +1,7 @@
 package com.gantenx.utils;
 
 import com.gantenx.constant.Side;
+import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
@@ -137,11 +138,11 @@ public class TradeAnnotationManager {
         addTimeAnnotation(timestamp);
 
         // 处理订单
-        Map<String, List<Order>> ordersBySymbol = orders.stream()
+        Map<Symbol, List<Order>> ordersBySymbol = orders.stream()
                 .collect(Collectors.groupingBy(Order::getSymbol));
 
         int symbolIndex = 0;
-        for (Map.Entry<String, List<Order>> entry : ordersBySymbol.entrySet()) {
+        for (Map.Entry<Symbol, List<Order>> entry : ordersBySymbol.entrySet()) {
             List<Order> symbolOrders = entry.getValue();
             processSymbolOrders(timestamp, symbolOrders, symbolIndex);
             symbolIndex += symbolOrders.size();

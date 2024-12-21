@@ -6,18 +6,18 @@ import com.gantenx.constant.Symbol;
 import com.gantenx.model.Time;
 
 public class Order extends Time {
-    private long orderId;
+    private final Symbol symbol;    // 标的符号
     private final Side type;       // "buy" or "sell"
     private final double price;      // 价格
     @ExcelColumn(need = false)
     private final double quantity;   // 数量
-    private final String symbol;    // 标的符号
-    private final String reason;    // 标的符号
+    private long orderId;
+    private final String reason;
 
     public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp, String reason) {
         super(timestamp);
         this.orderId = orderId;
-        this.symbol = symbol.name();
+        this.symbol = symbol;
         this.type = side;
         this.price = price;
         this.quantity = quantity;
@@ -40,7 +40,7 @@ public class Order extends Time {
         return quantity;
     }
 
-    public String getSymbol() {
+    public Symbol getSymbol() {
         return this.symbol;
     }
 
