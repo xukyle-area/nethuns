@@ -12,7 +12,6 @@ public class DateUtils {
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("dd");
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm");
-
     public static final Long MS_OF_ONE_DAY = 1000L * 3600 * 24;
     public static final double MS_OF_ONE_DAY_DOUBLE = 1000L * 3600 * 24.0;
 
@@ -32,5 +31,10 @@ public class DateUtils {
         long epochSecond = timestamp / 1000;
         int nanoOfSecond = (int) (timestamp % 1000) * 1_000_000;
         return LocalDateTime.ofEpochSecond(epochSecond, nanoOfSecond, zoneOffset).format(FORMATTER);
+    }
+
+    public static String getDate(long timestamp) {
+        LocalDate date = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate();  // 使用毫秒时间戳
+        return date.format(DATE_TIME_FORMATTER);
     }
 }

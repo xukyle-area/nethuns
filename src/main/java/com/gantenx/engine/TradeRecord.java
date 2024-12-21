@@ -1,11 +1,10 @@
 package com.gantenx.engine;
 
 import com.gantenx.annotation.ExcelColumn;
-import com.gantenx.constant.Symbol;
 
-public class TradeRecord {
+public class TradeRecord<T> {
     private long id;
-    private Symbol symbol;
+    private T symbol;
     // 买入时间
     @ExcelColumn(dateFormat = "yyyy-MM-dd")
     private long buyTime;
@@ -38,11 +37,11 @@ public class TradeRecord {
         this.id = id;
     }
 
-    public Symbol getSymbol() {
+    public T getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(Symbol symbol) {
+    public void setSymbol(T symbol) {
         this.symbol = symbol;
     }
 

@@ -2,6 +2,7 @@ package com.gantenx.chart;
 
 import com.gantenx.calculator.IndexCalculator;
 import com.gantenx.constant.Constants;
+import com.gantenx.constant.QQQSymbol;
 import com.gantenx.model.Index;
 import com.gantenx.model.Kline;
 import com.gantenx.engine.Order;
@@ -11,18 +12,14 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.util.List;
 import java.util.Map;
 
-public class WeightScoreChart extends BaseQQQChart {
+public class WeightScoreChart extends BaseQQQChart<QQQSymbol> {
 
     private static final String WEIGHT_SCORE = "WeightScore";
 
-    /**
-     *
-     * @param qqqMap
-     * @param tqqqMap
-     * @param sqqqMap
-     * @param orderList
-     */
-    public WeightScoreChart(Map<Long, Kline> qqqMap, Map<Long, Kline> tqqqMap, Map<Long, Kline> sqqqMap, List<Order> orderList) {
+    public WeightScoreChart(Map<Long, Kline> qqqMap,
+                            Map<Long, Kline> tqqqMap,
+                            Map<Long, Kline> sqqqMap,
+                            List<Order<QQQSymbol>> orderList) {
         super(qqqMap, tqqqMap, sqqqMap, WeightScoreChart.subDataset(qqqMap), WEIGHT_SCORE, 1.0, orderList);
     }
 

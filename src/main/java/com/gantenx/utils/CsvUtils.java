@@ -1,6 +1,6 @@
 package com.gantenx.utils;
 
-import com.gantenx.constant.Symbol;
+import com.gantenx.constant.QQQSymbol;
 import com.gantenx.model.Kline;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,8 +41,8 @@ public class CsvUtils {
         return klineList;
     }
 
-    public static Map<Long, Kline> getKLineMap(Symbol symbol, long startTime, long endTime) {
-        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(symbol.getResources(), startTime, endTime);
+    public static Map<Long, Kline> getKLineMap(QQQSymbol QQQSymbol, long startTime, long endTime) {
+        List<Kline> qqqKlineList = CsvUtils.getKLineFromCsv(QQQSymbol.getResources(), startTime, endTime);
         return CollectionUtils.toTimeMap(qqqKlineList);
     }
 }

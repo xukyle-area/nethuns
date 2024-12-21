@@ -1,5 +1,6 @@
 package com.gantenx.utils;
 
+import com.gantenx.model.Kline;
 import com.gantenx.model.Time;
 
 import java.util.*;
@@ -10,6 +11,24 @@ public class CollectionUtils {
     public static <T extends Time> Map<Long, T> toTimeMap(List<T> klineList) {
         return klineList.stream().collect(Collectors.toMap(Time::getTimestamp, kline -> kline));
     }
+
+    public static <T extends Time> T getLast(Map<Long, T> klineMap) {
+        if (klineMap == null || klineMap.isEmpty()) {
+            return null;
+        }
+
+        Long maxTimestamp = Collections.max(klineMap.keySet());
+        return klineMap.get(maxTimestamp);
+    }
+
+    public static <T extends Time> Long findLatestTime(Map<Long, T> klineMap) {
+        if (klineMap == null || klineMap.isEmpty()) {
+            return null;
+        }
+
+        return Collections.max(klineMap.keySet());
+    }
+
 
     public static <T> boolean isEmpty(Collection<T> collection) {
         if (Objects.isNull(collection)) {

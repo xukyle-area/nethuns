@@ -2,9 +2,8 @@ package com.gantenx.controller;
 
 import com.gantenx.constant.CryptoCurrency;
 import com.gantenx.constant.CryptoSymbol;
-import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
-import com.gantenx.service.BinanceQuoteService;
+import com.gantenx.service.BinanceService;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import static com.gantenx.constant.Constants.ONE_DAY;
 public class AutoTradeController {
 
     @Autowired
-    private BinanceQuoteService binanceQuoteService;
+    private BinanceService binanceService;
 
     @GetMapping("/hello")
     public String hello() {
@@ -37,6 +36,6 @@ public class AutoTradeController {
                              @RequestParam("end") String endStr,
                              @RequestParam(value = "limit", required = false, defaultValue = "500") int limit) {
         CryptoSymbol symbol = CryptoSymbol.toSymbol(base, quote);
-        return binanceQuoteService.getKline(symbol, ONE_DAY, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr), limit);
+        return binanceService.getKline(symbol, DateUtils.getTimestamp(beginStr), DateUtils.getTimestamp(endStr));
     }
 }

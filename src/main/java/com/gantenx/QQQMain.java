@@ -1,17 +1,9 @@
 package com.gantenx;
 
-import com.gantenx.model.Kline;
-import com.gantenx.service.BinanceQuoteService;
-import com.gantenx.strategy.qqq.ImprovedRsiStrategy;
-import com.gantenx.strategy.qqq.LongHoldingStrategy;
-import com.gantenx.strategy.qqq.RsiStrategy;
-import com.gantenx.utils.DateUtils;
+import com.gantenx.strategy.qqq.ImprovedRsiQQQStrategy;
+import com.gantenx.strategy.qqq.LongHoldingQQQStrategy;
+import com.gantenx.strategy.qqq.RsiQQQStrategy;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-
-import static com.gantenx.constant.Constants.ONE_DAY;
-import static com.gantenx.constant.CryptoSymbol.BTC_USDT;
 
 @Slf4j
 public class QQQMain {
@@ -28,11 +20,11 @@ public class QQQMain {
     }
 
     public static void start(String startStr, String endStr) {
-        RsiStrategy rsiStrategy = new RsiStrategy(startStr, endStr);
+        RsiQQQStrategy rsiStrategy = new RsiQQQStrategy(startStr, endStr);
         rsiStrategy.process();
-        ImprovedRsiStrategy improvedRsiStrategy = new ImprovedRsiStrategy(startStr, endStr);
+        ImprovedRsiQQQStrategy improvedRsiStrategy = new ImprovedRsiQQQStrategy(startStr, endStr);
         improvedRsiStrategy.process();
-        LongHoldingStrategy longHoldingStrategy = new LongHoldingStrategy(startStr, endStr);
+        LongHoldingQQQStrategy longHoldingStrategy = new LongHoldingQQQStrategy(startStr, endStr);
         longHoldingStrategy.process();
     }
 }

@@ -2,7 +2,7 @@ package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.chart.RSIChart;
-import com.gantenx.constant.Symbol;
+import com.gantenx.constant.QQQSymbol;
 import com.gantenx.engine.Position;
 import com.gantenx.engine.TradingContext;
 import com.gantenx.utils.CollectionUtils;
@@ -13,17 +13,27 @@ import java.util.*;
 
 import static com.gantenx.constant.Constants.MACD;
 import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Symbol.*;
-import static com.gantenx.strategy.qqq.ImprovedRsiStrategyTL.*;
+import static com.gantenx.constant.QQQSymbol.*;
+
 
 @Slf4j
-public class ImprovedRsiStrategy extends BaseStrategy {
+public class ImprovedRsiQQQStrategy extends BaseQQQStrategy {
+
+    private static final double EXTREME_OVERSOLD = 25.0;
+    private static final double EXTREME_OVERBOUGHT = 85.0;
+    private static final int RSI_PERIOD = 6;
+    private static final int TREND_PERIOD = 20;
+    private static final int FAST_EMA_PERIOD = 5;
+    private static final double STOP_LOSS_THRESHOLD = 0.05;
+    private static final int MAX_LEVERAGED_HOLDING_DAYS = 5 * 24 * 3600 * 1000;
+    private static final long MIN_TRADE_INTERVAL = 24 * 60 * 60 * 1000;
+    private static final double MAX_VOLATILITY_THRESHOLD = 0.03;
 
     private long lastTradeTime = 0;
     private Map<Long, TradingContext> contextCache;
 
-    public ImprovedRsiStrategy(String startStr, String endStr) {
-        super(ImprovedRsiStrategy.class.getSimpleName(), startStr, endStr);
+    public ImprovedRsiQQQStrategy(String startStr, String endStr) {
+        super(ImprovedRsiQQQStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override
@@ -86,22 +96,22 @@ public class ImprovedRsiStrategy extends BaseStrategy {
 
     private void executeRiskManagement(TradingContext context) {
         long currentTimestamp = context.getTimestamp();
-        Map<Symbol, List<Position>> positionMap = tradeEngine.getPositions();
-        for (Map.Entry<Symbol, List<Position>> entry : positionMap.entrySet()) {
-            Symbol symbol = entry.getKey();
+        Map<QQQSymbol, List<Position>> positionMap = tradeEngine.getPositions();
+        for (Map.Entry<QQQSymbol, List<Position>> entry : positionMap.entrySet()) {
+            QQQSymbol QQQSymbol = entry.getKey();
             List<Position> positions = entry.getValue();
             double averagePrice = Position.getAveragePrice(positions, currentTimestamp);
             double averageHoldingDays = Position.getAverageHoldingDays(positions, currentTimestamp);
-            double currentPrice = this.getCurrentPrice(symbol, context);
-            if (symbol.equals(QQQ)) {
+            double currentPrice = this.getCurrentPrice(QQQSymbol, context);
+            if (QQQSymbol.equals(QQQ)) {
                 continue;
             }
             if (averageHoldingDays >= MAX_LEVERAGED_HOLDING_DAYS) {
-                tradeEngine.sell(symbol, currentPrice, PROPORTION_OF_100, currentTimestamp, "超过持有天数，卖出");
+                tradeEngine.sell(QQQSymbol, currentPrice, PROPORTION_OF_100, currentTimestamp, "超过持有天数，卖出");
             }
             double lossRate = (currentPrice - averagePrice) / averagePrice;
             if (lossRate < -STOP_LOSS_THRESHOLD) {
-                tradeEngine.sell(symbol,
+                tradeEngine.sell(QQQSymbol,
                                  currentPrice,
                                  PROPORTION_OF_100,
                                  currentTimestamp,
@@ -161,8 +171,8 @@ public class ImprovedRsiStrategy extends BaseStrategy {
         return context.getRsi() > EXTREME_OVERBOUGHT && TradingContext.confirmDowntrendReversal(context);
     }
 
-    private void allinBuy(TradingContext context, Symbol symbol, String reason) {
-        if (symbol.equals(QQQ)) {
+    private void allinBuy(TradingContext context, QQQSymbol QQQSymbol, String reason) {
+        if (QQQSymbol.equals(QQQ)) {
             return;
         }
         tradeEngine.sell(QQQ,
@@ -170,7 +180,7 @@ public class ImprovedRsiStrategy extends BaseStrategy {
                          PROPORTION_OF_100,
                          context.getTimestamp(),
                          "出现了极端的上涨或者下跌趋势，卖出QQQ，买入");
-        tradeEngine.buy(symbol, context.getTqqqPrice(), PROPORTION_OF_100, context.getTimestamp(), reason);
+        tradeEngine.buy(QQQSymbol, context.getTqqqPrice(), PROPORTION_OF_100, context.getTimestamp(), reason);
         lastTradeTime = context.getTimestamp();
     }
 
@@ -202,8 +212,8 @@ public class ImprovedRsiStrategy extends BaseStrategy {
                         "RSI达到 " + rsi + ": 原先持仓SQQQ，目前判断已经下跌，买入QQQ");
     }
 
-    private double getCurrentPrice(Symbol symbol, TradingContext context) {
-        switch (symbol) {
+    private double getCurrentPrice(QQQSymbol QQQSymbol, TradingContext context) {
+        switch (QQQSymbol) {
             case QQQ:
                 return context.getQqqPrice();
             case TQQQ:
@@ -211,7 +221,7 @@ public class ImprovedRsiStrategy extends BaseStrategy {
             case SQQQ:
                 return context.getSqqqPrice();
             default:
-                throw new IllegalArgumentException("Unknown symbol: " + symbol);
+                throw new IllegalArgumentException("Unknown symbol: " + QQQSymbol);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.gantenx.engine;
 
-import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
@@ -12,16 +11,14 @@ import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.constant.Side.SELL;
 
 @Slf4j
-public class TradeEngine {
+public class TradeEngine<T> {
 
     private static final double EPSILON = 1e-6;
-    private static final double BALANCE_THRESHOLD = 0.001;
-
     private final double initialBalance;
     private final double fee; // 交易手续费率
-    private final Map<Symbol, List<Position>> positions = new HashMap<>();
-    private final List<Order> orders = new ArrayList<>();
-    private final List<TradeRecord> records = new ArrayList<>();
+    private final Map<T, List<Position>> positions = new HashMap<>();
+    private final List<Order<T>> orders = new ArrayList<>();
+    private final List<TradeRecord<T>> records = new ArrayList<>();
     private double balance;
     private double feeCount;
     private long orderId = 0;
@@ -34,7 +31,7 @@ public class TradeEngine {
         this.feeCount = 0.0;
     }
 
-    public boolean hasPosition(Symbol symbol) {
+    public boolean hasPosition(T symbol) {
         List<Position> positionList = positions.get(symbol);
         if (CollectionUtils.isEmpty(positionList)) {
             return false;
@@ -60,7 +57,7 @@ public class TradeEngine {
      * @param proportion 百分比
      * @param ts         时间戳
      */
-    public void sell(Symbol symbol, double price, long proportion, long ts, String reason) {
+    public void sell(T symbol, double price, long proportion, long ts, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             log.warn("No position to sell for {}", symbol);
@@ -86,7 +83,7 @@ public class TradeEngine {
      * @param proportion 百分比
      * @param ts         时间戳
      */
-    public void buy(Symbol symbol, double price, long proportion, long ts, String reason) {
+    public void buy(T symbol, double price, long proportion, long ts, String reason) {
         double maxQuantity = (balance * proportion / 100) / (price * (1 + fee));  // 计算可以买入的最大数量
         if (maxQuantity <= 0) {
             log.warn("Insufficient balance to buy {}: balance={}", symbol, balance);
@@ -96,7 +93,7 @@ public class TradeEngine {
     }
 
 
-    private void buy(Symbol symbol, double price, double quantity, long ts, String reason) {
+    private void buy(T symbol, double price, double quantity, long ts, String reason) {
         if (quantity <= 0 || price <= 0) {
             log.warn("Invalid buy parameters: price={}, quantity={}", price, quantity);
             return;
@@ -119,7 +116,7 @@ public class TradeEngine {
         }
     }
 
-    private void sell(Symbol symbol, double price, double quantity, long timestamp, String reason) {
+    private void sell(T symbol, double price, double quantity, long timestamp, String reason) {
         if (quantity <= 0 || price <= 0) {
             log.warn("Invalid sell parameters: price={}, quantity={}", price, quantity);
             return;
@@ -149,7 +146,7 @@ public class TradeEngine {
             position.setQuantity(position.getQuantity() - sellQuantity);
             remainingQuantity -= sellQuantity;
             // 只在卖出的时候生成一条这个记录
-            TradeRecord record = new TradeRecord();
+            TradeRecord<T> record = new TradeRecord<>();
             record.setId(generateRecordId());
             record.setBuyOrderId(position.getOrderId());
             record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
@@ -189,7 +186,7 @@ public class TradeEngine {
         return revenue - curFee;
     }
 
-    public double getQuantity(Symbol symbol) {
+    public double getQuantity(T symbol) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             return 0d;
@@ -209,20 +206,20 @@ public class TradeEngine {
         return recordId;
     }
 
-    public Map<Symbol, List<Position>> getPositions() {
+    public Map<T, List<Position>> getPositions() {
         return new HashMap<>(positions);
     }
 
-    public List<Position> getPositions(Symbol symbol) {
+    public List<Position> getPositions(T symbol) {
         List<Position> list = positions.get(symbol);
         return new ArrayList<>(list);
     }
 
-    public TradeDetail exit(Map<Symbol, Kline> priceMap, long ts) {
+    public TradeDetail<T> exit(Map<T, Kline> priceMap, long ts) {
         priceMap.forEach((a, b) -> this.sell(a, b.getClose(), 100, ts, "回放时间结束，卖出所有持仓"));
-        TradeDetail tradeDetail = new TradeDetail();
+        TradeDetail<T> tradeDetail = new TradeDetail<>();
         tradeDetail.setBalance(balance);
-        tradeDetail.setOrders(new ArrayList<>(orders));
+        tradeDetail.setOrders(orders);
         tradeDetail.setInitialBalance(initialBalance);
         tradeDetail.setFeeCount(feeCount);
         tradeDetail.setRecords(records);

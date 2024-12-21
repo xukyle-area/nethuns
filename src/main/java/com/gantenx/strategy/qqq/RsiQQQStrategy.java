@@ -13,23 +13,24 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Symbol.*;
+import static com.gantenx.constant.Constants.RSI_PERIOD;
+import static com.gantenx.constant.QQQSymbol.*;
 
 @Slf4j
-public class RsiStrategy extends BaseStrategy {
+public class RsiQQQStrategy extends BaseQQQStrategy {
 
     // RSI阈值
     private static final double EXTREME_OVERSOLD = 25.0;
     private static final double EXTREME_OVERBOUGHT = 85.0;
     private static final double NEUTRAL_LEVEL = 60.0;
-    private static final int RSI_PERIOD = 6;
+
 
     // 风险控制参数
     private static final double MAX_HOLDING_DAYS = 100.0; // 最大持仓天数（天）
     private static final double STOP_LOSS_THRESHOLD = -0.03; // 止损阈值（-5%）
 
-    public RsiStrategy(String startStr, String endStr) {
-        super(RsiStrategy.class.getSimpleName(), startStr, endStr);
+    public RsiQQQStrategy(String startStr, String endStr) {
+        super(RsiQQQStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override

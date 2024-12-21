@@ -13,4 +13,6 @@ public class Constants {
     public static final int PROPORTION_OF_75 = 75;
     public static final int PROPORTION_OF_50 = 50;
     public static final int PROPORTION_OF_25 = 25;
+
+    public static final int RSI_PERIOD = 6;
 }

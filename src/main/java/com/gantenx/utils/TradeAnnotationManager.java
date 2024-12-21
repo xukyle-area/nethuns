@@ -1,7 +1,5 @@
 package com.gantenx.utils;
 
-import com.gantenx.constant.Side;
-import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
 import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT_WITHOUT_TIME;
 
-public class TradeAnnotationManager {
+public class TradeAnnotationManager<T> {
     private static final int FONT_SIZE = 10;
     private static final float LINE_WIDTH = 1.0f;
     private static final double BASE_Y_POSITION = 530;
@@ -36,17 +34,17 @@ public class TradeAnnotationManager {
         this.rsiPlot = rsiPlot;
     }
 
-    public static void markOrders(XYPlot mainPlot, XYPlot rsiPlot, List<Order> orderMap) {
-        TradeAnnotationManager annotationManager = new TradeAnnotationManager(mainPlot, rsiPlot);
+    public static <T> void markOrders(XYPlot mainPlot, XYPlot rsiPlot, List<Order<T>> orderMap) {
+        TradeAnnotationManager<T> annotationManager = new TradeAnnotationManager<>(mainPlot, rsiPlot);
         annotationManager.addTradeMarkers(orderMap);
     }
 
-    public void addTradeMarkers(List<Order> orders) {
+    public void addTradeMarkers(List<Order<T>> orders) {
         if (orders == null || orders.isEmpty()) {
             return;
         }
 
-        Map<Long, List<Order>> ordersByTimestamp = orders.stream()
+        Map<Long, List<Order<T>>> ordersByTimestamp = orders.stream()
                 .collect(Collectors.groupingBy(Order::getTimestamp));
 
         List<Long> sortedTimestamps = new ArrayList<>(ordersByTimestamp.keySet());
@@ -59,13 +57,13 @@ public class TradeAnnotationManager {
     }
 
 
-    private void processSymbolOrders(Long timestamp, List<Order> orders, int startIndex) {
+    private void processSymbolOrders(Long timestamp, List<Order<T>> orders, int startIndex) {
         for (int i = 0; i < orders.size(); i++) {
             addOrderAnnotation(orders.get(i), timestamp, startIndex + i);
         }
     }
 
-    private void addOrderAnnotation(Order order, Long timestamp, int index) {
+    private void addOrderAnnotation(Order<T> order, Long timestamp, int index) {
         Color orderColor = order.getType().equals(BUY) ? BUY_COLOR : SELL_COLOR;
         String[] lines = formatOrderInfo(order).split("\n");
         double baseY = calculateYPosition(index);
@@ -123,7 +121,7 @@ public class TradeAnnotationManager {
 
     // ... 其他代码保持不变，直到 processOrderGroup 方法 ...
 
-    private void processOrderGroup(Long timestamp, List<Order> orders) {
+    private void processOrderGroup(Long timestamp, List<Order<T>> orders) {
         // 添加竖直线
         XYLineAnnotation line = new XYLineAnnotation(
                 timestamp, 0,
@@ -138,12 +136,12 @@ public class TradeAnnotationManager {
         addTimeAnnotation(timestamp);
 
         // 处理订单
-        Map<Symbol, List<Order>> ordersBySymbol = orders.stream()
+        Map<T, List<Order<T>>> ordersBySymbol = orders.stream()
                 .collect(Collectors.groupingBy(Order::getSymbol));
 
         int symbolIndex = 0;
-        for (Map.Entry<Symbol, List<Order>> entry : ordersBySymbol.entrySet()) {
-            List<Order> symbolOrders = entry.getValue();
+        for (Map.Entry<T, List<Order<T>>> entry : ordersBySymbol.entrySet()) {
+            List<Order<T>> symbolOrders = entry.getValue();
             processSymbolOrders(timestamp, symbolOrders, symbolIndex);
             symbolIndex += symbolOrders.size();
         }

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT;
-public abstract class BaseQQQChart extends ApplicationFrame {
+public abstract class BaseQQQChart<T> extends ApplicationFrame {
     private static final String TIME = "Time";
     private static final String PRICE = "Price";
     private static final String K_LINE = "K-Line";
@@ -47,7 +47,7 @@ public abstract class BaseQQQChart extends ApplicationFrame {
                            XYSeriesCollection subDataset,
                            String subDataName,
                            double subDataRange,
-                           List<Order> orderList) {
+                           List<Order<T>> orderList) {
         super("Trading Line");
 
         // 创建主图表

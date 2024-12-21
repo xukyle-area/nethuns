@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Symbol.QQQ;
+import static com.gantenx.constant.QQQSymbol.QQQ;
 
-public class LongHoldingStrategy extends BaseStrategy {
+public class LongHoldingQQQStrategy extends BaseQQQStrategy {
 
-    public LongHoldingStrategy(String startStr, String endStr) {
-        super(LongHoldingStrategy.class.getSimpleName(), startStr, endStr);
+    public LongHoldingQQQStrategy(String startStr, String endStr) {
+        super(LongHoldingQQQStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override

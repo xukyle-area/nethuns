@@ -1,7 +1,7 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.engine.*;
-import com.gantenx.constant.Symbol;
+import com.gantenx.constant.QQQSymbol;
 import com.gantenx.model.Kline;
 import com.gantenx.calculator.Profit;
 import com.gantenx.utils.CsvUtils;
@@ -14,23 +14,23 @@ import org.jfree.chart.JFreeChart;
 
 import java.util.*;
 
-import static com.gantenx.constant.Symbol.*;
+import static com.gantenx.constant.QQQSymbol.*;
 
 @Slf4j
-public abstract class BaseStrategy {
+public abstract class BaseQQQStrategy {
 
     protected final double initialBalance;
     protected final double fee;
     protected final String strategyName;
-    protected TradeDetail tradeDetail;
+    protected TradeDetail<QQQSymbol> tradeDetail;
     protected Map<Long, Kline> tqqqKlineMap;
     protected Map<Long, Kline> sqqqKlineMap;
     protected Map<Long, Kline> qqqKlineMap;
-    protected TradeEngine tradeEngine;
+    protected TradeEngine<QQQSymbol> tradeEngine;
     protected String startStr;
     protected String endStr;
 
-    public BaseStrategy(String strategyName, String startStr, String endStr) {
+    public BaseQQQStrategy(String strategyName, String startStr, String endStr) {
         this.initialBalance = 10000L;
         this.fee = 0.0001;
         this.strategyName = strategyName;
@@ -38,7 +38,7 @@ public abstract class BaseStrategy {
         this.endStr = endStr;
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
-        tradeEngine = new TradeEngine(initialBalance, fee);
+        tradeEngine = new TradeEngine<>(initialBalance, fee);
         tqqqKlineMap = CsvUtils.getKLineMap(TQQQ, start, end);
         sqqqKlineMap = CsvUtils.getKLineMap(SQQQ, start, end);
         qqqKlineMap = CsvUtils.getKLineMap(QQQ, start, end);
@@ -48,7 +48,7 @@ public abstract class BaseStrategy {
         Workbook workbook = ExcelUtils.singleSheet(Collections.singletonList(tradeDetail), "trade-detail");
         ExcelUtils.addDataToNewSheet(workbook, tradeDetail.getOrders(), "order-list");
         ExcelUtils.addDataToNewSheet(workbook, tradeDetail.getRecords(), "record-list");
-        List<Profit> profitList = OrderCalculator.calculateProfitAndHoldingDays(tradeDetail.getOrders());
+        List<Profit<QQQSymbol>> profitList = OrderCalculator.calculateProfitAndHoldingDays(tradeDetail.getOrders());
         ExcelUtils.addDataToNewSheet(workbook, profitList, "profit-list");
         ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, "result");
         JFreeChart tradingChart = getTradingChart();
@@ -63,7 +63,7 @@ public abstract class BaseStrategy {
 
     public void process() {
         openTrade();
-        HashMap<Symbol, Kline> map = new HashMap<>();
+        HashMap<QQQSymbol, Kline> map = new HashMap<>();
         map.put(TQQQ, findLatestKline(tqqqKlineMap));
         map.put(QQQ, findLatestKline(qqqKlineMap));
         map.put(SQQQ, findLatestKline(sqqqKlineMap));

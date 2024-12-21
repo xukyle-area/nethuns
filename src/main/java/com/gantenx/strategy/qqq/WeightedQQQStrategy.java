@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Symbol.QQQ;
+import static com.gantenx.constant.QQQSymbol.QQQ;
 
 @Slf4j
-public class WeightedStrategy extends BaseStrategy {
+public class WeightedQQQStrategy extends BaseQQQStrategy {
 
-    public WeightedStrategy(String startStr, String endStr) {
-        super(WeightedStrategy.class.getSimpleName(), startStr, endStr);
+    public WeightedQQQStrategy(String startStr, String endStr) {
+        super(WeightedQQQStrategy.class.getSimpleName(), startStr, endStr);
     }
 
     @Override
