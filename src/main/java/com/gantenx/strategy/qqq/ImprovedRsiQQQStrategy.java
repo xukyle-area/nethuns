@@ -1,7 +1,7 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.RSIChart;
+import com.gantenx.chart.qqq.RSIChart;
 import com.gantenx.constant.QQQSymbol;
 import com.gantenx.engine.Position;
 import com.gantenx.engine.TradingContext;

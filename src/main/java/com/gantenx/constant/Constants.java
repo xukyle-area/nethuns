@@ -13,6 +13,7 @@ public class Constants {
     public static final int PROPORTION_OF_75 = 75;
     public static final int PROPORTION_OF_50 = 50;
     public static final int PROPORTION_OF_25 = 25;
+    public static final int PROPORTION_OF_10 = 10;
 
     public static final String TIME = "Time";
     public static final String PRICE = "Price";
@@ -21,6 +22,9 @@ public class Constants {
     public static final int CHART_WIDTH = 2400;  // 增加宽度
     public static final int CHART_HEIGHT = 1200;
 
+
+    public static final double initialBalance = 10000L;
+    public static final double fee = 0.0001;
 
     public static final int RSI_PERIOD = 6;
 }

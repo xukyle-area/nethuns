@@ -1,7 +1,7 @@
 package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexCalculator;
-import com.gantenx.chart.WeightScoreChart;
+import com.gantenx.chart.qqq.WeightScoreChart;
 import com.gantenx.constant.Constants;
 import com.gantenx.model.*;
 import com.gantenx.utils.CollectionUtils;

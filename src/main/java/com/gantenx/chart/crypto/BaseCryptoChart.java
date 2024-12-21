@@ -1,4 +1,4 @@
-package com.gantenx.chart;
+package com.gantenx.chart.crypto;
 
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
@@ -8,13 +8,10 @@ import com.gantenx.utils.TradeAnnotationManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
@@ -23,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gantenx.constant.Constants.*;
-import static com.gantenx.utils.ChartUtils.BASE_STROKE;
 
 public abstract class BaseCryptoChart<T> extends ApplicationFrame {
 

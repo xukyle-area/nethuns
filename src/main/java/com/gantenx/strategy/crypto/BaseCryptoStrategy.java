@@ -17,11 +17,11 @@ import org.jfree.chart.JFreeChart;
 
 import java.util.*;
 
+import static com.gantenx.constant.Constants.fee;
+import static com.gantenx.constant.Constants.initialBalance;
+
 @Slf4j
 public abstract class BaseCryptoStrategy {
-
-    protected final double initialBalance = 10000L;
-    protected final double fee = 0.0001;
     protected final String strategyName;
     protected String start;
     protected String end;

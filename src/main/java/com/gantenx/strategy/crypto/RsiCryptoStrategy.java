@@ -1,21 +1,22 @@
 package com.gantenx.strategy.crypto;
 
+import com.gantenx.calculator.AssetCalculator;
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.RSICryptoChart;
+import com.gantenx.chart.crypto.RSICryptoChart;
 import com.gantenx.constant.CryptoSymbol;
+import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Constants.RSI_PERIOD;
+import static com.gantenx.constant.Constants.*;
+import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 @Slf4j
 public class RsiCryptoStrategy extends BaseCryptoStrategy {
@@ -37,7 +38,7 @@ public class RsiCryptoStrategy extends BaseCryptoStrategy {
                 continue;
             }
             Kline kline = klineMap.get(timestamp);
-            if (RSI < 25) {
+            if (this.lowestOfDays(timestamp) > 5 && RSI < 50) {
                 tradeEngine.buy(symbol, kline.getClose(), PROPORTION_OF_100, timestamp, "rsi:" + RSI);
             } else if (tradeEngine.hasPosition(symbol) && RSI >= 60) {
                 tradeEngine.sell(symbol, kline.getClose(), PROPORTION_OF_100, timestamp, "rsi:" + RSI);
@@ -45,9 +46,27 @@ public class RsiCryptoStrategy extends BaseCryptoStrategy {
         }
     }
 
+    public int lowestOfDays(long timestamp) {
+        Double curRsi = rsiMap.get(timestamp);
+        if (curRsi == null) {
+            throw new IllegalArgumentException("No RSI data for the given timestamp: " + timestamp);
+        }
+
+        int days = 0;
+        long dayMillis = MS_OF_ONE_DAY;
+        while (true) {
+            long previousTimestamp = timestamp - (++days) * dayMillis;
+            Double previousRsi = rsiMap.get(previousTimestamp);
+            if (previousRsi == null || curRsi >= previousRsi) {
+                return days - 1;
+            }
+        }
+    }
+
     @Override
     protected JFreeChart getTradingChart() {
-        RSICryptoChart chart = new RSICryptoChart(klineMap, new HashMap<>(), tradeDetail.getOrders());
-        return chart.getCombinedChart();
+        List<Order<CryptoSymbol>> orders = tradeDetail.getOrders();
+        Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap, orders, initialBalance);
+        return new RSICryptoChart(klineMap, assetMap, orders).getCombinedChart();
     }
 }

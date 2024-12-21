@@ -1,4 +1,4 @@
-package com.gantenx.chart;
+package com.gantenx.chart.qqq;
 
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;

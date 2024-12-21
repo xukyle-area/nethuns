@@ -1,36 +1,23 @@
 package com.gantenx;
 
-import com.gantenx.constant.CryptoSymbol;
-import com.gantenx.engine.TradeEngine;
-import com.gantenx.model.Kline;
-import com.gantenx.service.BinanceService;
 import com.gantenx.strategy.crypto.RsiCryptoStrategy;
-import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.DateUtils;
+import com.gantenx.strategy.crypto.WyckoffStrategy;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.gantenx.constant.CryptoSymbol.BTC_USDT;
+import static com.gantenx.constant.CryptoSymbol.*;
 
 @Slf4j
 public class CryptoMain {
 
     public static void main(String[] args) {
-        // start("20240101", "20241101");
-
-        long startTimestamp = DateUtils.getTimestamp("20240101");
-        long endTimestamp = DateUtils.getTimestamp("20241101");
-
-        List<Kline> kline = BinanceService.getKline(BTC_USDT, startTimestamp, endTimestamp);
-        Map<Long, Kline> klineMap = CollectionUtils.toTimeMap(kline);
-
+        start("20230101", "20241221");
         System.exit(1);
     }
 
     public static void start(String startStr, String endStr) {
         RsiCryptoStrategy rsiStrategy = new RsiCryptoStrategy(BTC_USDT, startStr, endStr);
         rsiStrategy.process();
+//        WyckoffStrategy wyckoffStrategy = new WyckoffStrategy(BTC_USDT, startStr, endStr);
+//        wyckoffStrategy.process();
     }
 }

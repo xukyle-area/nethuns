@@ -98,7 +98,7 @@ public class ExcelUtils {
      */
     public static <T> void addDataToNewSheet(Workbook workbook, List<T> dataList, String sheetName) {
         if (dataList == null || dataList.isEmpty()) {
-            throw new IllegalArgumentException("The data list is empty or null.");
+            return;
         }
 
         Sheet sheet = workbook.createSheet(sheetName);

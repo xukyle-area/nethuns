@@ -12,13 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.gantenx.constant.Side.BUY;
-import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT_WITHOUT_TIME;
 
 public class TradeAnnotationManager<T> {
     private static final int FONT_SIZE = 10;
     private static final float LINE_WIDTH = 1.0f;
-    private static final double BASE_Y_POSITION = 530;
-    private static final double TEXT_Y_SPACING = 20;
     private static final Color BUY_COLOR = new Color(0, 150, 0);
     private static final Color SELL_COLOR = new Color(150, 0, 0);
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, FONT_SIZE);
@@ -134,14 +131,7 @@ public class TradeAnnotationManager<T> {
     }
 
 
-    // 添加时间标记的常量
-    private static final int TIME_FONT_SIZE = 9;
-    private static final Font TIME_FONT = new Font("SansSerif", Font.PLAIN, TIME_FONT_SIZE);
-
     private void processOrderGroup(Long timestamp, List<Order<T>> orders) {
-        double yLower = mainPlot.getRangeAxis().getLowerBound();
-        double yUpper = mainPlot.getRangeAxis().getUpperBound();
-
         // 添加竖直线
         XYLineAnnotation line = new XYLineAnnotation(timestamp, 0,
                                                      timestamp, 1000_000,
@@ -150,10 +140,10 @@ public class TradeAnnotationManager<T> {
         );
         mainPlot.addAnnotation(line);
         rsiPlot.addAnnotation(line);
+        // this.addOrderTag(timestamp, orders);
+    }
 
-        // 添加时间标记
-        addTimeAnnotation(timestamp);
-
+    private void addOrderTag(Long timestamp, List<Order<T>> orders) {
         // 处理订单
         Map<T, List<Order<T>>> ordersBySymbol = orders.stream()
                 .collect(Collectors.groupingBy(Order::getSymbol));
@@ -164,35 +154,5 @@ public class TradeAnnotationManager<T> {
             processSymbolOrders(timestamp, symbolOrders, symbolIndex);
             symbolIndex += symbolOrders.size();
         }
-    }
-
-
-    private void addTimeAnnotation(Long timestamp) {
-        // 格式化时间
-        String timeStr = SIMPLE_DATE_FORMAT_WITHOUT_TIME.format(new Date(timestamp));
-
-        // 计算Y轴相对位置
-        double yOffset = mainPlot.getRangeAxis().getLowerBound() * 0.95;
-
-        // 创建时间标注
-        XYTextAnnotation timeAnnotation = new XYTextAnnotation(
-                timeStr, timestamp, yOffset
-        );
-
-        // 设置时间标注样式
-        styleTimeAnnotation(timeAnnotation);
-
-        // 添加到主图和RSI图
-        mainPlot.addAnnotation(timeAnnotation);
-        rsiPlot.addAnnotation(timeAnnotation);
-    }
-
-    private void styleTimeAnnotation(XYTextAnnotation annotation) {
-        annotation.setFont(TIME_FONT);
-        annotation.setTextAnchor(TextAnchor.TOP_CENTER); // 文本在线的上方
-        annotation.setPaint(Color.DARK_GRAY);
-        annotation.setBackgroundPaint(new Color(255, 255, 255, 200));
-        annotation.setOutlinePaint(Color.GRAY);
-        annotation.setOutlineVisible(true);
     }
 }

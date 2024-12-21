@@ -2,7 +2,7 @@ package com.gantenx.strategy.qqq;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.model.Kline;
-import com.gantenx.chart.RSIChart;
+import com.gantenx.chart.qqq.RSIChart;
 import com.gantenx.utils.CollectionUtils;
 import org.jfree.chart.JFreeChart;
 

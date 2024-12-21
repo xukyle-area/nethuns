@@ -1,4 +1,4 @@
-package com.gantenx.chart;
+package com.gantenx.chart.crypto;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.constant.CryptoSymbol;
@@ -29,7 +29,6 @@ public class RSICryptoChart extends BaseCryptoChart<CryptoSymbol> {
 
         for (Map.Entry<Long, Double> entry : rsiMap.entrySet()) {
             series.add((double) entry.getKey(), entry.getValue());
-            log.info("subdata, key:{}, value:{}", entry.getKey(), entry.getValue());
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);

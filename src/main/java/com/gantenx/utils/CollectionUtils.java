@@ -12,8 +12,8 @@ import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 @Slf4j
 public class CollectionUtils {
 
-    public static <T extends Time> Map<Long, T> toTimeMap(List<T> klineList) {
-        return klineList.stream().collect(Collectors.toMap(Time::getTimestamp, kline -> kline));
+    public static <T extends Time> Map<Long, T> toTimeMap(List<T> dataList) {
+        return dataList.stream().collect(Collectors.toMap(Time::getTimestamp, kline -> kline));
     }
 
     public static <T extends Time> T getLast(Map<Long, T> klineMap) {
@@ -34,7 +34,6 @@ public class CollectionUtils {
                 log.error("Data missing for: {}", DateUtils.getDate(i));
                 return false;
             }
-            log.error("Data {} for {}", JsonUtils.toJson(obj), DateUtils.getDate(i));
         }
         return true;
     }
@@ -51,6 +50,20 @@ public class CollectionUtils {
             return 0.0;
         }
         return Collections.min(map.values());
+    }
+
+    public static <T> Long getMinKey(Map<Long, T> map) {
+        if (map.isEmpty()) {
+            return 0L;
+        }
+        return Collections.min(map.keySet());
+    }
+
+    public static <T> Long getMaxKey(Map<Long, T> map) {
+        if (map.isEmpty()) {
+            return 0L;
+        }
+        return Collections.max(map.keySet());
     }
 
     public static Map<Long, Double> toPriceMap(Map<Long, Kline> klineMap) {
