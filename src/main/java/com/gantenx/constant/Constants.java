@@ -3,6 +3,12 @@ package com.gantenx.constant;
 import com.gantenx.model.IndexPeriod;
 import com.gantenx.model.IndexWeights;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static com.gantenx.constant.Symbol.*;
+
 public class Constants {
     public static final String ONE_DAY = "1d";
     public static final String MACD = "macd";
@@ -37,9 +43,18 @@ public class Constants {
     public static final int CHART_WIDTH = 2400;  // 增加宽度
     public static final int CHART_HEIGHT = 1200;
 
-
-    public static final double initialBalance = 10000L;
-    public static final double fee = 0.0001;
-
+    public static final String TRADE_DETAIL = "trade-detail";
+    public static final String ORDER_LIST = "order-list";
+    public static final String RECORD_LIST = "record-list";
+    public static final String PROFIT_LIST = "profit-list";
+    public static final String RESULT = "result";
+    public static final String LINES = "lines";
     public static final int RSI_PERIOD = 6;
+
+    public static final double EPSILON = 1e-6;
+    public static final double INITIAL_BALANCE = 100000;
+    public final static double FEE = 0.001;
+
+    public static final List<Symbol> QQQ_SYMBOL_LIST = Arrays.asList(QQQUSD, SQQQUSD, TQQQUSD);
+    public static final List<Symbol> CRYPTO_SYMBOL_LIST = Collections.singletonList(BTCUSDT);
 }

@@ -1,60 +1,81 @@
 package com.gantenx.calculator;
 
+import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
+import static com.gantenx.constant.Constants.FEE;
 import static com.gantenx.constant.Side.BUY;
 import static com.gantenx.constant.Side.SELL;
-import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 @Slf4j
 public class AssetCalculator {
 
-    // 用于存储每个时间戳对应的资产
-    public static <T> Map<Long, Double> calculateAssetMap(Map<Long, Kline> klineMap,
-                                                          List<Order<T>> orders,
-                                                          double init) {
-        Map<Long, Double> assetMap = new TreeMap<>();
-        double currentBalance = init;
-        double currentPosition = 0.0;
-
-        Long startTimestamp = CollectionUtils.getMinKey(klineMap);
-        assetMap.put(startTimestamp, currentBalance);
-
-        Map<Long, List<Order<T>>> orderMap = CollectionUtils.toListMap(orders);
-
-        Long endTimestamp = CollectionUtils.getMaxKey(klineMap);
-        for (long i = startTimestamp; i <= endTimestamp; i += MS_OF_ONE_DAY) {
-            List<Order<T>> orderList = orderMap.get(i);
-            if (CollectionUtils.isEmpty(orderList)) {
-                continue;
-            }
-            for (Order<T> order : orderList) {
-                Kline kline = klineMap.get(i);
-                double price = kline.getClose();
-                if (Objects.nonNull(order)) {
-                    double quantity = order.getQuantity();
-                    if (order.getType() == BUY) {
-                        currentBalance -= price * quantity;
-                        currentPosition += quantity;
-                    } else if (order.getType() == SELL) {
-                        currentBalance += price * quantity;
-                        currentPosition -= quantity;
-                    }
-                }
-                double asset = currentBalance + currentPosition * price;
-                assetMap.put(i, asset);
-            }
+    public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Kline>> klineMap,
+                                                      List<Long> openDayList,
+                                                      List<Order> orders,
+                                                      double init) {
+        // 参数验证
+        if (CollectionUtils.isEmpty(openDayList) || klineMap == null || init < 0) {
+            throw new IllegalArgumentException("Invalid input parameters");
         }
 
+        Map<Long, Double> assetMap = new TreeMap<>();
+        double currentBalance = init;
+        Map<Symbol, Double> currentPosition = new HashMap<>();
+
+        // 设置初始资产
+        Long startTimestamp = openDayList.get(0);
+        assetMap.put(startTimestamp, currentBalance);
+
+        // 按时间戳组织订单
+        Map<Long, List<Order>> orderMap = CollectionUtils.toListMap(orders);
+
+        // 遍历每个交易日
+        for (Long timestamp : openDayList) {
+            // 处理当天的订单
+            List<Order> orderList = orderMap.get(timestamp);
+            if (!CollectionUtils.isEmpty(orderList)) {
+                for (Order order : orderList) {
+                    Symbol symbol = order.getSymbol();
+                    double price = order.getPrice();
+                    double quantity = order.getQuantity();
+                    double fee = price * quantity * FEE;
+
+                    if (order.getType() == BUY) {
+                        currentBalance -= (price * quantity + fee);
+                        currentPosition.merge(symbol, quantity, Double::sum);
+                    } else if (order.getType() == SELL) {
+                        currentBalance += (price * quantity - fee);
+                        currentPosition.merge(symbol, -quantity, Double::sum);
+                    }
+                }
+            }
+
+            // 计算当天的持仓市值
+            double assetOfPosition = calculatePositionAsset(currentPosition, klineMap, timestamp);
+            // 更新当天的总资产
+            assetMap.put(timestamp, assetOfPosition + currentBalance);
+        }
         return assetMap;
+    }
+
+    // 抽取持仓市值计算逻辑
+    private static double calculatePositionAsset(Map<Symbol, Double> positions,
+                                                 Map<Symbol, Map<Long, Kline>> klineMap,
+                                                 long timestamp) {
+        return positions.entrySet().stream().mapToDouble(entry -> {
+            Symbol symbol = entry.getKey();
+            double quantity = entry.getValue();
+            Kline kline = CollectionUtils.get(klineMap, symbol, timestamp);
+            if (kline == null) {
+                throw new IllegalStateException("No kline data found for " + symbol + " at " + timestamp);
+            }
+            return kline.getClose() * quantity;
+        }).sum();
     }
 }

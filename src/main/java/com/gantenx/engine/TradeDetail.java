@@ -4,20 +4,20 @@ import com.gantenx.annotation.ExcelColumn;
 
 import java.util.List;
 
-public class TradeDetail<T> {
+public class TradeDetail {
     private double balance;
     private double initialBalance;
     private double feeCount;
     @ExcelColumn(need = false)
-    private List<Order<T>> orders;
+    private List<Order> orders;
     @ExcelColumn(need = false)
-    private List<TradeRecord<T>> records;
+    private List<TradeRecord> records;
 
-    public List<TradeRecord<T>> getRecords() {
+    public List<TradeRecord> getRecords() {
         return records;
     }
 
-    public void setRecords(List<TradeRecord<T>> records) {
+    public void setRecords(List<TradeRecord> records) {
         this.records = records;
     }
 
@@ -48,11 +48,11 @@ public class TradeDetail<T> {
         this.feeCount = feeCount;
     }
 
-    public List<Order<T>> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Order<T>> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 }

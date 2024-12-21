@@ -1,7 +1,6 @@
 package com.gantenx.chart.crypto;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.constant.CryptoSymbol;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import lombok.extern.slf4j.Slf4j;
@@ -14,13 +13,13 @@ import java.util.Map;
 import static com.gantenx.constant.Constants.INDEX_PERIOD;
 
 @Slf4j
-public class RSICryptoChart extends BaseCryptoChart<CryptoSymbol> {
+public class RSIAndAssetChart extends BaseCryptoChart {
     private static final String RSI = "RSI";
 
-    public RSICryptoChart(Map<Long, Kline> priceMap,
-                          Map<Long, Double> assetMap,
-                          List<Order<CryptoSymbol>> orderList) {
-        super(priceMap, assetMap, RSICryptoChart.subDataset(priceMap), RSI, 100.0, orderList);
+    public RSIAndAssetChart(Map<Long, Kline> priceMap,
+                            Map<Long, Double> assetMap,
+                            List<Order> orderList) {
+        super(priceMap, assetMap, RSIAndAssetChart.subDataset(priceMap), RSI, 100.0, orderList);
     }
 
     private static XYSeriesCollection subDataset(Map<Long, Kline> klineMap) {

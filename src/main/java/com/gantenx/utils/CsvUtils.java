@@ -1,19 +1,16 @@
 package com.gantenx.utils;
 
-import com.gantenx.constant.QQQSymbol;
 import com.gantenx.model.Kline;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class CsvUtils {
     public static List<Kline> getKLineList(String csvFile, long startTime, long endTime) {
         List<Kline> klineList = new ArrayList<>();
-
         try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream(csvFile)) {
             assert is != null;
             try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
@@ -37,12 +34,26 @@ public class CsvUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return klineList;
     }
 
-    public static Map<Long, Kline> getKLineMap(QQQSymbol QQQSymbol, long startTime, long endTime) {
-        List<Kline> qqqKlineList = CsvUtils.getKLineList(QQQSymbol.getResources(), startTime, endTime);
-        return CollectionUtils.toTimeMap(qqqKlineList);
+    public static List<Long> getOpenDayList(long startTime, long endTime) {
+        List<Long> openDayList = new ArrayList<>();
+        try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream("data/OPEN_DAY.csv")) {
+            assert is != null;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                br.readLine();
+                while ((line = br.readLine()) != null) {
+                    long timestamp = DateUtils.getTimestamp(line.trim());
+                    if (timestamp >= startTime && timestamp <= endTime) {
+                        openDayList.add(timestamp);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return openDayList;
     }
 }

@@ -1,12 +1,11 @@
 package com.gantenx;
 
-import com.gantenx.strategy.crypto.RsiCryptoStrategy;
-import com.gantenx.strategy.crypto.WyckoffStrategy;
+import com.gantenx.strategy.BaseStrategy;
+import com.gantenx.strategy.crypto.RsiStrategy;
+import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
-
-import static com.gantenx.constant.CryptoSymbol.*;
+import static com.gantenx.constant.Constants.CRYPTO_SYMBOL_LIST;
 
 @Slf4j
 public class CryptoMain {
@@ -17,9 +16,9 @@ public class CryptoMain {
     }
 
     public static void start(String startStr, String endStr) {
-        RsiCryptoStrategy rsiStrategy = new RsiCryptoStrategy(Collections.singletonList(BTC_USDT), startStr, endStr);
-        rsiStrategy.process();
-//        WyckoffStrategy wyckoffStrategy = new WyckoffStrategy(BTC_USDT, startStr, endStr);
-//        wyckoffStrategy.process();
+        long start = DateUtils.getTimestamp(startStr);
+        long end = DateUtils.getTimestamp(endStr);
+        RsiStrategy rsiStrategy = new RsiStrategy(CRYPTO_SYMBOL_LIST, start, end);
+        BaseStrategy.processAndExport(rsiStrategy);
     }
 }

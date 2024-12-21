@@ -1,5 +1,6 @@
 package com.gantenx.utils;
 
+import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
@@ -7,13 +8,13 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ui.TextAnchor;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.gantenx.constant.Side.BUY;
 
-public class OrderMarker<T> {
+public class OrderMarker {
     private static final int FONT_SIZE = 10;
     private static final float LINE_WIDTH = 1.0f;
     private static final Color BUY_COLOR = new Color(0, 150, 0); // 绿色
@@ -30,17 +31,17 @@ public class OrderMarker<T> {
         this.rsiPlot = rsiPlot;
     }
 
-    public static <T> void markOrders(XYPlot mainPlot, XYPlot rsiPlot, List<Order<T>> orders) {
-        OrderMarker<T> annotationManager = new OrderMarker<>(mainPlot, rsiPlot);
+    public static void markOrders(XYPlot mainPlot, XYPlot rsiPlot, List<Order> orders) {
+        OrderMarker annotationManager = new OrderMarker(mainPlot, rsiPlot);
         annotationManager.addTradeMarkers(orders);
     }
 
-    public void addTradeMarkers(List<Order<T>> orders) {
+    public void addTradeMarkers(List<Order> orders) {
         if (orders == null || orders.isEmpty()) {
             return;
         }
 
-        Map<Long, List<Order<T>>> ordersByTimestamp = orders.stream()
+        Map<Long, List<Order>> ordersByTimestamp = orders.stream()
                 .collect(Collectors.groupingBy(Order::getTimestamp));
 
         List<Long> sortedTimestamps = new ArrayList<>(ordersByTimestamp.keySet());
@@ -52,7 +53,7 @@ public class OrderMarker<T> {
         });
     }
 
-    private void processOrderGroup(Long timestamp, List<Order<T>> orders) {
+    private void processOrderGroup(Long timestamp, List<Order> orders) {
         // 获取订单类型颜色
         boolean isBuyOrder = orders.stream().anyMatch(order -> order.getType().equals(BUY));
         Color lineColor = isBuyOrder ? BUY_COLOR : SELL_COLOR;
@@ -90,26 +91,26 @@ public class OrderMarker<T> {
         );
     }
 
-    private void addOrderTag(Long timestamp, List<Order<T>> orders) {
+    private void addOrderTag(Long timestamp, List<Order> orders) {
         // 处理订单
-        Map<T, List<Order<T>>> ordersBySymbol = orders.stream().collect(Collectors.groupingBy(Order::getSymbol));
+        Map<Symbol, List<Order>> ordersBySymbol = orders.stream().collect(Collectors.groupingBy(Order::getSymbol));
 
         int symbolIndex = 0;
-        for (Map.Entry<T, List<Order<T>>> entry : ordersBySymbol.entrySet()) {
-            List<Order<T>> symbolOrders = entry.getValue();
+        for (Map.Entry<Symbol, List<Order>> entry : ordersBySymbol.entrySet()) {
+            List<Order> symbolOrders = entry.getValue();
             processSymbolOrders(timestamp, symbolOrders, symbolIndex);
             symbolIndex += symbolOrders.size();
         }
     }
 
-    private void processSymbolOrders(Long timestamp, List<Order<T>> orders, int startIndex) {
+    private void processSymbolOrders(Long timestamp, List<Order> orders, int startIndex) {
         for (int i = 0; i < orders.size(); i++) {
             addOrderAnnotation(orders.get(i), timestamp, startIndex + i);
         }
     }
 
 
-    private void addOrderAnnotation(Order<T> order, Long timestamp, int index) {
+    private void addOrderAnnotation(Order order, Long timestamp, int index) {
         Color orderColor = order.getType().equals(BUY) ? BUY_COLOR : SELL_COLOR;
         String[] lines = formatOrderInfo(order).split("\n");
 
@@ -137,7 +138,7 @@ public class OrderMarker<T> {
         double range = yUpper - yLower;
 
         boolean isTopPosition = timestampId % 2 == 0;
-        int tiers = timestampId % 3 + 1;
+        int tiers = timestampId % 5 + 1;
         // 动态计算基础 Y 坐标
         double baseY = isTopPosition ? yUpper - (tiers * 0.05 * range) : yLower + (tiers * 0.05 * range); // 10% 的上方或下方偏移
 
@@ -148,9 +149,10 @@ public class OrderMarker<T> {
         return baseY - (index * spacing);
     }
 
-    private String formatOrderInfo(Order<T> order) {
-        return String.format("%s\n%s@%.2f",
-                             DateUtils.getDate(order.getTimestamp()),
+    private String formatOrderInfo(Order order) {
+        return String.format("%s %s\n%s@%.2f",
+                             order.getSymbol(),
+                             DateUtils.getDateForOrderMarker(order.getTimestamp()),
                              order.getType().name(),
                              order.getPrice());
     }

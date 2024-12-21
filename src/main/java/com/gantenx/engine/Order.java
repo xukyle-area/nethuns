@@ -1,18 +1,18 @@
 package com.gantenx.engine;
 
-import com.gantenx.annotation.ExcelColumn;
 import com.gantenx.constant.Side;
+import com.gantenx.constant.Symbol;
 import com.gantenx.model.Time;
 
-public class Order<T> extends Time {
-    private final T symbol;    // 标的符号
+public class Order extends Time {
+    private final Symbol symbol;    // 标的符号
     private final Side type;       // "buy" or "sell"
     private final double price;      // 价格
     private final double quantity;   // 数量
     private long orderId;
     private final String reason;
 
-    public Order(long orderId, T symbol, Side side, double price, double quantity, long timestamp, String reason) {
+    public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp, String reason) {
         super(timestamp);
         this.orderId = orderId;
         this.symbol = symbol;
@@ -38,7 +38,7 @@ public class Order<T> extends Time {
         return quantity;
     }
 
-    public T getSymbol() {
+    public Symbol getSymbol() {
         return this.symbol;
     }
 

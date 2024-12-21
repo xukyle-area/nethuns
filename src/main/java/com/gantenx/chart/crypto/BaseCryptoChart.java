@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static com.gantenx.constant.Constants.*;
 
-public abstract class BaseCryptoChart<T> extends ApplicationFrame {
+public abstract class BaseCryptoChart extends ApplicationFrame {
 
     private final JFreeChart combinedChart;
 
@@ -30,7 +30,7 @@ public abstract class BaseCryptoChart<T> extends ApplicationFrame {
                               XYSeriesCollection subDataset,
                               String subDataName,
                               double subDataRange,
-                              List<Order<T>> orderList) {
+                              List<Order> orderList) {
         super("Trading Line");
         XYPlot mainPlot = createMainPlot(CollectionUtils.toPriceMap(priceMap), assetMap);
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);

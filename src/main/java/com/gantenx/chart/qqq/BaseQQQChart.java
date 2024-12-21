@@ -1,6 +1,6 @@
 package com.gantenx.chart.qqq;
 
-import com.gantenx.constant.QQQSymbol;
+import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.ChartUtils;
@@ -18,22 +18,22 @@ import org.jfree.ui.ApplicationFrame;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.gantenx.constant.Constants.*;
-import static com.gantenx.constant.QQQSymbol.*;
+import static com.gantenx.constant.Symbol.QQQUSD;
+import static com.gantenx.constant.Symbol.TQQQUSD;
 
-public abstract class BaseQQQChart<T> extends ApplicationFrame {
+public abstract class BaseQQQChart extends ApplicationFrame {
     private final JFreeChart combinedChart;
 
-    protected BaseQQQChart(Map<QQQSymbol, Map<Long, Kline>> klineMap,
+    protected BaseQQQChart(Map<Symbol, Map<Long, Kline>> klineMap,
                            XYSeriesCollection subDataset,
                            String subDataName,
                            double subDataRange,
-                           List<Order<T>> orderList) {
+                           List<Order> orderList) {
         super("Trading Line");
         XYPlot mainPlot = createMainPlot(klineMap);
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);
@@ -46,13 +46,13 @@ public abstract class BaseQQQChart<T> extends ApplicationFrame {
         this.setupChartPanel();
     }
 
-    private XYPlot createMainPlot(Map<QQQSymbol, Map<Long, Kline>> klineMap) {
+    private XYPlot createMainPlot(Map<Symbol, Map<Long, Kline>> klineMap) {
         // 1. 数据准备
-        Map<QQQSymbol, Map<Long, Double>> priceDataMap = Arrays.stream(QQQSymbol.values()).collect(Collectors.toMap(
+        Map<Symbol, Map<Long, Double>> priceDataMap = klineMap.keySet().stream().collect(Collectors.toMap(
                 symbol -> symbol,
                 symbol -> CollectionUtils.toPriceMap(klineMap.get(symbol))));
         // 2. 创建数据集
-        XYSeriesCollection[] datasets = Arrays.stream(QQQSymbol.values())
+        XYSeriesCollection[] datasets = klineMap.keySet().stream()
                 .map(symbol -> ChartUtils.createDataset(symbol.name(), priceDataMap.get(symbol)))
                 .toArray(XYSeriesCollection[]::new);
         // 3. 创建图表
@@ -70,9 +70,9 @@ public abstract class BaseQQQChart<T> extends ApplicationFrame {
     }
 
     // 抽取坐标轴设置逻辑
-    private void setupAxisRanges(XYPlot plot, Map<QQQSymbol, Map<Long, Double>> priceDataMap) {
-        Map<Long, Double> qqqData = priceDataMap.get(QQQ);
-        Map<Long, Double> tqqqData = priceDataMap.get(TQQQ);
+    private void setupAxisRanges(XYPlot plot, Map<Symbol, Map<Long, Double>> priceDataMap) {
+        Map<Long, Double> qqqData = priceDataMap.get(QQQUSD);
+        Map<Long, Double> tqqqData = priceDataMap.get(TQQQUSD);
 
         ChartUtils.setupAxes(plot,
                              PRICE,

@@ -1,7 +1,11 @@
 package com.gantenx.constant;
 
-public enum CryptoCurrency {
+public enum Currency {
     BTC("BTC", "btc"),
+    USD("BTC", "btc"),
+    QQQ("QQQ", "qqq"),
+    TQQQ("TQQQ", "tqqq"),
+    SQQQ("SQQQ", "sqqq"),
     ETH("ETH", "eth"),
     DOGE("DOGE", "doge"),
     USDT("USDT", "usdt");
@@ -9,7 +13,7 @@ public enum CryptoCurrency {
     private final String upperName;
     private final String lowerName;
 
-    CryptoCurrency(String upperName, String lowerName) {
+    Currency(String upperName, String lowerName) {
         this.upperName = upperName;
         this.lowerName = lowerName;
     }
@@ -22,8 +26,8 @@ public enum CryptoCurrency {
         return lowerName;
     }
 
-    public CryptoCurrency toCurrency(String currency) {
-        for (CryptoCurrency value : CryptoCurrency.values()) {
+    public Currency toCurrency(String currency) {
+        for (Currency value : Currency.values()) {
             if (value.getUpperName().equals(currency)) {
                 return value;
             }

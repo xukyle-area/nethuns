@@ -1,9 +1,11 @@
-package com.gantenx.calculator;
+package com.gantenx.model;
 
-public class  Profit<T> {
+import com.gantenx.constant.Symbol;
+
+public class Profit {
     private double profit;
     private long totalHoldingDays;
-    private T symbol;
+    private Symbol symbol;
 
     // Constructor
     public Profit() {
@@ -19,11 +21,11 @@ public class  Profit<T> {
         this.totalHoldingDays = totalHoldingDays;
     }
 
-    public T getSymbol() {
+    public Symbol getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(T symbol) {
+    public void setSymbol(Symbol symbol) {
         this.symbol = symbol;
     }
 
