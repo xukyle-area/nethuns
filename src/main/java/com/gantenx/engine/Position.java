@@ -1,5 +1,7 @@
 package com.gantenx.engine;
 
+import com.gantenx.constant.Period;
+
 import java.util.List;
 
 import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY_DOUBLE;
@@ -101,7 +103,7 @@ public class Position {
         for (Position position : positionList) {
             if (position.getQuantity() > 0 && position.getTimestamp() <= timestamp) {
                 // 将毫秒转换为天
-                double holdingDays = (timestamp - position.getTimestamp()) / (MS_OF_ONE_DAY_DOUBLE);
+                double holdingDays = (double) (timestamp - position.getTimestamp()) / (Period.ONE_DAY.getMillisecond());
                 totalDays += holdingDays * position.getQuantity();
                 totalQuantity += position.getQuantity();
             }

@@ -10,7 +10,8 @@ public enum Symbol {
     SQQQUSD(SQQQ, USD, CSV, "data/SQQQ.csv"),
     BTCUSDT(BTC, USDT, BINANCE, null),
     ETHUSDT(ETH, USDT, BINANCE, null),
-    DOGEUSDT(DOGE, USDT, BINANCE, null);
+    DOGEUSDT(DOGE, USDT, BINANCE, null),
+    PEPEUSDT(PEPE, USDT, BINANCE, null);
 
     private final Currency base;
     private final Currency quote;

@@ -10,7 +10,11 @@ import java.util.List;
 import static com.gantenx.constant.Symbol.*;
 
 public class Constants {
-    public static final String ONE_DAY = "1d";
+    public static final Symbol CRYPTO_TRADING = ETHUSDT;
+    public static final List<Symbol> CRYPTO_SYMBOL_LIST = Collections.singletonList(CRYPTO_TRADING);
+    public static final List<Symbol> QQQ_SYMBOL_LIST = Arrays.asList(QQQUSD, SQQQUSD, TQQQUSD);
+
+
     public static final String MACD = "macd";
     public static final String BINANCE_URL = "https://data-api.binance.vision";
     public static final IndexPeriod INDEX_PERIOD = new IndexPeriod(6, 9, 6);
@@ -47,6 +51,7 @@ public class Constants {
     public static final String ORDER_LIST = "order-list";
     public static final String RECORD_LIST = "record-list";
     public static final String PROFIT_LIST = "profit-list";
+    public static final String LONG_HOLDING_PROFIT_RATE = "long-holding-profit-rate";
     public static final String RESULT = "result";
     public static final String LINES = "lines";
     public static final int RSI_PERIOD = 6;
@@ -54,7 +59,4 @@ public class Constants {
     public static final double EPSILON = 1e-6;
     public static final double INITIAL_BALANCE = 100000;
     public final static double FEE = 0.001;
-
-    public static final List<Symbol> QQQ_SYMBOL_LIST = Arrays.asList(QQQUSD, SQQQUSD, TQQQUSD);
-    public static final List<Symbol> CRYPTO_SYMBOL_LIST = Collections.singletonList(BTCUSDT);
 }

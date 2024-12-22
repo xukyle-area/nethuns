@@ -70,7 +70,6 @@ public class TradeEngine {
     public void sell(Symbol symbol, long proportion, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
-            log.warn("{} - No position to sell for {}", DateUtils.getDate(timestamp), symbol);
             return;
         }
 
@@ -78,10 +77,6 @@ public class TradeEngine {
         double sellQuantity = totalQuantity * proportion / 100;
 
         if (sellQuantity <= 0) {
-            log.warn("{} - Invalid sell quantity: sellQuantity={}, totalQuantity={}",
-                     DateUtils.getDate(timestamp),
-                     sellQuantity,
-                     totalQuantity);
             return;
         }
 
@@ -92,7 +87,6 @@ public class TradeEngine {
         double price = this.getPrice(symbol);
         double maxQuantity = (balance * proportion / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
         if (maxQuantity <= 0) {
-            log.warn("{} - Insufficient balance to buy {}: balance={}", DateUtils.getDate(timestamp), symbol, balance);
             return;
         }
         buy(symbol, maxQuantity, reason);
@@ -104,16 +98,12 @@ public class TradeEngine {
             throw new IllegalArgumentException("Invalid kline getting parameters: symbol=" + symbol.name() + ", date=" + DateUtils.getDate(
                     timestamp));
         }
-        return kline.getClose();
+        return kline.getOpen();
     }
 
     private void buy(Symbol symbol, double quantity, String reason) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
-            log.warn("{} - Invalid buy parameters: price={}, quantity={}",
-                     DateUtils.getDate(timestamp),
-                     price,
-                     quantity);
             return;
         }
 
@@ -125,38 +115,18 @@ public class TradeEngine {
             long orderId = generateOrderId();
             positionList.add(new Position(orderId, price, quantity, timestamp)); // 保存买入记录
             positions.put(symbol, positionList);
-
             orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp, reason));
-
-            log.info("{} - Bought {} {} at price {}, cost: {}, remaining balance: {}",
-                     DateUtils.getDate(timestamp),
-                     quantity,
-                     symbol,
-                     price,
-                     cost,
-                     balance);
-        } else {
-            log.warn("{} - Insufficient balance to buy {}: cost={}, balance={}",
-                     DateUtils.getDate(timestamp),
-                     symbol,
-                     cost,
-                     balance);
         }
     }
 
     private void sell(Symbol symbol, double quantity, String reason) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
-            log.warn("{} - Invalid sell parameters: price={}, quantity={}",
-                     DateUtils.getDate(timestamp),
-                     price,
-                     quantity);
             return;
         }
 
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
-            log.warn("{} - No position to sell for {}", DateUtils.getDate(timestamp), symbol);
             return;
         }
 
@@ -199,13 +169,6 @@ public class TradeEngine {
             }
         }
         balance += totalRevenue;
-        log.info("{} - Sold {} {} at price {}, revenue: {}, remaining balance: {}",
-                 DateUtils.getDate(timestamp),
-                 quantity,
-                 symbol,
-                 price,
-                 totalRevenue,
-                 balance);
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));
     }
 
@@ -218,10 +181,7 @@ public class TradeEngine {
 
     private double calculateTotalRevenue(Symbol symbol, double quantity) {
         double price = this.getPrice(symbol);
-        double revenue = price * quantity;
-        double curFee = revenue * FEE;
-        feeCount += curFee;
-        return revenue - curFee;
+        return price * quantity;
     }
 
     public double getQuantity(Symbol symbol) {

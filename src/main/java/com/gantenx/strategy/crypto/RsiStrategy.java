@@ -2,6 +2,7 @@ package com.gantenx.strategy.crypto;
 
 import com.gantenx.calculator.AssetCalculator;
 import com.gantenx.chart.crypto.RSIAndAssetChart;
+import com.gantenx.constant.Period;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import com.gantenx.service.KlineService;
@@ -16,15 +17,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.*;
-import static com.gantenx.constant.Symbol.BTCUSDT;
-import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 @Slf4j
 public class RsiStrategy extends BaseStrategy {
     protected final Map<Symbol, Map<Long, Double>> rsiMap;
 
-    public RsiStrategy(List<Symbol> symbolList, long start, long end) {
-        super(RsiStrategy.class.getSimpleName(), symbolList, DateUtils.genTimeList(start, end));
+    public RsiStrategy(List<Symbol> symbolList, Period period, long start, long end) {
+        super(RsiStrategy.class.getSimpleName(), symbolList, period, DateUtils.genTimeList(period, start, end));
         rsiMap = KlineService.genRsiMap(klineMap, symbolList);
     }
 
@@ -32,10 +31,11 @@ public class RsiStrategy extends BaseStrategy {
     protected void open() {
         while (tradeEngine.hasNextDay()) {
             long timestamp = tradeEngine.nextDay();
+            String dateStr = DateUtils.getDate(timestamp);
             for (Symbol symbol : klineMap.keySet()) {
                 Double RSI = CollectionUtils.get(rsiMap, symbol, timestamp);
                 if (Objects.isNull(RSI)) {
-                    log.error("data not found, date:{}", DateUtils.getDate(timestamp));
+                    log.error("data not found, date:{}", dateStr);
                     continue;
                 }
                 if (this.lowestOfDays(symbol, timestamp) > 5 && RSI < 50) {
@@ -55,9 +55,8 @@ public class RsiStrategy extends BaseStrategy {
         }
 
         int days = 0;
-        long dayMillis = MS_OF_ONE_DAY;
         while (true) {
-            long previousTimestamp = timestamp - (++days) * dayMillis;
+            long previousTimestamp = timestamp - (++days) * Period.ONE_DAY.getMillisecond();
             Double previousRsi = CollectionUtils.get(rsiMap, symbol, previousTimestamp);
             if (previousRsi == null || curRsi >= previousRsi) {
                 return days - 1;
@@ -69,6 +68,6 @@ public class RsiStrategy extends BaseStrategy {
     protected JFreeChart getTradingChart() {
         List<Order> orders = tradeDetail.getOrders();
         Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap, openDayList, orders, INITIAL_BALANCE);
-        return new RSIAndAssetChart(klineMap.get(BTCUSDT), assetMap, orders).getCombinedChart();
+        return new RSIAndAssetChart(klineMap.get(CRYPTO_TRADING), assetMap, orders).getCombinedChart();
     }
 }

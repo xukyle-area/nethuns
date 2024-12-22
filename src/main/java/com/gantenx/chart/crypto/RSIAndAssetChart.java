@@ -3,6 +3,7 @@ package com.gantenx.chart.crypto;
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
+import com.gantenx.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -19,7 +20,12 @@ public class RSIAndAssetChart extends BaseCryptoChart {
     public RSIAndAssetChart(Map<Long, Kline> priceMap,
                             Map<Long, Double> assetMap,
                             List<Order> orderList) {
-        super(priceMap, assetMap, RSIAndAssetChart.subDataset(priceMap), RSI, 100.0, orderList);
+        super(CollectionUtils.toPriceMap(priceMap),
+              assetMap,
+              RSIAndAssetChart.subDataset(priceMap),
+              RSI,
+              100.0,
+              orderList);
     }
 
     private static XYSeriesCollection subDataset(Map<Long, Kline> klineMap) {

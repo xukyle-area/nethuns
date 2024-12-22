@@ -1,10 +1,9 @@
 package com.gantenx.chart.crypto;
 
 import com.gantenx.engine.Order;
-import com.gantenx.model.Kline;
-import com.gantenx.utils.ChartUtils;
+import com.gantenx.chart.ChartUtils;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.OrderMarker;
+import com.gantenx.chart.OrderMarker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -25,14 +24,14 @@ public abstract class BaseCryptoChart extends ApplicationFrame {
 
     private final JFreeChart combinedChart;
 
-    protected BaseCryptoChart(Map<Long, Kline> priceMap,
-                              Map<Long, Double> assetMap,
+    protected BaseCryptoChart(Map<Long, Double> mapLeft,
+                              Map<Long, Double> mapRight,
                               XYSeriesCollection subDataset,
                               String subDataName,
                               double subDataRange,
                               List<Order> orderList) {
         super("Trading Line");
-        XYPlot mainPlot = createMainPlot(CollectionUtils.toPriceMap(priceMap), assetMap);
+        XYPlot mainPlot = createMainPlot(mapLeft, mapRight);
         XYPlot subPlot = ChartUtils.createSubPlot(subDataset, subDataName, subDataRange);
         OrderMarker.markOrders(mainPlot, subPlot, orderList);
 

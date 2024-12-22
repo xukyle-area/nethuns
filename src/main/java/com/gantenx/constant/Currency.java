@@ -8,6 +8,7 @@ public enum Currency {
     SQQQ("SQQQ", "sqqq"),
     ETH("ETH", "eth"),
     DOGE("DOGE", "doge"),
+    PEPE("PEPE", "pepe"),
     USDT("USDT", "usdt");
 
     private final String upperName;

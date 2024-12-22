@@ -4,6 +4,7 @@ import com.gantenx.calculator.AssetCalculator;
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.chart.crypto.RSIAndAssetChart;
 import com.gantenx.chart.qqq.RSIChart;
+import com.gantenx.constant.Period;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
 import com.gantenx.engine.Position;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.*;
+import static com.gantenx.constant.Period.ONE_DAY;
 import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
@@ -29,7 +31,7 @@ public class RsiStrategy extends BaseStrategy {
     private static final double STOP_LOSS_THRESHOLD = -0.03;
 
     public RsiStrategy(List<Symbol> symbolList,long start, long end) {
-        super(RsiStrategy.class.getSimpleName(), symbolList, CsvUtils.getOpenDayList(start, end));
+        super(RsiStrategy.class.getSimpleName(), symbolList, ONE_DAY, CsvUtils.getOpenDayList(start, end));
     }
 
     @Override

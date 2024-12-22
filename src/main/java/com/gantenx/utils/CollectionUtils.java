@@ -6,11 +6,9 @@ import com.gantenx.model.Time;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 @Slf4j
 public class CollectionUtils {

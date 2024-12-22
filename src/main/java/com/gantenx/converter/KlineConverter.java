@@ -1,5 +1,6 @@
 package com.gantenx.converter;
 
+import com.gantenx.constant.Period;
 import com.gantenx.model.Kline;
 
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY;
 
 public class KlineConverter {
 
@@ -16,7 +16,7 @@ public class KlineConverter {
         List<Kline> resultList = new ArrayList<>();
 
         // 遍历时间戳区间
-        for (long timestamp = start; timestamp <= end; timestamp += MS_OF_ONE_DAY) {
+        for (long timestamp = start; timestamp <= end; timestamp += Period.ONE_DAY.getMillisecond()) {
             Kline baseKline = baseMap.get(timestamp);  // A/USD Kline
             Kline quoteKline = quoteMap.get(timestamp); // B/USD Kline
 

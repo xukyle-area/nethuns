@@ -1,4 +1,4 @@
-package com.gantenx.utils;
+package com.gantenx.chart;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.axis.AxisLocation;
@@ -70,9 +70,6 @@ public class ChartUtils {
         rightAxis.setAutoRange(false);
         plot.setRangeAxis(1, rightAxis);
         plot.setRangeAxisLocation(1, AxisLocation.BOTTOM_OR_RIGHT);
-
-        log.info("Left Axis Range: {}-{} to {}", leftMin, leftMax, leftAxis.getRange());
-        log.info("Right Axis Range: {}-{} to {}", rightMin, rightMax, rightAxis.getRange());
     }
 
     public static DateAxis getDateAxis() {

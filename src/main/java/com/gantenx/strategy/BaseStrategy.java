@@ -1,11 +1,14 @@
 package com.gantenx.strategy;
 
+import com.gantenx.calculator.LongHoldingProfitCalculator;
+import com.gantenx.constant.Period;
 import com.gantenx.model.Profit;
 import com.gantenx.constant.Symbol;
-import com.gantenx.engine.OrderCalculator;
+import com.gantenx.calculator.OrderCalculator;
 import com.gantenx.engine.TradeDetail;
 import com.gantenx.engine.TradeEngine;
 import com.gantenx.model.Kline;
+import com.gantenx.model.ProfitRate;
 import com.gantenx.service.KlineService;
 import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.ExcelUtils;
@@ -29,11 +32,11 @@ public abstract class BaseStrategy {
     protected final TradeEngine tradeEngine;
     protected TradeDetail tradeDetail;
 
-    public BaseStrategy(String name, List<Symbol> symbols, List<Long> openDayList) {
+    public BaseStrategy(String name, List<Symbol> symbols, Period period, List<Long> openTimeList) {
         this.strategyName = name;
-        this.klineMap = KlineService.genKlineMap(symbols, openDayList);
-        this.openDayList = openDayList;
-        this.tradeEngine = new TradeEngine(openDayList, this.klineMap);
+        this.klineMap = KlineService.genKlineMap(symbols, period, openTimeList);
+        this.openDayList = openTimeList;
+        this.tradeEngine = new TradeEngine(openTimeList, this.klineMap);
     }
 
     protected void process() {
@@ -50,7 +53,8 @@ public abstract class BaseStrategy {
         ExcelUtils.addDataToNewSheet(workbook, this.tradeDetail.getRecords(), RECORD_LIST);
         List<Profit> profitList = OrderCalculator.calculateProfitAndHoldingDays(this.tradeDetail.getOrders());
         ExcelUtils.addDataToNewSheet(workbook, profitList, PROFIT_LIST);
-
+        List<ProfitRate> longHoldingProfitList = LongHoldingProfitCalculator.calculator(openDayList, klineMap);
+        ExcelUtils.addDataToNewSheet(workbook, longHoldingProfitList, LONG_HOLDING_PROFIT_RATE);
         // 导出 excel 表格
         String startStr = DateUtils.getDate(openDayList.get(0));
         String endStr = DateUtils.getDate(openDayList.get(openDayList.size() - 1));
