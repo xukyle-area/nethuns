@@ -119,9 +119,9 @@ public class ChartUtils {
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
         renderer.setSeriesPaint(0, Color.ORANGE);
         renderer.setSeriesStroke(0, BASE_STROKE);
-
+        XYPlot mainPlot = ChartUtils.createMainPlot(dataMap);
         XYPlot subPlot = new XYPlot(dataset, null, axis, renderer);
-        return new Chart(dataMap, subPlot, orders);
+        return new Chart(mainPlot, subPlot, orders);
     }
 
     public static JFreeChart getJFreeChart(List<Order> orders,

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Series {
-    QQQ, TQQQ, SQQQ, BTC, ETH, DOGE, PEPE, ASSET,RSI;
+    QQQ, TQQQ, SQQQ, BTC, ETH, DOGE, PEPE, ASSET,RSI,SUPERTREND;
 
     private static final Map<Symbol, Series> SYMBOL_TO_SERIES_MAP = new HashMap<>();
 

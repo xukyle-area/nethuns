@@ -1,13 +1,13 @@
-package com.gantenx.strategy;
+package com.gantenx.strategy.template;
 
 import com.gantenx.calculator.LongHoldingProfitCalculator;
-import com.gantenx.constant.Period;
-import com.gantenx.model.Profit;
-import com.gantenx.constant.Symbol;
 import com.gantenx.calculator.OrderCalculator;
+import com.gantenx.constant.Period;
+import com.gantenx.constant.Symbol;
 import com.gantenx.engine.TradeDetail;
 import com.gantenx.engine.TradeEngine;
 import com.gantenx.model.Kline;
+import com.gantenx.model.Profit;
 import com.gantenx.model.ProfitRate;
 import com.gantenx.service.KlineService;
 import com.gantenx.utils.DateUtils;
@@ -32,7 +32,7 @@ public abstract class BaseStrategy {
     protected final TradeEngine tradeEngine;
     protected TradeDetail tradeDetail;
 
-    public BaseStrategy(String name, List<Symbol> symbols, Period period, List<Long> timestampList) {
+    public BaseStrategy(String name, Period period, List<Long> timestampList, List<Symbol> symbols) {
         this.strategyName = name;
         this.klineMap = KlineService.getSymbolKlineMap(symbols, period, timestampList);
         this.timestampList = timestampList;
@@ -67,9 +67,8 @@ public abstract class BaseStrategy {
         }
     }
 
-    protected JFreeChart getChart() {
-        return null;
-    }
+    protected abstract JFreeChart getChart();
+
 
     public static <T extends BaseStrategy> void processAndExport(T strategy) {
         strategy.process();

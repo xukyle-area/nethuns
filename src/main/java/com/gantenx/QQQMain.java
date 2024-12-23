@@ -1,14 +1,11 @@
 package com.gantenx;
 
-import com.gantenx.strategy.BaseStrategy;
-import com.gantenx.strategy.qqq.RsiStrategy;
+import com.gantenx.constant.Period;
+import com.gantenx.constant.Symbol;
+import com.gantenx.strategy.template.BaseStrategy;
+import com.gantenx.strategy.MultiRsiStrategy;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Collections;
-
-import static com.gantenx.constant.Constants.QQQ_SYMBOL_LIST;
-import static com.gantenx.constant.Symbol.BTCUSDT;
 
 @Slf4j
 public class QQQMain {
@@ -27,7 +24,11 @@ public class QQQMain {
     public static <T> void start(String startStr, String endStr) {
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
-        RsiStrategy rsiStrategy = new RsiStrategy(QQQ_SYMBOL_LIST, start, end);
-        BaseStrategy.processAndExport(rsiStrategy);
+        MultiRsiStrategy multiplierRsiStrategy = new MultiRsiStrategy(start,
+                                                                      end,
+                                                                      Period.ONE_DAY,
+                                                                      Symbol.QQQUSD,
+                                                                      Symbol.TQQQUSD);
+        BaseStrategy.processAndExport(multiplierRsiStrategy);
     }
 }

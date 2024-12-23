@@ -1,6 +1,6 @@
 package com.gantenx;
 
-import com.gantenx.chart.Chart;
+import com.gantenx.calculator.SupertrendCalculator;
 import com.gantenx.chart.ChartUtils;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
@@ -14,34 +14,34 @@ import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.ExportUtils;
 import org.jfree.chart.JFreeChart;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.gantenx.constant.Constants.CRYPTO_SYMBOL_LIST;
 import static com.gantenx.constant.Period.ONE_DAY;
 import static com.gantenx.constant.Series.BTC;
+import static com.gantenx.constant.Series.SUPERTREND;
 import static com.gantenx.constant.Symbol.BTCUSDT;
 
 public class TestMain {
     private static final TrendIdentifier identifier = new PriceTrendIdentifier();
 
     public static void main(String[] args) {
-        String startStr = "20240101";
+        String startStr = "20241201";
         long start = DateUtils.getTimestamp(startStr);
         String endStr = "20241220";
         long end = DateUtils.getTimestamp(endStr);
         List<Long> timestampList = DateUtils.genTimeList(ONE_DAY, start, end);
-        Map<Symbol, Map<Long, Kline>> symbolKlineMap = KlineService.getSymbolKlineMap(CRYPTO_SYMBOL_LIST,
-                                                                                      ONE_DAY,
-                                                                                      timestampList);
-        Map<Series, Map<Long, Double>> dataMap = CollectionUtils.toSeriesPriceMap(symbolKlineMap,
-                                                                                  symbolKlineMap.keySet());
-        Map<Long, Kline> kline = symbolKlineMap.get(BTCUSDT);
-        Map<Long, Double> priceMap = CollectionUtils.toPriceMap(kline);
+        Map<Symbol, Map<Long, Kline>> symbolKlineMap = KlineService.getSymbolKlineMap(
+                Arrays.asList(BTCUSDT), ONE_DAY, timestampList);
+        Map<Long, Kline> klineData = symbolKlineMap.get(BTCUSDT);
 
-        JFreeChart freeChart = ChartUtils.getJFreeChart(new ArrayList<>(), Pair.create(BTC, priceMap), dataMap);
-        ExportUtils.saveJFreeChartAsImage(freeChart, startStr, endStr, "测试导出", "k线");
+        Map<Series, Map<Long, Double>> seriesDataMap = CollectionUtils.toSeriesPriceMap(symbolKlineMap,
+                                                                                        symbolKlineMap.keySet());
+
+        Map<Long, Double> supertrendMap = SupertrendCalculator.getSupertrendMap(klineData);
+        seriesDataMap.put(SUPERTREND, supertrendMap);
+        Map<Long, Double> priceMap = CollectionUtils.toPriceMap(klineData);
+        JFreeChart freeChart = ChartUtils.getJFreeChart(new ArrayList<>(), Pair.create(BTC, priceMap), seriesDataMap);
+        ExportUtils.saveJFreeChartAsImage(freeChart, startStr, endStr, "测试导出", "数据");
     }
 
 

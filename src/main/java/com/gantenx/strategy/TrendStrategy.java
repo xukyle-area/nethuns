@@ -1,10 +1,11 @@
-package com.gantenx.strategy.crypto;
+package com.gantenx.strategy;
 
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Signal;
 import com.gantenx.constant.Symbol;
 import com.gantenx.constant.Trend;
-import com.gantenx.strategy.BaseStrategy;
+import com.gantenx.strategy.template.BaseStrategy;
+import com.gantenx.strategy.template.SingleStrategy;
 import com.gantenx.trend.PriceTrendIdentifier;
 import com.gantenx.trend.TrendUtils;
 import com.gantenx.utils.DateUtils;
@@ -15,14 +16,14 @@ import java.util.*;
 import static com.gantenx.constant.Constants.*;
 
 @Slf4j
-public class TrendStrategy extends BaseStrategy {
+public class TrendStrategy extends SingleStrategy {
     protected final Map<Symbol, Map<Long, Trend>> trendMap;
     protected final PriceTrendIdentifier identifier = new PriceTrendIdentifier();
     protected final LinkedList<Trend> trendList = new LinkedList<>();
     private static final int TREND_LIST_SIZE = 7; // 与period相同
 
-    public TrendStrategy(List<Symbol> symbolList, Period period, long start, long end) {
-        super(TrendStrategy.class.getSimpleName(), symbolList, period, DateUtils.genTimeList(period, start, end));
+    public TrendStrategy(Period period, long start, long end, Symbol symbol) {
+        super(TrendStrategy.class.getSimpleName(), period, start, end, symbol);
         trendMap = new HashMap<>();
         for (int i = 0; i < TREND_LIST_SIZE; i++) {
             trendList.add(Trend.SIDEWAYS);

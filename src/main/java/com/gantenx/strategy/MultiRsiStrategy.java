@@ -1,37 +1,37 @@
-package com.gantenx.strategy.qqq;
+package com.gantenx.strategy;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
 import com.gantenx.chart.ChartUtils;
+import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Position;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
-import com.gantenx.strategy.BaseStrategy;
+import com.gantenx.strategy.template.MultiStrategy;
 import com.gantenx.utils.CollectionUtils;
-import com.gantenx.utils.CsvUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Period.ONE_DAY;
 import static com.gantenx.constant.Series.QQQ;
 import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
-public class RsiStrategy extends BaseStrategy {
+public class MultiRsiStrategy extends MultiStrategy {
     private static final double EXTREME_OVERSOLD = 25.0;
     private static final double EXTREME_OVERBOUGHT = 85.0;
     private static final double NEUTRAL_LEVEL = 60.0;
     private static final double MAX_HOLDING_DAYS = 100.0;
     private static final double STOP_LOSS_THRESHOLD = -0.03;
 
-    public RsiStrategy(List<Symbol> symbolList,long start, long end) {
-        super(RsiStrategy.class.getSimpleName(), symbolList, ONE_DAY, CsvUtils.getOpenDayList(start, end));
+    public MultiRsiStrategy(long start, long end, Period period, Symbol... symbolList) {
+        super(MultiRsiStrategy.class.getSimpleName(), period, start, end, Arrays.asList(symbolList));
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.gantenx;
 
-import com.gantenx.strategy.BaseStrategy;
-import com.gantenx.strategy.crypto.TrendStrategy;
+import com.gantenx.strategy.TrendStrategy;
+import com.gantenx.strategy.template.BaseStrategy;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.gantenx.constant.Constants.CRYPTO_SYMBOL_LIST;
 import static com.gantenx.constant.Period.FOUR_HOURS;
+import static com.gantenx.constant.Symbol.BTCUSDT;
 
 @Slf4j
 public class CryptoMain {
@@ -19,7 +19,7 @@ public class CryptoMain {
     public static void start(String startStr, String endStr) {
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
-        TrendStrategy trendStrategy = new TrendStrategy(CRYPTO_SYMBOL_LIST, FOUR_HOURS, start, end);
+        TrendStrategy trendStrategy = new TrendStrategy(FOUR_HOURS, start, end, BTCUSDT);
         BaseStrategy.processAndExport(trendStrategy);
     }
 }

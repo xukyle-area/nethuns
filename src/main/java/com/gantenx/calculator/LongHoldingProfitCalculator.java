@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public class LongHoldingProfitCalculator {
-    public static List<ProfitRate> calculator(List<Long> openDays, Map<Symbol, Map<Long, Kline>> klineMap) {
-        long start = openDays.get(0);
-        long end = openDays.get(openDays.size() - 1);
+    public static List<ProfitRate> calculator(List<Long> timestampList, Map<Symbol, Map<Long, Kline>> klineMap) {
+        long start = timestampList.get(0);
+        long end = timestampList.get(timestampList.size() - 1);
         List<ProfitRate> list = new ArrayList<>();
         for (Map.Entry<Symbol, Map<Long, Kline>> entry : klineMap.entrySet()) {
             Symbol symbol = entry.getKey();

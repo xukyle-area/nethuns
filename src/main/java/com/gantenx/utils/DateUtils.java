@@ -28,8 +28,11 @@ public class DateUtils {
     }
 
     public static List<Long> genTimeList(Period period, long startTimestamp, long endTimestamp) {
-        List<Long> list = new ArrayList<>();
         startTimestamp = startTimestamp - startTimestamp % period.getMillisecond();
+        if(Period.CSV.equals(period)){
+            return CsvUtils.getOpenDayList(startTimestamp,endTimestamp);
+        }
+        List<Long> list = new ArrayList<>();
         for (long i = startTimestamp; i <= endTimestamp; i += period.getMillisecond()) {
             list.add(i);
         }

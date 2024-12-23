@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.gantenx.constant.Constants.RSI_PERIOD;
 import static com.gantenx.constant.From.CSV;
 import static com.gantenx.constant.Period.ONE_DAY;
 
