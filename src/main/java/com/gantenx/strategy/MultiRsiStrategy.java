@@ -1,25 +1,20 @@
 package com.gantenx.strategy;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.ChartUtils;
 import com.gantenx.constant.Period;
-import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Position;
 import com.gantenx.model.Kline;
-import com.gantenx.model.Pair;
 import com.gantenx.strategy.template.MultiStrategy;
 import com.gantenx.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jfree.chart.JFreeChart;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Series.QQQ;
+import static com.gantenx.constant.Proportion.PROPORTION_OF_100;
 import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
@@ -128,24 +123,17 @@ public class MultiRsiStrategy extends MultiStrategy {
     private void handleNormalHolding(double rsi) {
         // 持有SQQQ且RSI回归中性，换回QQQ
         if (tradeEngine.getQuantity(SQQQUSD) > 0 && rsi <= NEUTRAL_LEVEL) {
-            tradeEngine.sell(SQQQUSD, PROPORTION_OF_100,
+            tradeEngine.sell(SQQQUSD,
+                             PROPORTION_OF_100,
                              String.format("持有SQQQ，RSI=%.2f 回归中性，卖出SQQQ换回QQQ", rsi));
-            tradeEngine.buy(QQQUSD, PROPORTION_OF_100,
-                            String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
+            tradeEngine.buy(QQQUSD, PROPORTION_OF_100, String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
         }
         // 持有TQQQ且RSI回归中性，换回QQQ
         else if (tradeEngine.getQuantity(TQQQUSD) > 0 && rsi >= NEUTRAL_LEVEL) {
-            tradeEngine.sell(TQQQUSD, PROPORTION_OF_100,
+            tradeEngine.sell(TQQQUSD,
+                             PROPORTION_OF_100,
                              String.format("持有TQQQ，RSI=%.2f 回归中性，卖出TQQQ换回QQQ", rsi));
-            tradeEngine.buy(QQQUSD, PROPORTION_OF_100,
-                            String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
+            tradeEngine.buy(QQQUSD, PROPORTION_OF_100, String.format("RSI=%.2f 回归中性，买入QQQ", rsi));
         }
-    }
-
-    @Override
-    protected JFreeChart getChart() {
-        Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
-        Pair<Series, Map<Long, Double>> pair = Pair.create(QQQ, CollectionUtils.toPriceMap(klineMap.get(QQQUSD)));
-        return ChartUtils.getJFreeChart(tradeDetail.getOrders(), pair, map);
     }
 }

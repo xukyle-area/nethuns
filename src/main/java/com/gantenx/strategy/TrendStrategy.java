@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 import static com.gantenx.constant.Constants.*;
+import static com.gantenx.constant.Proportion.PROPORTION_OF_15;
 
 @Slf4j
 public class TrendStrategy extends SingleStrategy {

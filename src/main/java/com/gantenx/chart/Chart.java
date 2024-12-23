@@ -1,6 +1,7 @@
 package com.gantenx.chart;
 
 import com.gantenx.engine.Order;
+import com.gantenx.utils.CollectionUtils;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -17,7 +18,9 @@ public class Chart extends ApplicationFrame {
 
     protected Chart(XYPlot mainPlot, XYPlot subPlot, List<Order> orderList) {
         super("Trading Line");
-        OrderMarker.markOrders(mainPlot, subPlot, orderList);
+        if (!CollectionUtils.isEmpty(orderList)) {
+            OrderMarker.markOrders(mainPlot, subPlot, orderList);
+        }
         CombinedDomainXYPlot combinedPlot = ChartUtils.setCombinedPlot(mainPlot, subPlot);
         combinedChart = new JFreeChart(TITLE, JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
         this.setupChartPanel();

@@ -1,5 +1,6 @@
 package com.gantenx.engine;
 
+import com.gantenx.constant.Proportion;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
@@ -121,14 +122,14 @@ public class TradeEngine {
      * @param proportion 占有现在仓位的比例
      * @param reason     原因
      */
-    public void sell(Symbol symbol, long proportion, String reason) {
+    public void sell(Symbol symbol, Proportion proportion, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             return;
         }
 
         double totalQuantity = positionList.stream().mapToDouble(Position::getQuantity).sum();
-        double sellQuantity = totalQuantity * proportion / 100;
+        double sellQuantity = totalQuantity * proportion.getValue() / 100;
 
         if (sellQuantity <= 0) {
             return;
@@ -144,9 +145,9 @@ public class TradeEngine {
      * @param proportion 占有现在余额的比例
      * @param reason     原因
      */
-    public void buy(Symbol symbol, long proportion, String reason) {
+    public void buy(Symbol symbol, Proportion proportion, String reason) {
         double price = this.getPrice(symbol);
-        double maxQuantity = (balance * proportion / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
+        double maxQuantity = (balance * proportion.getValue() / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
         if (maxQuantity <= 0) {
             return;
         }

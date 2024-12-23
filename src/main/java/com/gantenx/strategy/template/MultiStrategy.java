@@ -32,6 +32,6 @@ public abstract class MultiStrategy extends BaseStrategy {
     protected JFreeChart getChart() {
         Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
         Pair<Series, Map<Long, Double>> pair = Pair.create(QQQ, CollectionUtils.toPriceMap(klineMap.get(QQQUSD)));
-        return ChartUtils.getJFreeChart(tradeDetail.getOrders(), pair, map);
+        return ChartUtils.getLineChart(tradeDetail.getOrders(), pair, map);
     }
 }

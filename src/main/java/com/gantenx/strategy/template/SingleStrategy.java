@@ -5,6 +5,7 @@ import com.gantenx.chart.ChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
+import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
@@ -31,11 +32,12 @@ public abstract class SingleStrategy extends BaseStrategy {
 
     @Override
     protected JFreeChart getChart() {
-        Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
         Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap,
                                                                        timestampList,
                                                                        tradeDetail.getOrders(),
                                                                        tradeDetail.getInitialBalance());
-        return ChartUtils.getJFreeChart(tradeDetail.getOrders(), Pair.create(ASSET, assetMap), map);
+        Series series = Series.getSeries(symbol);
+        Pair<Series, Map<Long, Kline>> pair = Pair.create(series, klineMap.get(symbol));
+        return ChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(ASSET, assetMap), pair);
     }
 }

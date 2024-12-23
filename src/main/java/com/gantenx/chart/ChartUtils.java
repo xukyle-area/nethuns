@@ -2,24 +2,28 @@ package com.gantenx.chart;
 
 import com.gantenx.constant.Series;
 import com.gantenx.engine.Order;
+import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
 import com.gantenx.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.DefaultHighLowDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.gantenx.constant.Constants.*;
 import static com.gantenx.utils.DateUtils.SIMPLE_DATE_FORMAT;
@@ -96,39 +100,48 @@ public class ChartUtils {
         DateAxis timeAxis = (DateAxis) mainPlot.getDomainAxis();
         CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
         combinedPlot.add(mainPlot, 3);
-        combinedPlot.add(subPlot, 1);
+        if (Objects.nonNull(subPlot)) {
+            combinedPlot.add(subPlot, 1);
+        }
         return combinedPlot;
     }
 
-    /**
-     * @param orders  展示在图标上的订单记录，可以为空
-     * @param dataMap 主图上的数据
-     * @param subData 展示在下方的图的数据
-     */
-    private static Chart getChart(List<Order> orders,
-                                 Pair<Series, Map<Long, Double>> subData,
-                                 Map<Series, Map<Long, Double>> dataMap) {
+    public static JFreeChart getCandleChart(List<Order> orders,
+                                            @Nullable Pair<Series, Map<Long, Double>> subData,
+                                            Pair<Series, Map<Long, Kline>> pair) {
+
+        XYPlot subPlot = ChartUtils.subPlot(subData);
+        XYPlot mainPlot = ChartUtils.createCandlePlot(pair);
+        return new Chart(mainPlot, subPlot, orders).getCombinedChart();
+    }
+
+    public static JFreeChart getLineChart(List<Order> orders,
+                                          @Nullable Pair<Series, Map<Long, Double>> subData,
+                                          Map<Series, Map<Long, Double>> dataMap) {
+        XYPlot mainPlot = ChartUtils.createMainPlot(dataMap);
+        XYPlot subPlot = ChartUtils.subPlot(subData);
+        return new Chart(mainPlot, subPlot, orders).getCombinedChart();
+    }
+
+    @Nullable
+    public static XYPlot subPlot(@Nullable Pair<Series, Map<Long, Double>> subData) {
+        if (Objects.isNull(subData)) {
+            return null;
+        }
         Map<Long, Double> subDataMap = subData.getValue();
         Series series = subData.getKey();
         XYSeriesCollection dataset = ChartUtils.subDataset(series, subDataMap);
         NumberAxis axis = new NumberAxis(series.name());
+
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+        XYPlot subPlot = new XYPlot(dataset, null, axis, renderer);
         double maxValue = CollectionUtils.getMaxValue(subDataMap);
         double minValue = CollectionUtils.getMinValue(subDataMap);
         axis.setRange(minValue, maxValue);
-
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
         renderer.setSeriesPaint(0, Color.ORANGE);
         renderer.setSeriesStroke(0, BASE_STROKE);
-        XYPlot mainPlot = ChartUtils.createMainPlot(dataMap);
-        XYPlot subPlot = new XYPlot(dataset, null, axis, renderer);
-        return new Chart(mainPlot, subPlot, orders);
-    }
 
-    public static JFreeChart getJFreeChart(List<Order> orders,
-                                           Pair<Series, Map<Long, Double>> subData,
-                                           Map<Series, Map<Long, Double>> dataMap) {
-        Chart chart = ChartUtils.getChart(orders, subData, dataMap);
-        return chart.getCombinedChart();
+        return subPlot;
     }
 
     private static XYSeriesCollection subDataset(Series series, Map<Long, Double> subDataMap) {
@@ -139,5 +152,47 @@ public class ChartUtils {
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(xySeries);
         return dataset;
+    }
+
+    private static XYPlot createCandlePlot(Pair<Series, Map<Long, Kline>> klineDataMap) {
+        DefaultHighLowDataset dataset = ChartUtils.createKlineDataset(klineDataMap);
+        JFreeChart chart = ChartFactory.createCandlestickChart(CANDLE, TIME, PRICE, dataset, Boolean.FALSE);
+
+        // 设置 CandlestickRenderer 以渲染 K 线
+        XYPlot plot = chart.getXYPlot();
+        plot.setRenderer(new CandlestickRenderer());
+
+        // 设置时间格式
+        DateAxis timeAxis = new DateAxis(TIME);
+        timeAxis.setDateFormatOverride(SIMPLE_DATE_FORMAT);
+        plot.setDomainAxis(timeAxis);
+        return plot;
+    }
+
+    private static DefaultHighLowDataset createKlineDataset(Pair<Series, Map<Long, Kline>> klineDataMap) {
+        Map<Long, Kline> klineData = klineDataMap.getValue();
+        int dataSize = klineData.size();
+        Date[] dates = new Date[dataSize];
+        double[] high = new double[dataSize];
+        double[] low = new double[dataSize];
+        double[] open = new double[dataSize];
+        double[] close = new double[dataSize];
+        double[] volume = new double[dataSize];
+
+        int i = 0;
+        for (Map.Entry<Long, Kline> entry : klineData.entrySet()) {
+            long timestamp = entry.getKey();
+            Kline kline = entry.getValue();
+
+            dates[i] = new Date(timestamp); // 转换时间戳为 Date 类型
+            high[i] = kline.getHigh();
+            low[i] = kline.getLow();
+            open[i] = kline.getOpen();
+            close[i] = kline.getClose();
+            volume[i] = kline.getVolume();
+            i++;
+        }
+
+        return new DefaultHighLowDataset(klineDataMap.getKey(), dates, high, low, open, close, volume);
     }
 }

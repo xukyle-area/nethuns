@@ -5,6 +5,7 @@ import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Time;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.K;
 
 import javax.annotation.Nullable;
 import java.util.*;

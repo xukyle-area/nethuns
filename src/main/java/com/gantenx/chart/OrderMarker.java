@@ -23,17 +23,17 @@ public class OrderMarker {
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, FONT_SIZE);
 
     private final XYPlot mainPlot;
-    private final XYPlot rsiPlot;
+    private final XYPlot subPlot;
     private final Map<Long, List<XYTextAnnotation>> annotationMap = new HashMap<>();
     private int timestampId = 0;
 
-    public OrderMarker(XYPlot mainPlot, XYPlot rsiPlot) {
+    public OrderMarker(XYPlot mainPlot, XYPlot subPlot) {
         this.mainPlot = mainPlot;
-        this.rsiPlot = rsiPlot;
+        this.subPlot = subPlot;
     }
 
-    public static void markOrders(XYPlot mainPlot, XYPlot rsiPlot, List<Order> orders) {
-        OrderMarker annotationManager = new OrderMarker(mainPlot, rsiPlot);
+    public static void markOrders(XYPlot mainPlot, XYPlot subPlot, List<Order> orders) {
+        OrderMarker annotationManager = new OrderMarker(mainPlot, subPlot);
         annotationManager.addTradeMarkers(orders);
     }
 
@@ -69,13 +69,15 @@ public class OrderMarker {
         mainPlot.addAnnotation(mainLine);
 
         // 添加竖直线到 rsiPlot
-        XYLineAnnotation rsiLine = new XYLineAnnotation(
-                timestamp, rsiPlot.getRangeAxis().getLowerBound(),
-                timestamp, rsiPlot.getRangeAxis().getUpperBound(),
-                createDashedStroke(),
-                lineColor
-        );
-        rsiPlot.addAnnotation(rsiLine);
+        if (Objects.nonNull(subPlot)) {
+            XYLineAnnotation rsiLine = new XYLineAnnotation(timestamp,
+                                                            subPlot.getRangeAxis().getLowerBound(),
+                                                            timestamp,
+                                                            subPlot.getRangeAxis().getUpperBound(),
+                                                            createDashedStroke(),
+                                                            lineColor);
+            subPlot.addAnnotation(rsiLine);
+        }
 
         // 添加订单标签
         addOrderTag(timestamp, orders);

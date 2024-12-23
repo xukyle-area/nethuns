@@ -1,17 +1,21 @@
 package com.gantenx.strategy;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.chart.ChartUtils;
 import com.gantenx.constant.Period;
+import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
+import com.gantenx.model.Kline;
+import com.gantenx.model.Pair;
 import com.gantenx.strategy.template.SingleStrategy;
-import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jfree.chart.JFreeChart;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Constants.PROPORTION_OF_100;
-import static com.gantenx.constant.Constants.PROPORTION_OF_30;
+import static com.gantenx.constant.Proportion.PROPORTION_OF_100;
+import static com.gantenx.constant.Series.RSI;
 
 @Slf4j
 public class SingleRsiStrategy extends SingleStrategy {
@@ -26,33 +30,23 @@ public class SingleRsiStrategy extends SingleStrategy {
     protected void open() {
         while (tradeEngine.hasNext()) {
             long timestamp = tradeEngine.next();
-            String dateStr = DateUtils.getDate(timestamp);
-            Double RSI = rsiMap.get(timestamp);
-            if (Objects.isNull(RSI)) {
-                log.error("data not found, date:{}", dateStr);
+            Double rsi = rsiMap.get(timestamp);
+            if (Objects.isNull(rsi)) {
                 continue;
             }
-            if (this.lowestOfDays(timestamp) > 5 && RSI < 50) {
-                tradeEngine.buy(symbol, PROPORTION_OF_30, "rsi: " + String.format("%.2f", RSI));
-            } else if (tradeEngine.getQuantity(symbol) > 0 && RSI >= 60) {
-                tradeEngine.sell(symbol, PROPORTION_OF_100, "rsi: " + String.format("%.2f", RSI));
+            if (rsi > 70) {
+                tradeEngine.sell(symbol, PROPORTION_OF_100, String.format("%.2f", rsi));
+            } else if (rsi < 30) {
+                tradeEngine.buy(symbol, PROPORTION_OF_100, String.format("%.2f", rsi));
             }
+
         }
     }
 
-    public int lowestOfDays(long timestamp) {
-        Double curRsi = rsiMap.get(timestamp);
-        if (curRsi == null) {
-            throw new IllegalArgumentException("No RSI data for the given timestamp: " + timestamp);
-        }
-
-        int days = 0;
-        while (true) {
-            long previousTimestamp = timestamp - (++days) * Period.ONE_DAY.getMillisecond();
-            Double previousRsi = rsiMap.get(timestamp);
-            if (previousRsi == null || curRsi >= previousRsi) {
-                return days - 1;
-            }
-        }
+    @Override
+    protected JFreeChart getChart() {
+        Series series = Series.getSeries(symbol);
+        Pair<Series, Map<Long, Kline>> pair = Pair.create(series, klineMap.get(symbol));
+        return ChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(RSI, rsiMap), pair);
     }
 }
