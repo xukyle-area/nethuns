@@ -14,7 +14,7 @@ public class Constants {
     public static final String TIME = "Time";
     public static final String CANDLE = "Candle";
     public static final String PRICE = "Price";
-    public static final int CHART_WIDTH = 2400;  // 增加宽度
+    public static final int CHART_WIDTH = 2400;
     public static final int CHART_HEIGHT = 1200;
     public static final String TRADE_DETAIL = "trade-detail";
     public static final String ORDER_LIST = "order-list";

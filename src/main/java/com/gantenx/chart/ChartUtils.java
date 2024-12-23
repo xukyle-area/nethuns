@@ -166,6 +166,18 @@ public class ChartUtils {
         DateAxis timeAxis = new DateAxis(TIME);
         timeAxis.setDateFormatOverride(SIMPLE_DATE_FORMAT);
         plot.setDomainAxis(timeAxis);
+
+
+        Pair<Double, Double> range = CollectionUtils.getRange(klineDataMap.getValue());
+        NumberAxis axis = new NumberAxis(klineDataMap.getKey().name());
+        Double min = range.getFirst();
+        Double max = range.getSecond();
+        double padding = (max - min) * 0.05;
+        axis.setRange(Math.max(0, min - padding), max + padding);
+        axis.setAutoRange(false);
+        plot.setRangeAxis(0, axis);
+        plot.setRangeAxisLocation(0, BOTTOM_OR_LEFT);
+
         return plot;
     }
 

@@ -2,6 +2,7 @@ package com.gantenx.chart;
 
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;
+import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
@@ -17,7 +18,7 @@ import static com.gantenx.constant.Side.BUY;
 
 public class OrderMarker {
     private static final int FONT_SIZE = 10;
-    private static final float LINE_WIDTH = 1.0f;
+    private static final float LINE_WIDTH = 0.5f;
     private static final Color BUY_COLOR = new Color(0, 150, 0); // 绿色
     private static final Color SELL_COLOR = new Color(150, 0, 0); // 红色
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, FONT_SIZE);
@@ -45,12 +46,11 @@ public class OrderMarker {
         Map<Long, List<Order>> ordersByTimestamp = orders.stream()
                 .collect(Collectors.groupingBy(Order::getTimestamp));
 
-        List<Long> sortedTimestamps = new ArrayList<>(ordersByTimestamp.keySet());
-        Collections.sort(sortedTimestamps);
+        List<Long> sortedTimestamps = CollectionUtils.getTimestamps(ordersByTimestamp);
 
         sortedTimestamps.forEach(timestamp -> {
             timestampId++;
-            processOrderGroup(timestamp, ordersByTimestamp.get(timestamp));
+            this.processOrderGroup(timestamp, ordersByTimestamp.get(timestamp));
         });
     }
 
@@ -141,7 +141,7 @@ public class OrderMarker {
         double range = yUpper - yLower;
 
         boolean isTopPosition = timestampId % 2 == 0;
-        int tiers = timestampId % 5 + 1;
+        int tiers = timestampId % 3 + 1;
         // 动态计算基础 Y 坐标
         double baseY = isTopPosition ? yUpper - (tiers * 0.05 * range) : yLower + (tiers * 0.05 * range); // 10% 的上方或下方偏移
 

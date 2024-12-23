@@ -2,7 +2,7 @@ package com.gantenx.constant;
 
 public enum Period {
     // public static final String ONE_DAY = "1d";
-    CSV("csv", 0),
+    CSV("csv", 1000L * 3600 * 24),
     ONE_DAY("1d", 1000L * 3600 * 24),
     FOUR_HOURS("4h", 1000L * 3600 * 4);
     private final String desc;

@@ -1,6 +1,7 @@
 package com.gantenx.engine;
 
 import com.gantenx.constant.Proportion;
+import com.gantenx.constant.Side;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
@@ -154,6 +155,7 @@ public class TradeEngine {
         buy(symbol, maxQuantity, reason);
     }
 
+
     public double getQuantity(Symbol symbol) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
@@ -198,7 +200,7 @@ public class TradeEngine {
         return tradeDetail;
     }
 
-    private double getPrice(Symbol symbol) {
+    public double getPrice(Symbol symbol) {
         Kline kline = CollectionUtils.get(klineMap, symbol, timestamp);
         if (Objects.isNull(kline)) {
             throw new IllegalArgumentException("Invalid kline getting parameters: symbol=" + symbol.name() + ", date=" + DateUtils.getDate(

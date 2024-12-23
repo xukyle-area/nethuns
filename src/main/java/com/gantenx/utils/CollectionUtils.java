@@ -1,11 +1,15 @@
 package com.gantenx.utils;
 
+import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
+import com.gantenx.model.Pair;
+import com.gantenx.model.ProfitRate;
 import com.gantenx.model.Time;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.K;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -76,6 +80,18 @@ public class CollectionUtils {
             map.put(entry.getKey(), entry.getValue().getClose());
         }
         return map;
+    }
+
+    public static Pair<Double, Double> getRange(Map<Long, Kline> map) {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+
+        for (Kline kline : map.values()) {
+            min = Math.min(min, kline.getLow());
+            max = Math.max(max, kline.getHigh());
+        }
+
+        return Pair.create(min, max);
     }
 
     public static <T> boolean isEmpty(Collection<T> collection) {

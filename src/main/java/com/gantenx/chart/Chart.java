@@ -29,9 +29,11 @@ public class Chart extends ApplicationFrame {
     private void setupChartPanel() {
         ChartPanel chartPanel = new ChartPanel(combinedChart);
         chartPanel.setPreferredSize(new Dimension(CHART_WIDTH, CHART_HEIGHT));
-        chartPanel.setMouseWheelEnabled(true);
-        chartPanel.setMouseZoomable(true);
-        setContentPane(chartPanel);
+        chartPanel.setMouseWheelEnabled(false);  // 禁用鼠标滚轮
+        chartPanel.setMouseZoomable(false);      // 禁用鼠标缩放
+        // 不设置内容面板为图表，可避免窗口跳转
+        this.setVisible(false); // 隐藏窗口
+        this.setContentPane(chartPanel); // 保留渲染内容
     }
 
     public JFreeChart getCombinedChart() {

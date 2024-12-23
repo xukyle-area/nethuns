@@ -14,7 +14,7 @@ import org.jfree.chart.JFreeChart;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Proportion.PROPORTION_OF_100;
+import static com.gantenx.constant.Proportion.*;
 import static com.gantenx.constant.Series.RSI;
 
 @Slf4j
@@ -28,18 +28,19 @@ public class SingleRsiStrategy extends SingleStrategy {
 
     @Override
     protected void open() {
+        long preTimestamp = 0;
         while (tradeEngine.hasNext()) {
             long timestamp = tradeEngine.next();
-            Double rsi = rsiMap.get(timestamp);
+            Double rsi = rsiMap.get(preTimestamp);
+            preTimestamp = timestamp;
             if (Objects.isNull(rsi)) {
                 continue;
             }
             if (rsi > 70) {
-                tradeEngine.sell(symbol, PROPORTION_OF_100, String.format("%.2f", rsi));
+                tradeEngine.sell(symbol, this.sellProportion(PROPORTION_OF_25, symbol), String.format("%.2f", rsi));
             } else if (rsi < 30) {
-                tradeEngine.buy(symbol, PROPORTION_OF_100, String.format("%.2f", rsi));
+                tradeEngine.buy(symbol, this.buyProportion(PROPORTION_OF_25), String.format("%.2f", rsi));
             }
-
         }
     }
 

@@ -3,6 +3,7 @@ package com.gantenx.strategy.template;
 import com.gantenx.calculator.LongHoldingProfitCalculator;
 import com.gantenx.calculator.OrderCalculator;
 import com.gantenx.constant.Period;
+import com.gantenx.constant.Proportion;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.TradeDetail;
 import com.gantenx.engine.TradeEngine;
@@ -45,6 +46,21 @@ public abstract class BaseStrategy {
     }
 
     protected abstract void open();
+
+    protected Proportion buyProportion(Proportion proportion) {
+        double m = INITIAL_BALANCE * proportion.getValue();
+        double v = m / tradeEngine.getBalance();
+        return Proportion.getProportion(v);
+    }
+
+    protected Proportion sellProportion(Proportion proportion, Symbol symbol) {
+        double m = INITIAL_BALANCE * proportion.getValue();
+        double price = tradeEngine.getPrice(symbol);
+        double quantity = tradeEngine.getQuantity(symbol);
+
+        double v = (m / price) / quantity;
+        return Proportion.getProportion(v);
+    }
 
     public void export() {
         // 构建 excel 表格

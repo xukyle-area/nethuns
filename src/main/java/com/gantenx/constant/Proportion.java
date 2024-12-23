@@ -19,8 +19,7 @@ public enum Proportion {
     PROPORTION_OF_25(25),
     PROPORTION_OF_20(20),
     PROPORTION_OF_15(15),
-    PROPORTION_OF_10(10),
-    PROPORTION_OF_5(5);
+    PROPORTION_OF_10(10), PROPORTION_OF_5(5), PROPORTION_OF_0(0);
 
     private final int value;
 
@@ -39,6 +38,15 @@ public enum Proportion {
             }
         }
         throw new IllegalArgumentException("No proportion found for value: " + value);
+    }
+
+    public static Proportion getProportion(double v) {
+        for (Proportion p : Proportion.values()) {
+            if (v >= p.getValue()) {
+                return p;
+            }
+        }
+        return Proportion.PROPORTION_OF_0;  // 如果 v 小于所有比例，返回 PROPORTION_OF_0
     }
 }
 

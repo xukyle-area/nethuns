@@ -12,15 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gantenx.constant.From.CSV;
-import static com.gantenx.constant.Period.ONE_DAY;
 
 public class KlineService {
     public static Map<Long, Kline> getKLineMap(Symbol symbol, Period period, long startTime, long endTime) {
         List<Kline> kline;
         if (CSV.equals(symbol.getFrom())) {
-            if (!ONE_DAY.equals(period)) {
-                throw new IllegalArgumentException("Symbol not support period of " + period);
-            }
             kline = CsvUtils.getKLineList(symbol.getPath(), startTime, endTime);
         } else {
             kline = BinanceService.getKline(symbol.getPath(), period, startTime, endTime);
