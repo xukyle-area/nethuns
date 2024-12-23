@@ -1,15 +1,14 @@
 package com.gantenx.strategy.qqq;
 
-import com.gantenx.calculator.AssetCalculator;
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.crypto.RSIAndAssetChart;
-import com.gantenx.chart.qqq.RSIChart;
-import com.gantenx.constant.Period;
+import com.gantenx.chart.ChartUtils;
+import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
-import com.gantenx.engine.Order;
 import com.gantenx.engine.Position;
 import com.gantenx.model.Kline;
+import com.gantenx.model.Pair;
 import com.gantenx.strategy.BaseStrategy;
+import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.CsvUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
@@ -18,8 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.gantenx.constant.Constants.*;
+import static com.gantenx.constant.Constants.PROPORTION_OF_100;
 import static com.gantenx.constant.Period.ONE_DAY;
+import static com.gantenx.constant.Series.QQQ;
 import static com.gantenx.constant.Symbol.*;
 
 @Slf4j
@@ -36,9 +36,9 @@ public class RsiStrategy extends BaseStrategy {
 
     @Override
     public void open() {
-        Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(klineMap.get(QQQUSD), RSI_PERIOD);
-        while (tradeEngine.hasNextDay()) {
-            long timestamp = tradeEngine.nextDay();
+        Map<Long, Double> rsiOfQQQ = IndexTechnicalIndicators.calculateRSI(klineMap.get(QQQUSD));
+        while (tradeEngine.hasNext()) {
+            long timestamp = tradeEngine.next();
             Double rsi = rsiOfQQQ.get(timestamp);
             if (Objects.isNull(rsi)) {
                 continue;
@@ -57,7 +57,8 @@ public class RsiStrategy extends BaseStrategy {
             List<Position> tqqqPositions = tradeEngine.getPositions(TQQQUSD);
             double avgHoldingDays = Position.getAverageHoldingDays(tqqqPositions, currentTime);
             double avgPrice = Position.getAveragePrice(tqqqPositions, currentTime);
-            double currentPrice = tradeEngine.getPrice(TQQQUSD);
+            Kline kline = CollectionUtils.get(klineMap, TQQQUSD, currentTime);
+            double currentPrice = kline.getOpen();
 
             if (avgHoldingDays >= MAX_HOLDING_DAYS) {
                 exitToQQQ(String.format("TQQQ平均持仓天数(%.2f)超过阈值", avgHoldingDays));
@@ -77,7 +78,7 @@ public class RsiStrategy extends BaseStrategy {
             List<Position> sqqqPositions = tradeEngine.getPositions(SQQQUSD);
             double avgHoldingDays = Position.getAverageHoldingDays(sqqqPositions, currentTime);
             double avgPrice = Position.getAveragePrice(sqqqPositions, currentTime);
-            double currentPrice = tradeEngine.getPrice(SQQQUSD);
+            double currentPrice = CollectionUtils.getPrice(klineMap, SQQQUSD, currentTime);
 
             // 检查持仓时间
             if (avgHoldingDays >= MAX_HOLDING_DAYS) {
@@ -142,9 +143,9 @@ public class RsiStrategy extends BaseStrategy {
     }
 
     @Override
-    protected JFreeChart getTradingChart() {
-        List<Order> orders = tradeDetail.getOrders();
-        Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap, openDayList, orders, INITIAL_BALANCE);
-        return new RSIAndAssetChart(klineMap.get(QQQUSD), assetMap, orders).getCombinedChart();
+    protected JFreeChart getChart() {
+        Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
+        Pair<Series, Map<Long, Double>> pair = Pair.create(QQQ, CollectionUtils.toPriceMap(klineMap.get(QQQUSD)));
+        return ChartUtils.getJFreeChart(tradeDetail.getOrders(), pair, map);
     }
 }

@@ -1,5 +1,6 @@
 package com.gantenx.utils;
 
+import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Time;
@@ -23,6 +24,19 @@ public class CollectionUtils {
                                                                                   Collectors.toList())));
     }
 
+    public static Map<Series, Map<Long, Double>> toSeriesPriceMap(Map<Symbol, Map<Long, Kline>> klineMap,
+                                                                  Set<Symbol> symbols) {
+        Map<Series, Map<Long, Double>> objectObjectHashMap = new HashMap<>();
+        for (Map.Entry<Symbol, Map<Long, Kline>> entry : klineMap.entrySet()) {
+            Symbol symbol = entry.getKey();
+            if (symbols.contains(symbol)) {
+                Map<Long, Double> priceMap = CollectionUtils.toPriceMap(entry.getValue());
+                objectObjectHashMap.put(Series.getSeries(symbol), priceMap);
+            }
+        }
+        return objectObjectHashMap;
+    }
+
     public static double getMaxValue(Map<Long, Double> map) {
         if (map.isEmpty()) {
             return 100.0;
@@ -39,25 +53,20 @@ public class CollectionUtils {
         return null;
     }
 
+    public static double getPrice(Map<Symbol, Map<Long, Kline>> map, Symbol symbol, long timestamp) {
+        Kline kline = get(map, symbol, timestamp);
+        if (Objects.nonNull(kline)) {
+            return kline.getOpen();
+        }
+        throw new IllegalArgumentException("Illegal symbol or timestamp to get price, " + symbol + ", " + DateUtils.getDate(
+                timestamp));
+    }
+
     public static double getMinValue(Map<Long, Double> map) {
         if (map.isEmpty()) {
             return 0.0;
         }
         return Collections.min(map.values());
-    }
-
-    public static <T> Long getMinKey(Map<Long, T> map) {
-        if (map.isEmpty()) {
-            return 0L;
-        }
-        return Collections.min(map.keySet());
-    }
-
-    public static <T> Long getMaxKey(Map<Long, T> map) {
-        if (map.isEmpty()) {
-            return 0L;
-        }
-        return Collections.max(map.keySet());
     }
 
     public static Map<Long, Double> toPriceMap(Map<Long, Kline> klineMap) {

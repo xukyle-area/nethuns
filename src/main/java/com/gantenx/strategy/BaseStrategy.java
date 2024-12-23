@@ -28,15 +28,15 @@ import static com.gantenx.constant.Constants.*;
 public abstract class BaseStrategy {
     protected final String strategyName;
     protected final Map<Symbol, Map<Long, Kline>> klineMap;
-    protected final List<Long> openDayList;
+    protected final List<Long> timestampList;
     protected final TradeEngine tradeEngine;
     protected TradeDetail tradeDetail;
 
-    public BaseStrategy(String name, List<Symbol> symbols, Period period, List<Long> openTimeList) {
+    public BaseStrategy(String name, List<Symbol> symbols, Period period, List<Long> timestampList) {
         this.strategyName = name;
-        this.klineMap = KlineService.genKlineMap(symbols, period, openTimeList);
-        this.openDayList = openTimeList;
-        this.tradeEngine = new TradeEngine(openTimeList, this.klineMap);
+        this.klineMap = KlineService.getSymbolKlineMap(symbols, period, timestampList);
+        this.timestampList = timestampList;
+        this.tradeEngine = new TradeEngine(timestampList, this.klineMap);
     }
 
     protected void process() {
@@ -53,22 +53,21 @@ public abstract class BaseStrategy {
         ExcelUtils.addDataToNewSheet(workbook, this.tradeDetail.getRecords(), RECORD_LIST);
         List<Profit> profitList = OrderCalculator.calculateProfitAndHoldingDays(this.tradeDetail.getOrders());
         ExcelUtils.addDataToNewSheet(workbook, profitList, PROFIT_LIST);
-        List<ProfitRate> longHoldingProfitList = LongHoldingProfitCalculator.calculator(openDayList, klineMap);
+        List<ProfitRate> longHoldingProfitList = LongHoldingProfitCalculator.calculator(timestampList, klineMap);
         ExcelUtils.addDataToNewSheet(workbook, longHoldingProfitList, LONG_HOLDING_PROFIT_RATE);
         // 导出 excel 表格
-        String startStr = DateUtils.getDate(openDayList.get(0));
-        String endStr = DateUtils.getDate(openDayList.get(openDayList.size() - 1));
+        String startStr = DateUtils.getDate(timestampList.get(0));
+        String endStr = DateUtils.getDate(timestampList.get(timestampList.size() - 1));
         ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, RESULT);
 
         // 保存
-        JFreeChart tradingChart = this.getTradingChart();
-        if (Objects.isNull(tradingChart)) {
-            return;
+        JFreeChart tradingChart = this.getChart();
+        if (Objects.nonNull(tradingChart)) {
+            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, LINES);
         }
-        ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, LINES, 2400, 1200);
     }
 
-    protected JFreeChart getTradingChart() {
+    protected JFreeChart getChart() {
         return null;
     }
 

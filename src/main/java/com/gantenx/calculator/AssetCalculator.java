@@ -16,11 +16,11 @@ import static com.gantenx.constant.Side.SELL;
 public class AssetCalculator {
 
     public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Kline>> klineMap,
-                                                      List<Long> openDayList,
+                                                      List<Long> timestampList,
                                                       List<Order> orders,
                                                       double init) {
         // 参数验证
-        if (CollectionUtils.isEmpty(openDayList) || klineMap == null || init < 0) {
+        if (CollectionUtils.isEmpty(timestampList) || klineMap == null || init < 0) {
             throw new IllegalArgumentException("Invalid input parameters");
         }
 
@@ -29,14 +29,14 @@ public class AssetCalculator {
         Map<Symbol, Double> currentPosition = new HashMap<>();
 
         // 设置初始资产
-        Long startTimestamp = openDayList.get(0);
+        Long startTimestamp = timestampList.get(0);
         assetMap.put(startTimestamp, currentBalance);
 
         // 按时间戳组织订单
         Map<Long, List<Order>> orderMap = CollectionUtils.toListMap(orders);
 
         // 遍历每个交易日
-        for (Long timestamp : openDayList) {
+        for (Long timestamp : timestampList) {
             // 处理当天的订单
             List<Order> orderList = orderMap.get(timestamp);
             if (!CollectionUtils.isEmpty(orderList)) {

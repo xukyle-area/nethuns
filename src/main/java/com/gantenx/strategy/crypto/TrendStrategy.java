@@ -1,20 +1,14 @@
 package com.gantenx.strategy.crypto;
 
-import com.gantenx.calculator.AssetCalculator;
-import com.gantenx.chart.crypto.RSIAndAssetChart;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Signal;
 import com.gantenx.constant.Symbol;
 import com.gantenx.constant.Trend;
-import com.gantenx.engine.Order;
 import com.gantenx.strategy.BaseStrategy;
-import com.gantenx.trend.ComprehensiveTrendIdentifier;
 import com.gantenx.trend.PriceTrendIdentifier;
-import com.gantenx.trend.TrendIdentifier;
 import com.gantenx.trend.TrendUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jfree.chart.JFreeChart;
 
 import java.util.*;
 
@@ -37,9 +31,9 @@ public class TrendStrategy extends BaseStrategy {
 
     @Override
     protected void open() {
-        Map<Long, Trend> longTrendMap = identifier.identify(klineMap.get(CRYPTO_TRADING), openDayList, 3);
-        while (tradeEngine.hasNextDay()) {
-            long timestamp = tradeEngine.nextDay();
+        Map<Long, Trend> longTrendMap = identifier.identify(klineMap.get(CRYPTO_TRADING), timestampList, 3);
+        while (tradeEngine.hasNext()) {
+            long timestamp = tradeEngine.next();
             String dateStr = DateUtils.getDate(timestamp);
 
             for (Symbol symbol : klineMap.keySet()) {
@@ -61,7 +55,6 @@ public class TrendStrategy extends BaseStrategy {
                 this.executeTradeSignal(symbol, signal);
             }
         }
-        tradeEngine.exit();
     }
 
     public Signal getSignal() {
@@ -85,12 +78,5 @@ public class TrendStrategy extends BaseStrategy {
             default:
                 break;
         }
-    }
-
-    @Override
-    protected JFreeChart getTradingChart() {
-        List<Order> orders = tradeDetail.getOrders();
-        Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap, openDayList, orders, INITIAL_BALANCE);
-        return new RSIAndAssetChart(klineMap.get(CRYPTO_TRADING), assetMap, orders).getCombinedChart();
     }
 }

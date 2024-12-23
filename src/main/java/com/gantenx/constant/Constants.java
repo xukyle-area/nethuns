@@ -1,24 +1,22 @@
 package com.gantenx.constant;
 
-import com.gantenx.model.IndexPeriod;
-import com.gantenx.model.IndexWeights;
-
+import java.awt.*;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.gantenx.constant.Symbol.*;
 
 public class Constants {
+    private static final float LINE_STROKE_WIDTH = 2.0f;
+    public static final BasicStroke BASE_STROKE = new BasicStroke(LINE_STROKE_WIDTH);
+    public static final String TITLE = "Trading Chart";
     public static final Symbol CRYPTO_TRADING = ETHUSDT;
-    public static final List<Symbol> CRYPTO_SYMBOL_LIST = Collections.singletonList(CRYPTO_TRADING);
+    public static final List<Symbol> CRYPTO_SYMBOL_LIST = Arrays.asList(DOGEUSDT, ETHUSDT, BTCUSDT);
     public static final List<Symbol> QQQ_SYMBOL_LIST = Arrays.asList(QQQUSD, SQQQUSD, TQQQUSD);
 
 
     public static final String MACD = "macd";
     public static final String BINANCE_URL = "https://data-api.binance.vision";
-    public static final IndexPeriod INDEX_PERIOD = new IndexPeriod(6, 9, 6);
-    public static final IndexWeights INDEX_WEIGHTS = new IndexWeights(0.5, 0.2, 0.3);
     public static final int PROPORTION_OF_100 = 100;
     public static final int PROPORTION_OF_95 = 95;
     public static final int PROPORTION_OF_90 = 90;
@@ -42,8 +40,6 @@ public class Constants {
 
     public static final String TIME = "Time";
     public static final String PRICE = "Price";
-    public static final String ASSET = "Asset";
-    public static final String K_LINE = "K-Line";
     public static final int CHART_WIDTH = 2400;  // 增加宽度
     public static final int CHART_HEIGHT = 1200;
 

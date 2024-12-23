@@ -1,10 +1,13 @@
 package com.gantenx.strategy.crypto;
 
 import com.gantenx.calculator.AssetCalculator;
-import com.gantenx.chart.crypto.RSIAndAssetChart;
+import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.chart.ChartUtils;
 import com.gantenx.constant.Period;
+import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
-import com.gantenx.engine.Order;
+import com.gantenx.model.Kline;
+import com.gantenx.model.Pair;
 import com.gantenx.service.KlineService;
 import com.gantenx.strategy.BaseStrategy;
 import com.gantenx.utils.CollectionUtils;
@@ -17,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.*;
+import static com.gantenx.constant.Series.RSI;
 
 @Slf4j
 public class RsiStrategy extends BaseStrategy {
@@ -29,8 +33,8 @@ public class RsiStrategy extends BaseStrategy {
 
     @Override
     protected void open() {
-        while (tradeEngine.hasNextDay()) {
-            long timestamp = tradeEngine.nextDay();
+        while (tradeEngine.hasNext()) {
+            long timestamp = tradeEngine.next();
             String dateStr = DateUtils.getDate(timestamp);
             for (Symbol symbol : klineMap.keySet()) {
                 Double RSI = CollectionUtils.get(rsiMap, symbol, timestamp);
@@ -45,7 +49,6 @@ public class RsiStrategy extends BaseStrategy {
                 }
             }
         }
-        tradeEngine.exit();
     }
 
     public int lowestOfDays(Symbol symbol, long timestamp) {
@@ -65,9 +68,15 @@ public class RsiStrategy extends BaseStrategy {
     }
 
     @Override
-    protected JFreeChart getTradingChart() {
-        List<Order> orders = tradeDetail.getOrders();
-        Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap, openDayList, orders, INITIAL_BALANCE);
-        return new RSIAndAssetChart(klineMap.get(CRYPTO_TRADING), assetMap, orders).getCombinedChart();
+    protected JFreeChart getChart() {
+        Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
+        Map<Long, Double> assetMap = AssetCalculator.calculateAssetMap(klineMap,
+                                                                       timestampList,
+                                                                       tradeDetail.getOrders(),
+                                                                       tradeDetail.getInitialBalance());
+        map.put(Series.ASSET, assetMap);
+        Map<Long, Kline> klineMapForRsi = klineMap.get(CRYPTO_TRADING);
+        Map<Long, Double> rsiMap = IndexTechnicalIndicators.calculateRSI(klineMapForRsi);
+        return ChartUtils.getJFreeChart(tradeDetail.getOrders(), Pair.create(RSI, rsiMap), map);
     }
 }

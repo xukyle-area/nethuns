@@ -14,59 +14,113 @@ import static com.gantenx.constant.Side.SELL;
 
 @Slf4j
 public class TradeEngine {
+    /**
+     * 当前持仓的仓位列表，每次买入都是单独的记录
+     */
     private final Map<Symbol, List<Position>> positions = new HashMap<>();
+    /**
+     * 进行交易的订单列表
+     */
     private final List<Order> orders = new ArrayList<>();
+    /**
+     * 买入和卖出之间的对应记录
+     */
     private final List<TradeRecord> records = new ArrayList<>();
-    private final List<Long> openDays;
+    /**
+     * 开放交易的时间戳列表
+     */
+    private final List<Long> timestampList;
+    /**
+     * 交易的标的的 k 线列表
+     */
     private final Map<Symbol, Map<Long, Kline>> klineMap;
 
+    /**
+     * 初始金额
+     */
     private double balance = INITIAL_BALANCE;
+    /**
+     * 手续费总计
+     */
     private double feeCount = 0.0;
+    /**
+     * 下一个订单的订单 id
+     */
     private long orderId = 0;
+    /**
+     * 下一个交易记录的 id
+     */
     private long recordId = 0;
-    private int openDayIndex = -1;
+    /**
+     * 时间戳对应的在列表中的 index
+     */
+    private int timestampIndex = -1;
+    /**
+     * 当前在进行中的交易的时间戳
+     */
     private long timestamp;
 
-    public Kline getKline(Symbol symbol) {
-        return CollectionUtils.get(klineMap, symbol, timestamp);
-    }
-
-    public TradeEngine(List<Long> openDays, Map<Symbol, Map<Long, Kline>> klineMap) {
-        if (openDays == null || openDays.isEmpty()) {
-            throw new IllegalArgumentException("OpenDays cannot be null or empty");
+    /**
+     * 构造方法，构建一个全新的交易引擎
+     *
+     * @param timestamps 写入交易的时间
+     * @param klineMap   写入交易的标的以及在对应的时间段的 K 线
+     */
+    public TradeEngine(List<Long> timestamps, Map<Symbol, Map<Long, Kline>> klineMap) {
+        if (timestamps == null || timestamps.isEmpty()) {
+            throw new IllegalArgumentException("Trading time list cannot be null or empty");
         }
         if (klineMap == null || klineMap.isEmpty()) {
             throw new IllegalArgumentException("KlineMap cannot be null or empty");
         }
-        this.openDays = openDays;
+        this.timestampList = timestamps;
         this.klineMap = klineMap;
     }
 
-    public boolean hasNextDay() {
-        return openDayIndex + 1 < openDays.size();
+    /**
+     * 是否存在下一个交易周期
+     */
+    public boolean hasNext() {
+        return timestampIndex + 1 < timestampList.size();
     }
 
-    public long nextDay() {
-        if (!this.hasNextDay()) {
+    /**
+     * 开启下一个交易周期
+     */
+    public long next() {
+        if (!this.hasNext()) {
             return -1;
         }
-        if (openDayIndex + 1 >= openDays.size()) {
+        if (timestampIndex + 1 >= timestampList.size()) {
             return -1; // 或抛出异常
         }
-        openDayIndex++;
-        timestamp = openDays.get(openDayIndex);
+        timestampIndex++;
+        timestamp = timestampList.get(timestampIndex);
         return timestamp;
     }
 
+    /**
+     * 获得当前的时间戳
+     */
     public long getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * 是否存在任何持仓
+     */
     public boolean hasPosition() {
         Collection<Position> positionList = CollectionUtils.toCollection(positions.values());
         return positionList.stream().anyMatch(position -> position.getQuantity() > 0);
     }
 
+    /**
+     * 卖出
+     *
+     * @param symbol     标的
+     * @param proportion 占有现在仓位的比例
+     * @param reason     原因
+     */
     public void sell(Symbol symbol, long proportion, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
@@ -83,6 +137,13 @@ public class TradeEngine {
         sell(symbol, sellQuantity, reason);
     }
 
+    /**
+     * 买入
+     *
+     * @param symbol     标的
+     * @param proportion 占有现在余额的比例
+     * @param reason     原因
+     */
     public void buy(Symbol symbol, long proportion, String reason) {
         double price = this.getPrice(symbol);
         double maxQuantity = (balance * proportion / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
@@ -92,8 +153,52 @@ public class TradeEngine {
         buy(symbol, maxQuantity, reason);
     }
 
-    public double getPrice(Symbol symbol) {
-        Kline kline = this.getKline(symbol);
+    public double getQuantity(Symbol symbol) {
+        List<Position> positionList = positions.get(symbol);
+        if (positionList == null || positionList.isEmpty()) {
+            return 0d;
+        }
+
+        Optional<Double> optional = positionList.stream().map(Position::getQuantity).reduce(Double::sum);
+        return optional.orElse(0d);
+    }
+
+    public List<Position> getPositions(Symbol symbol) {
+        List<Position> list = positions.get(symbol);
+        return list != null ? new ArrayList<>(list) : new ArrayList<>();
+    }
+
+    public double getBalance() {
+        return this.balance;
+    }
+
+    public double getPositionAsset() {
+        double asset = 0;
+        for (Symbol Symbol : positions.keySet()) {
+            double quantity = this.getQuantity(Symbol);
+            asset += quantity * this.getPrice(Symbol);
+        }
+        return asset;
+    }
+
+    /**
+     * 结束交易，卖出所有持仓，记录结果并导出
+     */
+    public TradeDetail exit() {
+        for (Symbol Symbol : klineMap.keySet()) {
+            this.sell(Symbol, 100, "Time up, sell all");
+        }
+        TradeDetail tradeDetail = new TradeDetail();
+        tradeDetail.setBalance(balance);
+        tradeDetail.setOrders(orders);
+        tradeDetail.setInitialBalance(INITIAL_BALANCE);
+        tradeDetail.setFeeCount(feeCount);
+        tradeDetail.setRecords(records);
+        return tradeDetail;
+    }
+
+    private double getPrice(Symbol symbol) {
+        Kline kline = CollectionUtils.get(klineMap, symbol, timestamp);
         if (Objects.isNull(kline)) {
             throw new IllegalArgumentException("Invalid kline getting parameters: symbol=" + symbol.name() + ", date=" + DateUtils.getDate(
                     timestamp));
@@ -184,16 +289,6 @@ public class TradeEngine {
         return price * quantity;
     }
 
-    public double getQuantity(Symbol symbol) {
-        List<Position> positionList = positions.get(symbol);
-        if (positionList == null || positionList.isEmpty()) {
-            return 0d;
-        }
-
-        Optional<Double> optional = positionList.stream().map(Position::getQuantity).reduce(Double::sum);
-        return optional.orElse(0d);
-    }
-
     private long generateOrderId() {
         orderId++;
         return orderId;
@@ -202,36 +297,5 @@ public class TradeEngine {
     private long generateRecordId() {
         recordId++;
         return recordId;
-    }
-
-    public List<Position> getPositions(Symbol symbol) {
-        List<Position> list = positions.get(symbol);
-        return list != null ? new ArrayList<>(list) : new ArrayList<>();
-    }
-
-    public double getBalance() {
-        return this.balance;
-    }
-
-    public double getPositionAsset() {
-        double asset = 0;
-        for (Symbol Symbol : positions.keySet()) {
-            double quantity = this.getQuantity(Symbol);
-            asset += quantity * this.getPrice(Symbol);
-        }
-        return asset;
-    }
-
-    public TradeDetail exit() {
-        for (Symbol Symbol : klineMap.keySet()) {
-            this.sell(Symbol, 100, "回放时间结束，卖出所有持仓");
-        }
-        TradeDetail tradeDetail = new TradeDetail();
-        tradeDetail.setBalance(balance);
-        tradeDetail.setOrders(orders);
-        tradeDetail.setInitialBalance(INITIAL_BALANCE);
-        tradeDetail.setFeeCount(feeCount);
-        tradeDetail.setRecords(records);
-        return tradeDetail;
     }
 }

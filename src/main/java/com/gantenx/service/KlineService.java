@@ -29,10 +29,10 @@ public class KlineService {
         return CollectionUtils.toTimeMap(kline);
     }
 
-    public static Map<Symbol, Map<Long, Kline>> genKlineMap(List<Symbol> list, Period period, List<Long> openDayList) {
+    public static Map<Symbol, Map<Long, Kline>> getSymbolKlineMap(List<Symbol> list, Period period, List<Long> timestampList) {
         HashMap<Symbol, Map<Long, Kline>> map = new HashMap<>();
-        long startTimestamp = openDayList.get(0);
-        long endTimestamp = openDayList.get(openDayList.size() - 1);
+        long startTimestamp = timestampList.get(0);
+        long endTimestamp = timestampList.get(timestampList.size() - 1);
         for (Symbol symbol : list) {
             Map<Long, Kline> kLineMap = KlineService.getKLineMap(symbol, period, startTimestamp, endTimestamp);
             map.put(symbol, kLineMap);
@@ -44,7 +44,7 @@ public class KlineService {
                                                            List<Symbol> symbols) {
         HashMap<Symbol, Map<Long, Double>> hashMap = new HashMap<>();
         for (Symbol symbol : symbols) {
-            Map<Long, Double> map = IndexTechnicalIndicators.calculateRSI(klineMap.get(symbol), RSI_PERIOD);
+            Map<Long, Double> map = IndexTechnicalIndicators.calculateRSI(klineMap.get(symbol));
             hashMap.put(symbol, map);
         }
         return hashMap;

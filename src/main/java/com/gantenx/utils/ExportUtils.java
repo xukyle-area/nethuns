@@ -19,8 +19,7 @@ import java.time.ZoneOffset;
 public class ExportUtils {
 
     public static void saveJFreeChartAsImage(JFreeChart chart, String startStr, String endStr,
-                                             String strategyName, String filePrefix,
-                                             int width, int height) {
+                                             String strategyName, String filePrefix) {
         if (chart == null) {
             throw new IllegalArgumentException("Chart cannot be null");
         }
@@ -28,7 +27,7 @@ public class ExportUtils {
         try {
             Path filePath = Paths.get(genChartPath(strategyName, startStr, endStr, filePrefix));
             Files.createDirectories(filePath.getParent());
-            BufferedImage image = chart.createBufferedImage(width, height);
+            BufferedImage image = chart.createBufferedImage(2400, 1200);
             if (image == null) {
                 throw new RuntimeException("Failed to create chart image");
             }

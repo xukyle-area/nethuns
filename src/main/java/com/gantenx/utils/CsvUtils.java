@@ -38,7 +38,7 @@ public class CsvUtils {
     }
 
     public static List<Long> getOpenDayList(long startTime, long endTime) {
-        List<Long> openDayList = new ArrayList<>();
+        List<Long> timestampList = new ArrayList<>();
         try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream("data/OPEN_DAY.csv")) {
             assert is != null;
             try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
@@ -47,13 +47,13 @@ public class CsvUtils {
                 while ((line = br.readLine()) != null) {
                     long timestamp = DateUtils.getTimestamp(line.trim());
                     if (timestamp >= startTime && timestamp <= endTime) {
-                        openDayList.add(timestamp);
+                        timestampList.add(timestamp);
                     }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return openDayList;
+        return timestampList;
     }
 }

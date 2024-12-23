@@ -1,9 +1,12 @@
 package com.gantenx.calculator;
 
+import com.gantenx.constant.Constants;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 
 import java.util.*;
+
+import static com.gantenx.constant.Constants.RSI_PERIOD;
 
 public class IndexTechnicalIndicators {
 
@@ -63,11 +66,11 @@ public class IndexTechnicalIndicators {
         return bollingerMap;
     }
 
-    public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap, int period) {
+    public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap) {
         Map<Long, Double> rsiMap = new TreeMap<>();
         List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
 
-        if (timestamps.size() < period + 1) {
+        if (timestamps.size() < RSI_PERIOD + 1) {
             return rsiMap; // 返回空Map如果数据不足
         }
 
@@ -84,7 +87,7 @@ public class IndexTechnicalIndicators {
         double avgLoss = 0;
 
         // 计算第一个RSI值的平均涨跌
-        for (int i = 0; i < period; i++) {
+        for (int i = 0; i < RSI_PERIOD; i++) {
             double change = changes.get(i);
             if (change > 0) {
                 avgGain += change;
@@ -93,24 +96,24 @@ public class IndexTechnicalIndicators {
             }
         }
 
-        avgGain = avgGain / period;
-        avgLoss = avgLoss / period;
+        avgGain = avgGain / RSI_PERIOD;
+        avgLoss = avgLoss / RSI_PERIOD;
 
         // 第三步：使用Wilder's smoothing计算后续的RSI值
         // 添加第一个RSI值
         double rs = avgGain / (avgLoss == 0 ? 1 : avgLoss);
         double rsi = 100 - (100 / (1 + rs));
-        rsiMap.put(timestamps.get(period), rsi);
+        rsiMap.put(timestamps.get(RSI_PERIOD), rsi);
 
         // 计算剩余的RSI值
-        for (int i = period; i < changes.size(); i++) {
+        for (int i = RSI_PERIOD; i < changes.size(); i++) {
             double change = changes.get(i);
             double gain = Math.max(0, change);
             double loss = Math.max(0, -change);
 
             // Wilder's smoothing
-            avgGain = ((avgGain * (period - 1)) + gain) / period;
-            avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+            avgGain = ((avgGain * (RSI_PERIOD - 1)) + gain) / RSI_PERIOD;
+            avgLoss = ((avgLoss * (RSI_PERIOD - 1)) + loss) / RSI_PERIOD;
 
             // 避免除以零
             rs = avgGain / (avgLoss == 0 ? 1e-10 : avgLoss);
