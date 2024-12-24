@@ -5,7 +5,7 @@ import com.gantenx.converter.DataConverter;
 import com.gantenx.model.Kline;
 import com.gantenx.retrofit.QuoteApi;
 import com.gantenx.retrofit.RetrofitClient;
-import com.gantenx.retrofit.RetrofitUtils;
+import com.gantenx.utils.RetrofitUtils;
 import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.FutureUtils;
 import lombok.extern.slf4j.Slf4j;

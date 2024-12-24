@@ -1,8 +1,9 @@
-package com.gantenx.chart;
+package com.gantenx.utils.chart;
 
-import com.gantenx.calculator.MacdDetail;
+import com.gantenx.utils.calculator.MacdDetail;
 import com.gantenx.constant.Series;
 import com.gantenx.engine.Order;
+import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.ValueMarker;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 public class MacdChartUtils {
     public static JFreeChart getSubMacdChart(List<Order> orders,
                                              @Nullable Map<Long, MacdDetail> subData,
@@ -93,6 +95,7 @@ public class MacdChartUtils {
 
             // 直方图
             histogramSeries.add(timestamp, macdDetail.histogram);
+            log.info("{}", macdDetail.histogram);
         }
 
         // 将 Series 添加到 Dataset

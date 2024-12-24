@@ -1,4 +1,4 @@
-package com.gantenx.chart;
+package com.gantenx.utils.chart;
 
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Order;

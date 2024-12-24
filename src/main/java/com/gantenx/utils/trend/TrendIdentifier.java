@@ -1,4 +1,4 @@
-package com.gantenx.trend;
+package com.gantenx.utils.trend;
 
 import com.gantenx.constant.Trend;
 import com.gantenx.model.Kline;

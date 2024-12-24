@@ -1,7 +1,7 @@
 package com.gantenx.strategy;
 
-import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.CandleChartUtils;
+import com.gantenx.utils.calculator.IndexTechnicalIndicators;
+import com.gantenx.utils.chart.CandleChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;

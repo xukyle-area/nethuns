@@ -1,4 +1,4 @@
-package com.gantenx.calculator;
+package com.gantenx.utils.calculator;
 
 public class MacdDetail {
     public Double macdLine;  // MACD 主线

@@ -1,4 +1,4 @@
-package com.gantenx.calculator;
+package com.gantenx.utils.calculator;
 
 public enum HistogramColor {
     GRAY("gray"),

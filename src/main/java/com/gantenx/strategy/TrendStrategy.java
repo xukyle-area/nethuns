@@ -4,10 +4,9 @@ import com.gantenx.constant.Period;
 import com.gantenx.constant.Signal;
 import com.gantenx.constant.Symbol;
 import com.gantenx.constant.Trend;
-import com.gantenx.strategy.template.BaseStrategy;
 import com.gantenx.strategy.template.SingleStrategy;
-import com.gantenx.trend.PriceTrendIdentifier;
-import com.gantenx.trend.TrendUtils;
+import com.gantenx.utils.trend.PriceTrendIdentifier;
+import com.gantenx.utils.trend.TrendUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 

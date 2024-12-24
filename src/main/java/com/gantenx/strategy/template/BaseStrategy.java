@@ -1,7 +1,7 @@
 package com.gantenx.strategy.template;
 
-import com.gantenx.calculator.LongHoldingProfitCalculator;
-import com.gantenx.calculator.OrderCalculator;
+import com.gantenx.utils.calculator.LongHoldingProfitCalculator;
+import com.gantenx.utils.calculator.OrderCalculator;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Proportion;
 import com.gantenx.constant.Symbol;

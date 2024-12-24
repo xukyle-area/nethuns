@@ -1,6 +1,6 @@
 package com.gantenx.service;
 
-import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.utils.calculator.IndexTechnicalIndicators;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;

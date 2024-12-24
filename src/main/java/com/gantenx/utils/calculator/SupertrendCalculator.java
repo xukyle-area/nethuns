@@ -1,4 +1,4 @@
-package com.gantenx.calculator;
+package com.gantenx.utils.calculator;
 
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;

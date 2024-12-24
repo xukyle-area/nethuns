@@ -1,6 +1,6 @@
 package com.gantenx.strategy.template;
 
-import com.gantenx.chart.MainChartUtils;
+import com.gantenx.utils.chart.MainChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;

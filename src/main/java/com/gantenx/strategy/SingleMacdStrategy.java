@@ -1,8 +1,8 @@
 package com.gantenx.strategy;
 
-import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.calculator.MacdDetail;
-import com.gantenx.chart.MacdChartUtils;
+import com.gantenx.utils.calculator.IndexTechnicalIndicators;
+import com.gantenx.utils.calculator.MacdDetail;
+import com.gantenx.utils.chart.MacdChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;

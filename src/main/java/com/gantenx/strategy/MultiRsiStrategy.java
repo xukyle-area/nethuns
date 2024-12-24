@@ -1,6 +1,6 @@
 package com.gantenx.strategy;
 
-import com.gantenx.calculator.IndexTechnicalIndicators;
+import com.gantenx.utils.calculator.IndexTechnicalIndicators;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Symbol;
 import com.gantenx.engine.Position;

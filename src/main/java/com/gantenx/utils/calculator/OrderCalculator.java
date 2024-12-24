@@ -1,4 +1,4 @@
-package com.gantenx.calculator;
+package com.gantenx.utils.calculator;
 
 import com.gantenx.engine.Order;
 import com.gantenx.model.Profit;
