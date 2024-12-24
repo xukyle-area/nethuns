@@ -1,7 +1,7 @@
 package com.gantenx.strategy;
 
 import com.gantenx.calculator.IndexTechnicalIndicators;
-import com.gantenx.chart.ChartUtils;
+import com.gantenx.chart.CandleChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
@@ -21,7 +21,7 @@ import static com.gantenx.constant.Series.RSI;
 public class SingleRsiStrategy extends SingleStrategy {
     protected final Map<Long, Double> rsiMap;
 
-    public SingleRsiStrategy(Symbol symbol, Period period, long start, long end) {
+    public SingleRsiStrategy(Period period, long start, long end, Symbol symbol) {
         super(SingleRsiStrategy.class.getSimpleName(), period, start, end, symbol);
         rsiMap = IndexTechnicalIndicators.calculateRSI(klineMap.get(symbol));
     }
@@ -48,6 +48,6 @@ public class SingleRsiStrategy extends SingleStrategy {
     protected JFreeChart getChart() {
         Series series = Series.getSeries(symbol);
         Pair<Series, Map<Long, Kline>> pair = Pair.create(series, klineMap.get(symbol));
-        return ChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(RSI, rsiMap), pair);
+        return CandleChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(RSI, rsiMap), pair);
     }
 }

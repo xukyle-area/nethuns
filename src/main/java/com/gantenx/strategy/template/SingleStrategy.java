@@ -1,13 +1,12 @@
 package com.gantenx.strategy.template;
 
 import com.gantenx.calculator.AssetCalculator;
-import com.gantenx.chart.ChartUtils;
+import com.gantenx.chart.CandleChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
-import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
@@ -38,6 +37,6 @@ public abstract class SingleStrategy extends BaseStrategy {
                                                                        tradeDetail.getInitialBalance());
         Series series = Series.getSeries(symbol);
         Pair<Series, Map<Long, Kline>> pair = Pair.create(series, klineMap.get(symbol));
-        return ChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(ASSET, assetMap), pair);
+        return CandleChartUtils.getCandleChart(tradeDetail.getOrders(), Pair.create(ASSET, assetMap), pair);
     }
 }

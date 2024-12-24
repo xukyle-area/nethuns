@@ -1,6 +1,6 @@
 package com.gantenx.strategy.template;
 
-import com.gantenx.chart.ChartUtils;
+import com.gantenx.chart.MainChartUtils;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
@@ -32,6 +32,6 @@ public abstract class MultiStrategy extends BaseStrategy {
     protected JFreeChart getChart() {
         Map<Series, Map<Long, Double>> map = CollectionUtils.toSeriesPriceMap(klineMap, klineMap.keySet());
         Pair<Series, Map<Long, Double>> pair = Pair.create(QQQ, CollectionUtils.toPriceMap(klineMap.get(QQQUSD)));
-        return ChartUtils.getLineChart(tradeDetail.getOrders(), pair, map);
+        return MainChartUtils.getLineChart(tradeDetail.getOrders(), pair, map);
     }
 }

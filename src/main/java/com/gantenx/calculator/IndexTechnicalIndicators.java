@@ -1,71 +1,16 @@
 package com.gantenx.calculator;
 
-import com.gantenx.constant.Constants;
+import com.gantenx.constant.Index;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 
 import java.util.*;
 
 import static com.gantenx.constant.Constants.RSI_PERIOD;
+import static com.gantenx.constant.Index.DIF;
+import static com.gantenx.constant.Index.EMA;
 
 public class IndexTechnicalIndicators {
-
-    // 计算SMA（简单移动平均）
-    public static Map<Long, Double> calculateSMA(Map<Long, Kline> klineMap, int period) {
-        Map<Long, Double> smaMap = new TreeMap<>();
-        List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
-        Queue<Double> window = new LinkedList<>();
-        double sum = 0.0;
-
-        for (Long timestamp : timestamps) {
-            double close = klineMap.get(timestamp).getClose();
-            window.add(close);
-            sum += close;
-
-            if (window.size() > period) {
-                sum -= window.poll();
-            }
-
-            if (window.size() == period) {
-                smaMap.put(timestamp, sum / period);
-            }
-        }
-        return smaMap;
-    }
-
-    // 计算布林带
-    public static Map<Long, double[]> calculateBollingerBands(Map<Long, Double> smaMap,
-                                                              Map<Long, Kline> klineMap,
-                                                              int period) {
-        Map<Long, double[]> bollingerMap = new TreeMap<>();
-        List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
-        Queue<Double> window = new LinkedList<>();
-
-        for (Long timestamp : timestamps) {
-            double close = klineMap.get(timestamp).getClose();
-            window.add(close);
-
-            if (window.size() > period) {
-                window.poll();
-            }
-
-            if (window.size() == period) {
-                double sma = smaMap.get(timestamp);
-                double variance = 0.0;
-                for (double price : window) {
-                    variance += Math.pow(price - sma, 2);
-                }
-                double stdDev = Math.sqrt(variance / period);
-                bollingerMap.put(timestamp, new double[]{
-                        sma - 2 * stdDev, // Lower Band
-                        sma,              // Middle Band
-                        sma + 2 * stdDev  // Upper Band
-                });
-            }
-        }
-        return bollingerMap;
-    }
-
     public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap) {
         Map<Long, Double> rsiMap = new TreeMap<>();
         List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
@@ -129,9 +74,12 @@ public class IndexTechnicalIndicators {
     }
 
     // MACD计算
-    public static Map<String, Map<Long, Double>> calculateMACDWithSignal(Map<Long, Kline> klineMap) {
-        Map<Long, Double> shortEMA = calculateEMA(klineMap, 12);  // 12日EMA
-        Map<Long, Double> longEMA = calculateEMA(klineMap, 26);   // 26日EMA
+    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Kline> klineMap,
+                                                               int fastLength,
+                                                               int slowLength,
+                                                               int signalLength) {
+        Map<Long, Double> shortEMA = calculateEMA(klineMap, fastLength);  // 12日EMA
+        Map<Long, Double> longEMA = calculateEMA(klineMap, slowLength);   // 26日EMA
 
         // 计算MACD线（DIF）
         Map<Long, Double> macdLine = new HashMap<>();
@@ -144,11 +92,11 @@ public class IndexTechnicalIndicators {
         }
 
         // 计算信号线（DEA）- 9日EMA
-        Map<Long, Double> signalLine = calculateEMA(macdLine, 9);
+        Map<Long, Double> signalLine = calculateEMA(macdLine, signalLength);
 
-        Map<String, Map<Long, Double>> result = new HashMap<>();
-        result.put("macd", macdLine);
-        result.put("signal", signalLine);
+        Map<Index, Map<Long, Double>> result = new HashMap<>();
+        result.put(DIF, macdLine);
+        result.put(EMA, signalLine);
 
         return result;
     }
@@ -194,5 +142,79 @@ public class IndexTechnicalIndicators {
             return ((Kline) obj).getClose();
         }
         throw new IllegalArgumentException("Unsupported data type");
+    }
+
+    public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Kline> klineMap,
+                                                                 int fastLength,
+                                                                 int slowLength,
+                                                                 int signalLength) {
+        // Index 包括 DIF 和 EMA
+        Map<Index, Map<Long, Double>> indexMapMap = calculateMACD(klineMap, fastLength, slowLength, signalLength);
+
+        // 构建 MACD 主线（DIF）
+        Map<Long, MacdDetail> resultMap = new HashMap<>();
+        Map<Long, Double> difMap = indexMapMap.get(DIF);
+        Map<Long, Double> emaMap = indexMapMap.get(EMA);
+
+        // 设置 MACD 主线和信号线
+        for (Long timestamp : difMap.keySet()) {
+            Double dif = difMap.get(timestamp);
+            Double ema = emaMap.get(timestamp);
+
+            if (Objects.isNull(dif) || Objects.isNull(ema)) {
+                continue;
+            }
+            MacdDetail macdDetail = new MacdDetail();
+            macdDetail.setMacdLine(dif);
+            macdDetail.setSignalLine(ema);
+            macdDetail.setHistogram(dif - ema);
+            resultMap.put(timestamp, macdDetail);
+        }
+
+        // 交叉点与直方图颜色计算
+        List<Long> sortedTimestamps = CollectionUtils.getTimestamps(resultMap);
+        Long previousTimestamp = null;
+
+        for (Long timestamp : sortedTimestamps) {
+            MacdDetail macdDetail = resultMap.get(timestamp);
+            macdDetail.setCross(isCross(macdDetail, resultMap.get(previousTimestamp)));
+            // 颜色逻辑
+            HistogramColor color = determineHistogramColor(previousTimestamp, macdDetail, resultMap);
+            macdDetail.setHistogramColor(color.getColor());
+
+            previousTimestamp = timestamp;
+        }
+
+        return resultMap;
+    }
+
+    // 交叉点计算方法
+    private static boolean isCross(MacdDetail macdDetail, MacdDetail previousMacdDetail) {
+        if (Objects.isNull(previousMacdDetail)) {
+            return false;
+        }
+        double previousMacd = previousMacdDetail.getMacdLine();
+        double previousSignal = previousMacdDetail.getSignalLine();
+        double currentMacd = macdDetail.getMacdLine();
+        double currentSignal = macdDetail.getSignalLine();
+        return (previousMacd <= previousSignal && currentMacd > currentSignal) || (previousMacd >= previousSignal && currentMacd < currentSignal);
+    }
+
+    // 颜色计算方法
+    private static HistogramColor determineHistogramColor(Long previousTimestamp,
+                                                          MacdDetail macdDetail,
+                                                          Map<Long, MacdDetail> resultMap) {
+        if (previousTimestamp == null) {
+            return HistogramColor.GRAY;
+        } else {
+            double previousHistogram = resultMap.get(previousTimestamp).getHistogram();
+            double currentHistogram = macdDetail.getHistogram();
+
+            if (currentHistogram > previousHistogram) {
+                return currentHistogram > 0 ? HistogramColor.GREEN : HistogramColor.MAROON;
+            } else {
+                return currentHistogram > 0 ? HistogramColor.BLUE : HistogramColor.RED;
+            }
+        }
     }
 }

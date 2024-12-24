@@ -1,28 +1,24 @@
 package com.gantenx;
 
-import com.gantenx.constant.Symbol;
 import com.gantenx.retrofit.RetrofitClient;
-import com.gantenx.strategy.SingleRsiStrategy;
+import com.gantenx.strategy.SingleMacdStrategy;
 import com.gantenx.strategy.template.BaseStrategy;
 import com.gantenx.utils.DateUtils;
 
-import static com.gantenx.constant.Period.CSV;
-import static com.gantenx.constant.Symbol.QQQUSD;
+import static com.gantenx.constant.Period.ONE_DAY;
+import static com.gantenx.constant.Symbol.BTCUSDT;
 
 public class TestMain {
 
     public static void main(String[] args) {
         String startStr = "20240101";
-        String endStr = "20241220";
-        Symbol symbol = QQQUSD;
+        String endStr = "20241101";
+
         long start = DateUtils.getTimestamp(startStr);
         long end = DateUtils.getTimestamp(endStr);
-        SingleRsiStrategy singleRsiStrategy = new SingleRsiStrategy(symbol, CSV, start, end);
-        BaseStrategy.processAndExport(singleRsiStrategy);
-//        Map<Long, Kline> kLineMap = KlineService.getKLineMap(symbol, ONE_DAY, start, end);
-//        Pair<Series, Map<Long, Kline>> pair = Pair.create(Series.getSeries(symbol), kLineMap);
-//        JFreeChart freeChart = ChartUtils.getCandleChart(null, null, pair);
-//        ExportUtils.saveJFreeChartAsImage(freeChart, startStr, endStr, "测试导出", "数据");
+
+        SingleMacdStrategy strategy = new SingleMacdStrategy(ONE_DAY, start, end, BTCUSDT);
+        BaseStrategy.processAndExport(strategy);
         RetrofitClient.shutdown();
     }
 }

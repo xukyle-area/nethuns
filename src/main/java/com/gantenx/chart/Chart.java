@@ -21,7 +21,7 @@ public class Chart extends ApplicationFrame {
         if (!CollectionUtils.isEmpty(orderList)) {
             OrderMarker.markOrders(mainPlot, subPlot, orderList);
         }
-        CombinedDomainXYPlot combinedPlot = ChartUtils.setCombinedPlot(mainPlot, subPlot);
+        CombinedDomainXYPlot combinedPlot = MainChartUtils.setCombinedPlot(mainPlot, subPlot);
         combinedChart = new JFreeChart(TITLE, JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
         this.setupChartPanel();
     }
