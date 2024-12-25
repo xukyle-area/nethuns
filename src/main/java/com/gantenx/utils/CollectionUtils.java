@@ -1,18 +1,15 @@
 package com.gantenx.utils;
 
-import com.gantenx.constant.Period;
 import com.gantenx.constant.Series;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
-import com.gantenx.model.ProfitRate;
 import com.gantenx.model.Time;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.K;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -27,6 +24,17 @@ public class CollectionUtils {
         return dataList.stream().collect(Collectors.groupingBy(Time::getTimestamp,
                                                                Collectors.mapping(kline -> kline,
                                                                                   Collectors.toList())));
+    }
+
+    public static <O> Pair<Double, Double> getRange(Map<Long, O> map, Function<O, Double> handler) {
+        double max = Double.MIN_VALUE;
+        double min = Double.MAX_VALUE;
+        for (Map.Entry<Long, O> entry : map.entrySet()) {
+            double aDouble = handler.apply(entry.getValue());
+            max = Math.max(max, aDouble);
+            min = Math.max(min, aDouble);
+        }
+        return Pair.create(min, max);
     }
 
     public static Map<Series, Map<Long, Double>> toSeriesPriceMap(Map<Symbol, Map<Long, Kline>> klineMap,

@@ -12,9 +12,14 @@ import java.util.List;
  * 此处方法如果没有特殊说明，都指的是UTC时间，也就是标准时间
  */
 public class DateUtils {
-    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YYYY_MM_DD = "yyyyMMdd";
+    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(YYYY_MM_DD);
+
     private final static DateTimeFormatter DATE_TIME_ORDER_MARKER = DateTimeFormatter.ofPattern("MMdd");
-    public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
+
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm");
     public static final double MS_OF_ONE_DAY_DOUBLE = 1000L * 3600 * 24.0;
 
@@ -48,6 +53,11 @@ public class DateUtils {
     public static String getDateForOrderMarker(long timestamp) {
         LocalDate date = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate();  // 使用毫秒时间戳
         return date.format(DATE_TIME_ORDER_MARKER);
+    }
+
+    public static String getDate(long timestamp, String dateFormat) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+        return Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDateTime().format(formatter);
     }
 
     public static String getDate(long timestamp) {

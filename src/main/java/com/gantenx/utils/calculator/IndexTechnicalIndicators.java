@@ -146,10 +146,11 @@ public class IndexTechnicalIndicators {
         throw new IllegalArgumentException("Unsupported data type");
     }
 
-    public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Kline> klineMap,
-                                                                 int fastLength,
-                                                                 int slowLength,
-                                                                 int signalLength) {
+    public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Kline> klineMap) {
+
+        int fastLength = 12;
+        int slowLength = 26;
+        int signalLength = 9;
         // Index 包括 DIF 和 EMA
         Map<Index, Map<Long, Double>> indexMapMap = calculateMACD(klineMap, fastLength, slowLength, signalLength);
 

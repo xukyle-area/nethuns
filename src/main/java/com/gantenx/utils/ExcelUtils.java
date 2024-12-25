@@ -216,12 +216,11 @@ public class ExcelUtils {
         return fields;
     }
 
-    // Helper method to format date
+    // Helper method to format date with hour
     private static String formatDate(long timestamp, String dateFormat) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
-        return Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDate().format(formatter);
+        return Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC).toLocalDateTime().format(formatter);
     }
-
 
     /**
      * @param response 来自 controller

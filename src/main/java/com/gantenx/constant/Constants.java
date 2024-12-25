@@ -25,6 +25,6 @@ public class Constants {
     public static final String LINES = "lines";
     public static final int RSI_PERIOD = 6;
     public static final double EPSILON = 1e-6;
-    public static final double INITIAL_BALANCE = 100000;
+    public static final double INITIAL_BALANCE = 10000;
     public final static double FEE = 0.001;
 }

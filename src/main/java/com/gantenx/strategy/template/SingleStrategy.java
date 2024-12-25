@@ -20,8 +20,8 @@ import static com.gantenx.constant.Series.ASSET;
 public abstract class SingleStrategy extends BaseStrategy {
     protected final Symbol symbol;
 
-    public SingleStrategy(String name, Period period, long start, long end, Symbol symbol) {
-        super(name, period, DateUtils.genTimeList(period, start, end), Collections.singletonList(symbol));
+    public SingleStrategy(Period period, long start, long end, Symbol symbol) {
+        super(period, DateUtils.genTimeList(period, start, end), Collections.singletonList(symbol));
         this.symbol = symbol;
     }
 

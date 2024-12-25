@@ -22,7 +22,7 @@ public class SingleRsiStrategy extends SingleStrategy {
     protected final Map<Long, Double> rsiMap;
 
     public SingleRsiStrategy(Period period, long start, long end, Symbol symbol) {
-        super(SingleRsiStrategy.class.getSimpleName(), period, start, end, symbol);
+        super(period, start, end, symbol);
         rsiMap = IndexTechnicalIndicators.calculateRSI(klineMap.get(symbol));
     }
 

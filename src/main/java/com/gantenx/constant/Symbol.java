@@ -11,7 +11,8 @@ public enum Symbol {
     BTCUSDT(BTC, USDT, BINANCE, null),
     ETHUSDT(ETH, USDT, BINANCE, null),
     DOGEUSDT(DOGE, USDT, BINANCE, null),
-    PEPEUSDT(PEPE, USDT, BINANCE, null);
+    PEPEUSDT(PEPE, USDT, BINANCE, null),
+    SOLUSDT(SOL, USDT, BINANCE, null);
 
     private final Currency base;
     private final Currency quote;

@@ -23,7 +23,7 @@ public class TrendStrategy extends SingleStrategy {
     private static final int TREND_LIST_SIZE = 7; // 与period相同
 
     public TrendStrategy(Period period, long start, long end, Symbol symbol) {
-        super(TrendStrategy.class.getSimpleName(), period, start, end, symbol);
+        super(period, start, end, symbol);
         trendMap = new HashMap<>();
         for (int i = 0; i < TREND_LIST_SIZE; i++) {
             trendList.add(Trend.SIDEWAYS);

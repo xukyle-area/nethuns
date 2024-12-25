@@ -2,6 +2,8 @@ package com.gantenx.utils.chart;
 
 import com.gantenx.constant.Series;
 import com.gantenx.engine.Order;
+import com.gantenx.model.Kline;
+import com.gantenx.model.Pair;
 import com.gantenx.utils.calculator.MacdDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
@@ -28,8 +30,8 @@ import static com.gantenx.constant.Series.MACD_DETAIL;
 public class MacdChartUtils {
     public static JFreeChart getSubMacdChart(List<Order> orders,
                                              @Nullable Map<Long, MacdDetail> subData,
-                                             Map<Series, Map<Long, Double>> dataMap) {
-        XYPlot mainPlot = MainChartUtils.createMainPlot(dataMap);
+                                             Pair<Series, Map<Long, Kline>> dataMap) {
+        XYPlot mainPlot = CandleChartUtils.createCandlePlot(dataMap);
         XYPlot subPlot = MacdChartUtils.macdDetailPlot(subData);
         return new Chart(mainPlot, subPlot, orders).getCombinedChart();
     }

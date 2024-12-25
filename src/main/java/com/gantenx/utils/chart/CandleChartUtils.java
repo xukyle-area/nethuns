@@ -35,7 +35,7 @@ public class CandleChartUtils {
         return new Chart(mainPlot, subPlot, orders).getCombinedChart();
     }
 
-    private static XYPlot createCandlePlot(Pair<Series, Map<Long, Kline>> klineDataMap) {
+    public static XYPlot createCandlePlot(Pair<Series, Map<Long, Kline>> klineDataMap) {
         DefaultHighLowDataset dataset = CandleChartUtils.createKlineDataset(klineDataMap);
         JFreeChart chart = ChartFactory.createCandlestickChart(CANDLE, TIME, PRICE, dataset, Boolean.FALSE);
 

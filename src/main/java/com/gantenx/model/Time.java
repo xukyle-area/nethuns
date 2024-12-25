@@ -4,7 +4,7 @@ import com.gantenx.annotation.ExcelColumn;
 
 public class Time {
 
-    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd")
+    @ExcelColumn(name = "date", dateFormat = "yyyy-MM-dd HH:mm:ss")
     private long timestamp;
 
     public Time(long timestamp) {

@@ -1,7 +1,6 @@
 package com.gantenx.engine;
 
 import com.gantenx.constant.Proportion;
-import com.gantenx.constant.Side;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
@@ -136,7 +135,25 @@ public class TradeEngine {
             return;
         }
 
-        sell(symbol, sellQuantity, reason);
+        this.sell(symbol, sellQuantity, reason);
+    }
+
+    /**
+     * 卖出
+     *
+     * @param symbol 标的
+     * @param amount 成交额
+     * @param reason 原因
+     */
+    public void sellForAmount(Symbol symbol, double amount, String reason) {
+        List<Position> positionList = positions.get(symbol);
+        if (positionList == null || positionList.isEmpty()) {
+            return;
+        }
+        double price = this.getPrice(symbol);
+        double sellQuantity = amount / price;
+
+        this.sell(symbol, sellQuantity, reason);
     }
 
     /**
@@ -152,7 +169,27 @@ public class TradeEngine {
         if (maxQuantity <= 0) {
             return;
         }
-        buy(symbol, maxQuantity, reason);
+        this.buy(symbol, maxQuantity, reason);
+    }
+
+    /**
+     * 买入
+     *
+     * @param symbol 标的
+     * @param amount 成交额
+     * @param reason 原因
+     */
+    public void buyForAmount(Symbol symbol, double amount, String reason) {
+        if (this.balance < amount) {
+            this.buy(symbol, Proportion.PROPORTION_OF_100, reason);
+        }
+        double price = this.getPrice(symbol);
+        double maxQuantity = amount / (price * (1 + FEE));  // 计算可以买入的最大数量
+        if (maxQuantity <= 0) {
+            return;
+        }
+        this.buy(symbol, maxQuantity, reason);
+        log.info("{}", this.balance);
     }
 
 
@@ -209,7 +246,7 @@ public class TradeEngine {
         return kline.getOpen();
     }
 
-    private void buy(Symbol symbol, double quantity, String reason) {
+    public void buy(Symbol symbol, double quantity, String reason) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
@@ -227,7 +264,7 @@ public class TradeEngine {
         }
     }
 
-    private void sell(Symbol symbol, double quantity, String reason) {
+    public void sell(Symbol symbol, double quantity, String reason) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
@@ -276,6 +313,9 @@ public class TradeEngine {
                 iterator.remove();
             }
         }
+        double curFee = totalRevenue * FEE;
+        feeCount += curFee;
+        totalRevenue -= curFee;
         balance += totalRevenue;
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));
     }

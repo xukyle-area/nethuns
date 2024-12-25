@@ -1,10 +1,9 @@
 package com.gantenx.strategy.template;
 
-import com.gantenx.utils.calculator.LongHoldingProfitCalculator;
-import com.gantenx.utils.calculator.OrderCalculator;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Proportion;
 import com.gantenx.constant.Symbol;
+import com.gantenx.engine.Position;
 import com.gantenx.engine.TradeDetail;
 import com.gantenx.engine.TradeEngine;
 import com.gantenx.model.Kline;
@@ -14,27 +13,24 @@ import com.gantenx.service.KlineService;
 import com.gantenx.utils.DateUtils;
 import com.gantenx.utils.ExcelUtils;
 import com.gantenx.utils.ExportUtils;
+import com.gantenx.utils.calculator.LongHoldingProfitCalculator;
+import com.gantenx.utils.calculator.OrderCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jfree.chart.JFreeChart;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.gantenx.constant.Constants.*;
 
 @Slf4j
 public abstract class BaseStrategy {
-    protected final String strategyName;
     protected final Map<Symbol, Map<Long, Kline>> klineMap;
     protected final List<Long> timestampList;
     protected final TradeEngine tradeEngine;
     protected TradeDetail tradeDetail;
 
-    public BaseStrategy(String name, Period period, List<Long> timestampList, List<Symbol> symbols) {
-        this.strategyName = name;
+    public BaseStrategy(Period period, List<Long> timestampList, List<Symbol> symbols) {
         this.klineMap = KlineService.getSymbolKlineMap(symbols, period, timestampList);
         this.timestampList = timestampList;
         this.tradeEngine = new TradeEngine(timestampList, this.klineMap);
@@ -63,6 +59,8 @@ public abstract class BaseStrategy {
     }
 
     public void export() {
+        UUID uuid = UUID.randomUUID();
+        String string = uuid.toString().substring(0, 16);
         // 构建 excel 表格
         Workbook workbook = ExcelUtils.singleSheet(Collections.singletonList(this.tradeDetail), TRADE_DETAIL);
         ExcelUtils.addDataToNewSheet(workbook, this.tradeDetail.getOrders(), ORDER_LIST);
@@ -74,12 +72,27 @@ public abstract class BaseStrategy {
         // 导出 excel 表格
         String startStr = DateUtils.getDate(timestampList.get(0));
         String endStr = DateUtils.getDate(timestampList.get(timestampList.size() - 1));
-        ExportUtils.exportWorkbook(workbook, startStr, endStr, strategyName, RESULT);
+        ExportUtils.exportWorkbook(workbook, startStr, endStr, string, RESULT);
 
         // 保存
         JFreeChart tradingChart = this.getChart();
         if (Objects.nonNull(tradingChart)) {
-            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, strategyName, LINES);
+            ExportUtils.saveJFreeChartAsImage(tradingChart, startStr, endStr, string, LINES);
+        }
+    }
+
+    protected void stopLoss(double lossRate) {
+        for (Map.Entry<Symbol, Map<Long, Kline>> entry : this.klineMap.entrySet()) {
+            Symbol symbol = entry.getKey();
+            List<Position> positionList = tradeEngine.getPositions(symbol);
+            double price = tradeEngine.getPrice(symbol);
+            for (Position position : positionList) {
+                double prevPrice = position.getPrice();
+                double v = 1 - price / prevPrice;
+                if (v > lossRate) {
+                    tradeEngine.sell(symbol, position.getQuantity(), "Loss rate: " + v + ", stop");
+                }
+            }
         }
     }
 

@@ -7,10 +7,10 @@ public class TradeRecord {
     private long id;
     private Symbol symbol;
     // 买入时间
-    @ExcelColumn(dateFormat = "yyyy-MM-dd")
+    @ExcelColumn(dateFormat = "yyyy-MM-dd HH:mm:ss")
     private long buyTime;
     // 卖出时间
-    @ExcelColumn(dateFormat = "yyyy-MM-dd")
+    @ExcelColumn(dateFormat = "yyyy-MM-dd HH:mm:ss")
     private long sellTime;
     // 持有天数
     @ExcelColumn(name = "days")
