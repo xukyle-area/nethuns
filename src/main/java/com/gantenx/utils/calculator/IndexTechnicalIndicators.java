@@ -4,6 +4,8 @@ import com.gantenx.constant.Index;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 
+import java.awt.*;
+import java.util.List;
 import java.util.*;
 
 import static com.gantenx.constant.Constants.RSI_PERIOD;
@@ -179,8 +181,8 @@ public class IndexTechnicalIndicators {
             MacdDetail macdDetail = resultMap.get(timestamp);
             macdDetail.setCross(isCross(macdDetail, resultMap.get(previousTimestamp)));
             // 颜色逻辑
-            HistogramColor color = determineHistogramColor(previousTimestamp, macdDetail, resultMap);
-            macdDetail.setHistogramColor(color.getColor());
+            Color color = determineHistogramColor(previousTimestamp, macdDetail, resultMap);
+            macdDetail.setHistogramColor(color);
 
             previousTimestamp = timestamp;
         }
@@ -201,19 +203,21 @@ public class IndexTechnicalIndicators {
     }
 
     // 颜色计算方法
-    private static HistogramColor determineHistogramColor(Long previousTimestamp,
-                                                          MacdDetail macdDetail,
-                                                          Map<Long, MacdDetail> resultMap) {
+    private static Color determineHistogramColor(Long previousTimestamp,
+                                                 MacdDetail macdDetail,
+                                                 Map<Long, MacdDetail> resultMap) {
         if (previousTimestamp == null) {
-            return HistogramColor.GRAY;
+            return Color.GRAY; // 没有前一个时间点，返回默认颜色
         } else {
             double previousHistogram = resultMap.get(previousTimestamp).getHistogram();
             double currentHistogram = macdDetail.getHistogram();
 
-            if (currentHistogram > previousHistogram) {
-                return currentHistogram > 0 ? HistogramColor.GREEN : HistogramColor.MAROON;
+            if (currentHistogram > 0) {
+                // 直方图值大于 0
+                return currentHistogram > previousHistogram ? Color.RED : Color.PINK;
             } else {
-                return currentHistogram > 0 ? HistogramColor.BLUE : HistogramColor.RED;
+                // 直方图值小于 0
+                return currentHistogram > previousHistogram ? Color.GREEN.brighter() : Color.GREEN.darker();
             }
         }
     }

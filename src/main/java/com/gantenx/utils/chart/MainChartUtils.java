@@ -60,7 +60,7 @@ public class MainChartUtils {
         }
     }
 
-    private static XYSeriesCollection[] createDatasets(Map<Series, Map<Long, Double>> priceDataMap) {
+    public static XYSeriesCollection[] createDatasets(Map<Series, Map<Long, Double>> priceDataMap) {
         XYSeriesCollection[] datasets = new XYSeriesCollection[priceDataMap.size()];
         int index = 0;
         for (Map.Entry<Series, Map<Long, Double>> entry : priceDataMap.entrySet()) {

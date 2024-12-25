@@ -1,11 +1,13 @@
 package com.gantenx.utils.calculator;
 
+import java.awt.*;
+
 public class MacdDetail {
-    public Double macdLine;  // MACD 主线
-    public Double signalLine;  // 信号线
-    public Double histogram;  // 直方图高度
-    public Boolean isCross;  // 是否交叉
-    public String histogramColor;  // 直方图颜色
+    private Double macdLine;  // MACD 主线
+    private Double signalLine;  // 信号线
+    private Double histogram;  // 直方图高度
+    private Boolean isCross;  // 是否交叉
+    private Color histogramColor;  // 直方图颜色
 
     public Double getMacdLine() {
         return macdLine;
@@ -39,11 +41,11 @@ public class MacdDetail {
         isCross = cross;
     }
 
-    public String getHistogramColor() {
+    public Color getHistogramColor() {
         return histogramColor;
     }
 
-    public void setHistogramColor(String histogramColor) {
+    public void setHistogramColor(Color histogramColor) {
         this.histogramColor = histogramColor;
     }
 }
