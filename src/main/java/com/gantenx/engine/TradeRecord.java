@@ -29,6 +29,24 @@ public class TradeRecord {
     private long buyOrderId;
     // 卖出时候的订单id
     private long sellOrderId;
+    private double revenue;
+    private double cost;
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
+    public double getRevenue() {
+        return revenue;
+    }
+
+    public void setRevenue(double revenue) {
+        this.revenue = revenue;
+    }
 
     public long getId() {
         return id;

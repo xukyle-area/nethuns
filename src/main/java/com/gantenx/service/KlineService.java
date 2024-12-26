@@ -1,11 +1,11 @@
 package com.gantenx.service;
 
-import com.gantenx.utils.calculator.IndexTechnicalIndicators;
 import com.gantenx.constant.Period;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.utils.CollectionUtils;
 import com.gantenx.utils.CsvUtils;
+import com.gantenx.utils.indicator.RsiCalculator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class KlineService {
                                                            List<Symbol> symbols) {
         HashMap<Symbol, Map<Long, Double>> hashMap = new HashMap<>();
         for (Symbol symbol : symbols) {
-            Map<Long, Double> map = IndexTechnicalIndicators.calculateRSI(klineMap.get(symbol));
+            Map<Long, Double> map = RsiCalculator.calculateRSI(klineMap.get(symbol));
             hashMap.put(symbol, map);
         }
         return hashMap;

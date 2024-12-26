@@ -5,8 +5,8 @@ import com.gantenx.constant.Proportion;
 import com.gantenx.constant.Symbol;
 import com.gantenx.model.Kline;
 import com.gantenx.strategy.template.MultiStrategy;
-import com.gantenx.utils.calculator.IndexTechnicalIndicators;
-import com.gantenx.utils.calculator.MacdDetail;
+import com.gantenx.utils.indicator.MacdCalculator;
+import com.gantenx.model.MacdDetail;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.gantenx.constant.Constants.INITIAL_BALANCE;
-import static com.gantenx.constant.Symbol.QQQUSD;
 
 @Slf4j
 public class MultiMacdStrategy extends MultiStrategy {
@@ -26,7 +25,7 @@ public class MultiMacdStrategy extends MultiStrategy {
         super(period, start, end, Arrays.asList(symbolList));
         for (Symbol symbol : klineMap.keySet()) {
             Map<Long, Kline> map = klineMap.get(symbol);
-            macdDetailMap.put(symbol, IndexTechnicalIndicators.calculateMACDWithDetails(map));
+            macdDetailMap.put(symbol, MacdCalculator.calculateMACDWithDetails(map));
         }
     }
 
@@ -54,7 +53,7 @@ public class MultiMacdStrategy extends MultiStrategy {
                 Color yesterdayColor = yesterdayMacdDetail.getHistogramColor();
                 if (isGreen(prevColor) && isRed(yesterdayColor)) {
                     // 绿转红，买入
-                    tradeEngine.buyForAmount(symbol, INITIAL_BALANCE / klineMap.keySet().size(), "" + histogram);
+                    tradeEngine.buyAmount(symbol, INITIAL_BALANCE / klineMap.keySet().size(), "" + histogram);
                 } else if (isRed(prevColor) && isGreen(yesterdayColor)) {
                     // 红转绿，卖出
                     tradeEngine.sell(symbol, Proportion.PROPORTION_OF_100, "" + histogram);

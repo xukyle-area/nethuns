@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 import static com.gantenx.constant.Constants.*;
-import static com.gantenx.constant.Proportion.PROPORTION_OF_15;
 
 @Slf4j
 public class TrendStrategy extends SingleStrategy {
@@ -71,10 +70,10 @@ public class TrendStrategy extends SingleStrategy {
     private void executeTradeSignal(Symbol symbol, Signal signal) {
         switch (signal) {
             case STRONG_BUY:
-                tradeEngine.buy(symbol, PROPORTION_OF_15, "强力下降转弱势买入");
+                tradeEngine.buyAmount(symbol, INITIAL_BALANCE / 4, "强力下降转弱势买入");
                 break;
             case STRONG_SELL:
-                tradeEngine.sell(symbol, PROPORTION_OF_15, "强力上升转弱势卖出");
+                tradeEngine.sellAmount(symbol, INITIAL_BALANCE / 4, "强力上升转弱势卖出");
                 break;
             default:
                 break;

@@ -1,10 +1,9 @@
 package com.gantenx.engine;
 
 import com.gantenx.constant.Period;
+import com.gantenx.constant.Symbol;
 
 import java.util.List;
-
-import static com.gantenx.utils.DateUtils.MS_OF_ONE_DAY_DOUBLE;
 
 public class Position {
     // 买入的时候的订单id
@@ -15,7 +14,15 @@ public class Position {
     private double quantity;
     // 买入时间
     private long timestamp;
+    private Symbol symbol;
 
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(Symbol symbol) {
+        this.symbol = symbol;
+    }
 
     public long getOrderId() {
         return orderId;
@@ -41,10 +48,8 @@ public class Position {
         this.timestamp = timestamp;
     }
 
-    public Position() {
-    }
-
-    public Position(long orderId, double price, double quantity, long timestamp) {
+    public Position(Symbol symbol, long orderId, double price, double quantity, long timestamp) {
+        this.symbol = symbol;
         this.orderId = orderId;
         this.price = price;
         this.quantity = quantity;

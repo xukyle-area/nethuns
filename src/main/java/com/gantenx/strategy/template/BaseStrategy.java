@@ -43,21 +43,6 @@ public abstract class BaseStrategy {
 
     protected abstract void open();
 
-    protected Proportion buyProportion(Proportion proportion) {
-        double m = INITIAL_BALANCE * proportion.getValue();
-        double v = m / tradeEngine.getBalance();
-        return Proportion.getProportion(v);
-    }
-
-    protected Proportion sellProportion(Proportion proportion, Symbol symbol) {
-        double m = INITIAL_BALANCE * proportion.getValue();
-        double price = tradeEngine.getPrice(symbol);
-        double quantity = tradeEngine.getQuantity(symbol);
-
-        double v = (m / price) / quantity;
-        return Proportion.getProportion(v);
-    }
-
     public void export() {
         UUID uuid = UUID.randomUUID();
         String string = uuid.toString().substring(0, 16);

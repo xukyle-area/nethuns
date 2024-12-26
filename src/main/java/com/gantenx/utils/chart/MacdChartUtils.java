@@ -4,7 +4,7 @@ import com.gantenx.constant.Series;
 import com.gantenx.engine.Order;
 import com.gantenx.model.Kline;
 import com.gantenx.model.Pair;
-import com.gantenx.utils.calculator.MacdDetail;
+import com.gantenx.model.MacdDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;

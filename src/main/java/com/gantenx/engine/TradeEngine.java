@@ -101,21 +101,6 @@ public class TradeEngine {
     }
 
     /**
-     * 获得当前的时间戳
-     */
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * 是否存在任何持仓
-     */
-    public boolean hasPosition() {
-        Collection<Position> positionList = CollectionUtils.toCollection(positions.values());
-        return positionList.stream().anyMatch(position -> position.getQuantity() > 0);
-    }
-
-    /**
      * 卖出
      *
      * @param symbol     标的
@@ -145,7 +130,7 @@ public class TradeEngine {
      * @param amount 成交额
      * @param reason 原因
      */
-    public void sellForAmount(Symbol symbol, double amount, String reason) {
+    public void sellAmount(Symbol symbol, double amount, String reason) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             return;
@@ -156,42 +141,13 @@ public class TradeEngine {
         this.sell(symbol, sellQuantity, reason);
     }
 
-    /**
-     * 买入
-     *
-     * @param symbol     标的
-     * @param proportion 占有现在余额的比例
-     * @param reason     原因
-     */
-    public void buy(Symbol symbol, Proportion proportion, String reason) {
-        double price = this.getPrice(symbol);
-        double maxQuantity = (balance * proportion.getValue() / 100) / (price * (1 + FEE));  // 计算可以买入的最大数量
-        if (maxQuantity <= 0) {
-            return;
-        }
-        this.buy(symbol, maxQuantity, reason);
-    }
-
-    /**
-     * 买入
-     *
-     * @param symbol 标的
-     * @param amount 成交额
-     * @param reason 原因
-     */
-    public void buyForAmount(Symbol symbol, double amount, String reason) {
+    public void buyAmount(Symbol symbol, double amount, String reason) {
         if (this.balance < amount) {
-            this.buy(symbol, Proportion.PROPORTION_OF_100, reason);
+            amount = this.balance;
         }
-        double price = this.getPrice(symbol);
-        double maxQuantity = amount / (price * (1 + FEE));  // 计算可以买入的最大数量
-        if (maxQuantity <= 0) {
-            return;
-        }
+        double maxQuantity = this.getMaxQuantity(symbol, amount);
         this.buy(symbol, maxQuantity, reason);
-        log.info("{}", this.balance);
     }
-
 
     public double getQuantity(Symbol symbol) {
         List<Position> positionList = positions.get(symbol);
@@ -246,21 +202,30 @@ public class TradeEngine {
         return kline.getOpen();
     }
 
-    public void buy(Symbol symbol, double quantity, String reason) {
+    /**
+     * 买入的股数
+     *
+     * @param symbol   币对
+     * @param quantity 数量
+     * @param reason   买入原因
+     */
+    private void buy(Symbol symbol, double quantity, String reason) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
         }
 
-        double cost = calculateTotalCost(symbol, quantity);
-        if (balance + EPSILON >= cost) {
+        double cost = this.calculateTotalCost(symbol, quantity);
+        if (cost >= 1 && balance + EPSILON >= cost) {
             balance -= cost;
 
             List<Position> positionList = positions.getOrDefault(symbol, new ArrayList<>());
             long orderId = generateOrderId();
-            positionList.add(new Position(orderId, price, quantity, timestamp)); // 保存买入记录
+            positionList.add(new Position(symbol, orderId, price, quantity, timestamp));
             positions.put(symbol, positionList);
             orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp, reason));
+        } else {
+            log.info("下单失败:{},{},{}", symbol.name(), cost, this.balance);
         }
     }
 
@@ -284,40 +249,48 @@ public class TradeEngine {
             Position position = iterator.next();
             double sellQuantity = Math.min(position.getQuantity(), remainingQuantity);
 
-            // 计算卖出收益
-            double revenue = calculateTotalRevenue(symbol, sellQuantity);
-            double profit = revenue - position.getPrice() * sellQuantity;
-
+            double revenue = this.calculateRevenue(symbol, sellQuantity);
             totalRevenue += revenue;
+            TradeRecord record = this.buildTradeRecord(position, revenue, sellQuantity);
 
-            position.setQuantity(position.getQuantity() - sellQuantity);
-            remainingQuantity -= sellQuantity;
-            // 只在卖出的时候生成一条这个记录
-            TradeRecord record = new TradeRecord();
-            record.setId(generateRecordId());
-            record.setBuyOrderId(position.getOrderId());
-            record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
-            record.setBuyPrice(position.getPrice());
-            record.setBuyTime(position.getTimestamp());
-            record.setSellOrderId(orderId);
-            record.setSellPrice(price);
-            record.setSellTime(timestamp);
-            record.setQuantity(sellQuantity);
-            record.setSymbol(symbol);
-            record.setProfit(profit);
-            record.setProfitRate(price / position.getPrice());
+
             records.add(record);
-
-            // 如果仓位清空，移除该记录
-            if (Math.abs(position.getQuantity()) < 1e-6) {
+            if (Math.abs(position.getQuantity()) < EPSILON) {
                 iterator.remove();
             }
+            position.setQuantity(position.getQuantity() - sellQuantity);
+            remainingQuantity -= sellQuantity;
         }
-        double curFee = totalRevenue * FEE;
-        feeCount += curFee;
-        totalRevenue -= curFee;
         balance += totalRevenue;
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));
+
+    }
+
+    private TradeRecord buildTradeRecord(Position position, double revenue, double sellQuantity) {
+        Symbol symbol = position.getSymbol();
+        double price = this.getPrice(symbol);
+
+        double profit = revenue - position.getPrice() * sellQuantity;
+        TradeRecord record = new TradeRecord();
+        record.setId(generateRecordId());
+        record.setBuyOrderId(position.getOrderId());
+        record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
+        record.setBuyPrice(position.getPrice());
+        record.setBuyTime(position.getTimestamp());
+        record.setSellOrderId(orderId);
+        record.setSellPrice(price);
+        record.setSellTime(timestamp);
+        record.setQuantity(sellQuantity);
+        record.setSymbol(symbol);
+        record.setProfit(profit);
+        record.setProfitRate(price / position.getPrice());
+        record.setRevenue(revenue);
+        return record;
+    }
+
+    public double getMaxQuantity(Symbol symbol, double amount) {
+        double price = this.getPrice(symbol);
+        return amount / (price * (1 + FEE));
     }
 
     private double calculateTotalCost(Symbol symbol, double quantity) {
@@ -327,9 +300,12 @@ public class TradeEngine {
         return cost + curFee;
     }
 
-    private double calculateTotalRevenue(Symbol symbol, double quantity) {
+    private double calculateRevenue(Symbol symbol, double quantity) {
         double price = this.getPrice(symbol);
-        return price * quantity;
+        double revenue = price * quantity;
+        double curFee = revenue * FEE;
+        feeCount += curFee;
+        return revenue - curFee;
     }
 
     private long generateOrderId() {
