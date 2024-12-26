@@ -2,7 +2,7 @@ package com.gantenx.nethuns.indicator;
 
 import com.gantenx.nethuns.commons.constant.Index;
 import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.model.MacdDetail;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 
 import java.awt.*;
@@ -13,7 +13,7 @@ import static com.gantenx.nethuns.commons.constant.Index.DIF;
 import static com.gantenx.nethuns.commons.constant.Index.EMA;
 
 
-public class MacdCalculator {
+public class MacdIndicator {
 
     public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Kline> klineMap) {
 

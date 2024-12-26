@@ -7,12 +7,13 @@ import com.gantenx.nethuns.strategy.MultiMacdStrategy;
 import com.gantenx.nethuns.strategy.SingleMacdStrategy;
 import com.gantenx.nethuns.strategy.SingleRsiStrategy;
 import com.gantenx.nethuns.strategy.template.BaseStrategy;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.gantenx.nethuns.commons.constant.Period.CSV;
 import static com.gantenx.nethuns.commons.constant.Period.FOUR_HOURS;
 import static com.gantenx.nethuns.commons.constant.Symbol.BTCUSDT;
-import static com.gantenx.nethuns.commons.constant.Symbol.QQQUSD;
 
+@Slf4j
 public class TestMain {
 
     public static void main(String[] args) {
@@ -33,6 +34,7 @@ public class TestMain {
 
     public static void runB(long start, long end, Symbol symbol) {
         SingleMacdStrategy strategy = new SingleMacdStrategy(FOUR_HOURS, start, end, symbol);
+        log.info("aaa");
         BaseStrategy.processAndExport(strategy);
     }
 

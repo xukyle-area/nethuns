@@ -39,6 +39,6 @@ public class ExportUtils {
         String timeWithoutDate = DateUtils.getDateTimeForExport(System.currentTimeMillis(), ZoneOffset.ofHours(8));
         String timeRange = startStr + "-" + endStr;
         String fullName = strategyName + "-" + filename + ".png";
-        return joiner.join("export", timeWithoutDate, timeRange, fullName);
+        return joiner.join("alpha/export", timeWithoutDate, timeRange, fullName);
     }
 }

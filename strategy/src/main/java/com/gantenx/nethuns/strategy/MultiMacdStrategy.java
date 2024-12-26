@@ -5,8 +5,8 @@ import com.gantenx.nethuns.commons.constant.Period;
 import com.gantenx.nethuns.commons.constant.Proportion;
 import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.model.MacdDetail;
-import com.gantenx.nethuns.indicator.MacdCalculator;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
+import com.gantenx.nethuns.indicator.MacdIndicator;
 import com.gantenx.nethuns.strategy.template.MultiStrategy;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class MultiMacdStrategy extends MultiStrategy {
         super(period, start, end, Arrays.asList(symbolList));
         for (Symbol symbol : klineMap.keySet()) {
             Map<Long, Kline> map = klineMap.get(symbol);
-            macdDetailMap.put(symbol, MacdCalculator.calculateMACDWithDetails(map));
+            macdDetailMap.put(symbol, MacdIndicator.calculateMACDWithDetails(map));
         }
     }
 

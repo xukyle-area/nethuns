@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import static com.gantenx.nethuns.commons.constant.Constants.RSI_PERIOD;
 
 
-public class RsiCalculator {
+public class RsiIndicator {
 
     public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap) {
         Map<Long, Double> rsiMap = new TreeMap<>();

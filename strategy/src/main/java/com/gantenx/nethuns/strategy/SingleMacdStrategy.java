@@ -6,8 +6,8 @@ import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.engine.chart.plot.CandlePlot;
 import com.gantenx.nethuns.engine.chart.Chart;
-import com.gantenx.nethuns.model.MacdDetail;
-import com.gantenx.nethuns.indicator.MacdCalculator;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
+import com.gantenx.nethuns.indicator.MacdIndicator;
 import com.gantenx.nethuns.engine.chart.plot.MacdPlot;
 import com.gantenx.nethuns.strategy.template.SingleStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class SingleMacdStrategy extends SingleStrategy {
 
     public SingleMacdStrategy(Period period, long start, long end, Symbol symbol) {
         super(period, start, end, symbol);
-        macdDetailMap = MacdCalculator.calculateMACDWithDetails(klineMap.get(super.symbol));
+        macdDetailMap = MacdIndicator.calculateMACDWithDetails(klineMap.get(super.symbol));
     }
 
     @Override

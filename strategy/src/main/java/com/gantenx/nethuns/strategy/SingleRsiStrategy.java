@@ -6,7 +6,7 @@ import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.engine.chart.Chart;
 import com.gantenx.nethuns.engine.chart.plot.LinePlot;
-import com.gantenx.nethuns.indicator.RsiCalculator;
+import com.gantenx.nethuns.indicator.RsiIndicator;
 import com.gantenx.nethuns.engine.chart.plot.CandlePlot;
 import com.gantenx.nethuns.strategy.template.SingleStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class SingleRsiStrategy extends SingleStrategy {
 
     public SingleRsiStrategy(Period period, long start, long end, Symbol symbol) {
         super(period, start, end, symbol);
-        rsiMap = RsiCalculator.calculateRSI(klineMap.get(symbol));
+        rsiMap = RsiIndicator.calculateRSI(klineMap.get(symbol));
     }
 
     @Override

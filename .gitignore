@@ -5,8 +5,7 @@ target/
 
 ### IntelliJ IDEA ###
 .idea/*
-logs/*
-export/*
+alpha/*
 
 ### Eclipse ###
 .apt_generated
