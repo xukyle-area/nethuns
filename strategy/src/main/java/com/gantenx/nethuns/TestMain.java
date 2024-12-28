@@ -34,7 +34,6 @@ public class TestMain {
 
     public static void runB(long start, long end, Symbol symbol) {
         SingleMacdStrategy strategy = new SingleMacdStrategy(FOUR_HOURS, start, end, symbol);
-        log.info("aaa");
         BaseStrategy.processAndExport(strategy);
     }
 

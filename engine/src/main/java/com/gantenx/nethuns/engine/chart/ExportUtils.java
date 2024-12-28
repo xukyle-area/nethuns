@@ -24,7 +24,7 @@ public class ExportUtils {
         try {
             Path filePath = Paths.get(genChartPath(strategyName, startStr, endStr, filePrefix));
             Files.createDirectories(filePath.getParent());
-            BufferedImage image = chart.createBufferedImage(2400, 1200);
+            BufferedImage image = chart.createBufferedImage(3600, 1200);
             if (image == null) {
                 throw new RuntimeException("Failed to create chart image");
             }

@@ -4,11 +4,11 @@ import com.gantenx.nethuns.commons.constant.Period;
 import com.gantenx.nethuns.commons.constant.Proportion;
 import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.engine.chart.plot.CandlePlot;
 import com.gantenx.nethuns.engine.chart.Chart;
-import com.gantenx.nethuns.indicator.model.MacdDetail;
-import com.gantenx.nethuns.indicator.MacdIndicator;
+import com.gantenx.nethuns.engine.chart.plot.CandlePlot;
 import com.gantenx.nethuns.engine.chart.plot.MacdPlot;
+import com.gantenx.nethuns.indicator.MacdIndicator;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
 import com.gantenx.nethuns.strategy.template.SingleStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
@@ -38,32 +38,23 @@ public class SingleMacdStrategy extends SingleStrategy {
             long today = tradeEngine.next();
             MacdDetail prevMacdDetail = macdDetailMap.get(lastTwo);
             MacdDetail yesterdayMacdDetail = macdDetailMap.get(lastOne);
-            MacdDetail todayMacdDetail = macdDetailMap.get(today);
 
-            if (Objects.isNull(prevMacdDetail) || Objects.isNull(yesterdayMacdDetail) || Objects.isNull(todayMacdDetail)) {
+            if (Objects.isNull(prevMacdDetail) || Objects.isNull(yesterdayMacdDetail)) {
                 lastTwo = lastOne;
                 lastOne = today;
                 continue;
             }
 
             // 判断是否金叉或死叉
-            boolean isGoldenCross = yesterdayMacdDetail.getMacdLine() <= yesterdayMacdDetail.getSignalLine() &&
-                    todayMacdDetail.getMacdLine() > todayMacdDetail.getSignalLine();
-            boolean isDeathCross = yesterdayMacdDetail.getMacdLine() >= yesterdayMacdDetail.getSignalLine() &&
-                    todayMacdDetail.getMacdLine() < todayMacdDetail.getSignalLine();
+            boolean isGoldenCross = prevMacdDetail.getMacdLine() <= prevMacdDetail.getSignalLine() &&
+                    yesterdayMacdDetail.getMacdLine() > yesterdayMacdDetail.getSignalLine();
+            boolean isDeathCross = prevMacdDetail.getMacdLine() >= prevMacdDetail.getSignalLine() &&
+                    yesterdayMacdDetail.getMacdLine() < yesterdayMacdDetail.getSignalLine();
 
-            // 获取短期和长期均线
-//            double shortTermMA = calculateMovingAverage(today, 10); // 短期均线
-//            double longTermMA = calculateMovingAverage(today, 50); // 长期均线
-
-            // 趋势确认
-            boolean isUptrend = true;
-            boolean isDowntrend = true;
-
-            if (isGoldenCross && isUptrend) {
+            if (isGoldenCross) {
                 // 开多仓
                 tradeEngine.buyAmount(symbol, INITIAL_BALANCE / 2, "Golden Cross");
-            } else if (isDeathCross && isDowntrend) {
+            } else if (isDeathCross) {
                 // 开空仓
                 tradeEngine.sell(symbol, Proportion.PROPORTION_OF_100, "Death Cross");
             }

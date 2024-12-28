@@ -247,35 +247,35 @@ public class TradeEngine {
         long orderId = generateOrderId();
         while (iterator.hasNext() && remainingQuantity > 0) {
             Position position = iterator.next();
+            if (Math.abs(position.getQuantity()) < EPSILON) {
+                iterator.remove();
+                continue;
+            }
             double sellQuantity = Math.min(position.getQuantity(), remainingQuantity);
 
             double revenue = this.calculateRevenue(symbol, sellQuantity);
             totalRevenue += revenue;
             TradeRecord record = this.buildTradeRecord(position, revenue, sellQuantity);
-
-
             records.add(record);
-            if (Math.abs(position.getQuantity()) < EPSILON) {
-                iterator.remove();
-            }
+
             position.setQuantity(position.getQuantity() - sellQuantity);
             remainingQuantity -= sellQuantity;
         }
         balance += totalRevenue;
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));
-
     }
 
     private TradeRecord buildTradeRecord(Position position, double revenue, double sellQuantity) {
         Symbol symbol = position.getSymbol();
         double price = this.getPrice(symbol);
 
-        double profit = revenue - position.getPrice() * sellQuantity;
+        double buyPrice = position.getPrice();
+        double profit = revenue - buyPrice * sellQuantity;
         TradeRecord record = new TradeRecord();
         record.setId(generateRecordId());
         record.setBuyOrderId(position.getOrderId());
         record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
-        record.setBuyPrice(position.getPrice());
+        record.setBuyPrice(buyPrice);
         record.setBuyTime(position.getTimestamp());
         record.setSellOrderId(orderId);
         record.setSellPrice(price);
@@ -283,8 +283,9 @@ public class TradeEngine {
         record.setQuantity(sellQuantity);
         record.setSymbol(symbol);
         record.setProfit(profit);
-        record.setProfitRate(price / position.getPrice());
+        record.setProfitRate(price / buyPrice);
         record.setRevenue(revenue);
+        record.setCost(sellQuantity * buyPrice);
         return record;
     }
 

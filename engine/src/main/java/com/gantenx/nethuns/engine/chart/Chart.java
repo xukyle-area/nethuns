@@ -62,7 +62,7 @@ public class Chart extends ApplicationFrame {
     private static CombinedDomainXYPlot setCombinedPlot(XYPlot mainPlot, XYPlot subPlot) {
         DateAxis timeAxis = (DateAxis) mainPlot.getDomainAxis();
         CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
-        combinedPlot.add(mainPlot, 3);
+        combinedPlot.add(mainPlot, 1);
         if (Objects.nonNull(subPlot)) {
             combinedPlot.add(subPlot, 1);
         }

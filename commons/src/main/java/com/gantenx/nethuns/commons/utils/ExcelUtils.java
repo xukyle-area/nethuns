@@ -153,8 +153,7 @@ public class ExcelUtils {
                             cell.setCellValue(((Enum<?>) value).name());
                         } else if (field.getType() == Double.class || field.getType() == double.class ||
                                 field.getType() == Float.class || field.getType() == float.class) {
-                            // 处理小数，保留两位有效小数
-                            cell.setCellValue(String.format("%.3f", (double) value));
+                            cell.setCellValue(String.format("%.4f", (double) value));
                         } else if (field.getType().isArray() ||
                                 isCollectionOrMap(field.getType()) ||
                                 isCustomObject(field.getType())) {
