@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 
-import java.awt.*;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,7 +37,13 @@ public class SingleMacdStrategy extends SingleStrategy {
             long today = tradeEngine.next();
             MacdDetail prevMacdDetail = macdDetailMap.get(lastTwo);
             MacdDetail yesterdayMacdDetail = macdDetailMap.get(lastOne);
-
+            /*
+             * MacdDetail:
+             *     private Double macdLine;  // MACD 主线
+             *     private Double signalLine;  // 信号线
+             *     private Double histogram;  // 直方图高度
+             *     private Color histogramColor;  // 直方图颜色
+             */
             if (Objects.isNull(prevMacdDetail) || Objects.isNull(yesterdayMacdDetail)) {
                 lastTwo = lastOne;
                 lastOne = today;
@@ -62,23 +67,6 @@ public class SingleMacdStrategy extends SingleStrategy {
             lastTwo = lastOne;
             lastOne = today;
         }
-    }
-
-
-    private boolean isRed(Color color) {
-        return color.equals(Color.RED) || color.equals(Color.PINK);
-    }
-
-    private boolean isGreen(Color color) {
-        return color.equals(Color.GREEN.darker()) || color.equals(Color.GREEN.brighter());
-    }
-
-    private boolean greenTurnBrighter(Color prevColor, Color yesterdayColor) {
-        return prevColor.equals(Color.GREEN.darker()) && yesterdayColor.equals(Color.GREEN.brighter());
-    }
-
-    private boolean redTurnBrighter(Color prevColor, Color yesterdayColor) {
-        return prevColor.equals(Color.RED) && yesterdayColor.equals(Color.PINK);
     }
 
     @Override
