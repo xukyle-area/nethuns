@@ -24,4 +24,13 @@ public enum Period {
     public long getMillisecond() {
         return millisecond;
     }
+
+    public static Period getPeriod(long time) {
+        for (Period value : Period.values()) {
+            if (value.getMillisecond() == time) {
+                return value;
+            }
+        }
+        throw new RuntimeException();
+    }
 }

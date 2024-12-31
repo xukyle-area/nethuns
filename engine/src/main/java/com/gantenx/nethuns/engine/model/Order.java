@@ -11,20 +11,14 @@ public class Order extends Time {
     private final double price;      // 价格
     private final double quantity;   // 数量
     private long orderId;
-    private final String reason;
 
-    public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp, String reason) {
+    public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp) {
         super(timestamp);
         this.orderId = orderId;
         this.symbol = symbol;
         this.type = side;
         this.price = price;
         this.quantity = quantity;
-        this.reason = reason;
-    }
-
-    public String getReason() {
-        return reason;
     }
 
     public Side getType() {

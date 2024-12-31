@@ -240,10 +240,10 @@ public class ExcelUtils {
         return style;
     }
 
-    public static void exportWorkbook(Workbook workbook, String startStr, String endStr, String strategyName, String filename) {
+    public static void exportWorkbook(Workbook workbook, String strategyName) {
         try {
             // 确保文件所在的目录存在
-            File file = new File(genWorkbookPath(strategyName, startStr, endStr, filename));
+            File file = new File(genWorkbookPath(strategyName));
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 boolean dirsCreated = parentDir.mkdirs();
@@ -263,10 +263,9 @@ public class ExcelUtils {
         }
     }
 
-    private static String genWorkbookPath(String strategyName, String startStr, String endStr, String filename) {
+    private static String genWorkbookPath(String strategyName) {
         String timeWithoutDate = DateUtils.getDateTimeForExport(System.currentTimeMillis(), ZoneOffset.ofHours(8));
-        String timeRange = startStr + "-" + endStr;
-        String fullName = strategyName + "-" + filename + ".xlsx";
-        return joiner.join("alpha/export", timeWithoutDate, timeRange, fullName);
+        String fullName = strategyName + ".xlsx";
+        return joiner.join("alpha/export", timeWithoutDate, fullName);
     }
 }

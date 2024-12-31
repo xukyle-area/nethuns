@@ -15,14 +15,13 @@ import static com.gantenx.nethuns.commons.constant.Constants.joiner;
 
 public class ExportUtils {
 
-    public static void saveJFreeChartAsImage(JFreeChart chart, String startStr, String endStr,
-                                             String strategyName, String filePrefix) {
+    public static void saveJFreeChartAsImage(JFreeChart chart, String strategyName) {
         if (chart == null) {
-            throw new IllegalArgumentException("Chart cannot be null");
+            return;
         }
 
         try {
-            Path filePath = Paths.get(genChartPath(strategyName, startStr, endStr, filePrefix));
+            Path filePath = Paths.get(genChartPath(strategyName));
             Files.createDirectories(filePath.getParent());
             BufferedImage image = chart.createBufferedImage(3600, 1200);
             if (image == null) {
@@ -35,10 +34,10 @@ public class ExportUtils {
             throw new RuntimeException("Unexpected error while saving chart: " + e.getMessage(), e);
         }
     }
-    private static String genChartPath(String strategyName, String startStr, String endStr, String filename) {
+
+    private static String genChartPath(String strategyName) {
         String timeWithoutDate = DateUtils.getDateTimeForExport(System.currentTimeMillis(), ZoneOffset.ofHours(8));
-        String timeRange = startStr + "-" + endStr;
-        String fullName = strategyName + "-" + filename + ".png";
-        return joiner.join("alpha/export", timeWithoutDate, timeRange, fullName);
+        String fullName = strategyName + ".png";
+        return joiner.join("alpha/export", timeWithoutDate, fullName);
     }
 }

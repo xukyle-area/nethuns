@@ -1,8 +1,9 @@
-package com.gantenx.nethuns.indicator;
+package com.gantenx.nethuns.calculator;
 
 
 import com.gantenx.nethuns.commons.model.Kline;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.TreeMap;
 import static com.gantenx.nethuns.commons.constant.Constants.RSI_PERIOD;
 
 
-public class RsiIndicator {
+@Slf4j
+public class RsiCalculator {
 
     public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap) {
         Map<Long, Double> rsiMap = new TreeMap<>();
@@ -69,7 +71,6 @@ public class RsiIndicator {
 
             // 确保RSI在0-100范围内
             rsi = Math.min(100, Math.max(0, rsi));
-
             rsiMap.put(timestamps.get(i + 1), rsi);
         }
 

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultProfitCalculator {
+public class ProfitCalculator {
     public static List<ProfitRate> calculator(List<Long> timestampList, Map<Symbol, Map<Long, Kline>> klineMap) {
         long start = timestampList.get(0);
         long end = timestampList.get(timestampList.size() - 1);

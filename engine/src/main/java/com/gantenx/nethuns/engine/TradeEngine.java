@@ -107,9 +107,8 @@ public class TradeEngine {
      *
      * @param symbol     标的
      * @param proportion 占有现在仓位的比例
-     * @param reason     原因
      */
-    public void sell(Symbol symbol, Proportion proportion, String reason) {
+    public void sell(Symbol symbol, Proportion proportion) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             return;
@@ -122,7 +121,7 @@ public class TradeEngine {
             return;
         }
 
-        this.sell(symbol, sellQuantity, reason);
+        this.sell(symbol, sellQuantity);
     }
 
     /**
@@ -130,9 +129,8 @@ public class TradeEngine {
      *
      * @param symbol 标的
      * @param amount 成交额
-     * @param reason 原因
      */
-    public void sellAmount(Symbol symbol, double amount, String reason) {
+    public void sellAmount(Symbol symbol, double amount) {
         List<Position> positionList = positions.get(symbol);
         if (positionList == null || positionList.isEmpty()) {
             return;
@@ -140,15 +138,15 @@ public class TradeEngine {
         double price = this.getPrice(symbol);
         double sellQuantity = amount / price;
 
-        this.sell(symbol, sellQuantity, reason);
+        this.sell(symbol, sellQuantity);
     }
 
-    public void buyAmount(Symbol symbol, double amount, String reason) {
+    public void buyAmount(Symbol symbol, double amount) {
         if (this.balance < amount) {
             amount = this.balance;
         }
         double maxQuantity = this.getMaxQuantity(symbol, amount);
-        this.buy(symbol, maxQuantity, reason);
+        this.buy(symbol, maxQuantity);
     }
 
     public double getQuantity(Symbol symbol) {
@@ -184,7 +182,7 @@ public class TradeEngine {
      */
     public TradeDetail exit() {
         for (Symbol Symbol : klineMap.keySet()) {
-            this.sell(Symbol, Proportion.PROPORTION_OF_100, "Time up, sell all");
+            this.sell(Symbol, Proportion.PROPORTION_OF_100);
         }
         TradeDetail tradeDetail = new TradeDetail();
         tradeDetail.setBalance(balance);
@@ -209,9 +207,8 @@ public class TradeEngine {
      *
      * @param symbol   币对
      * @param quantity 数量
-     * @param reason   买入原因
      */
-    private void buy(Symbol symbol, double quantity, String reason) {
+    private void buy(Symbol symbol, double quantity) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
@@ -225,11 +222,11 @@ public class TradeEngine {
             long orderId = generateOrderId();
             positionList.add(new Position(symbol, orderId, price, quantity, timestamp));
             positions.put(symbol, positionList);
-            orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp, reason));
+            orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp));
         }
     }
 
-    public void sell(Symbol symbol, double quantity, String reason) {
+    public void sell(Symbol symbol, double quantity) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
@@ -266,7 +263,7 @@ public class TradeEngine {
             }
         }
         balance += totalRevenue;
-        orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));
+        orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp));
     }
 
     private TradeRecord buildTradeRecord(Position position, double revenue, double sellQuantity) {

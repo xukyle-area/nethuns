@@ -1,8 +1,8 @@
-package com.gantenx.nethuns.indicator;
+package com.gantenx.nethuns.calculator;
 
 import com.gantenx.nethuns.commons.constant.Index;
 import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.indicator.model.MacdDetail;
+import com.gantenx.nethuns.calculator.model.MacdDetail;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 
 import java.awt.*;

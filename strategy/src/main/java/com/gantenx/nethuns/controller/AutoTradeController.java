@@ -27,15 +27,15 @@ public class AutoTradeController {
         return "hello";
     }
 
-    @GetMapping("/kline")
-    public Map<Long, Kline> kline(@RequestParam("base") Currency base,
-                                  @RequestParam("quote") Currency quote,
-                                  @RequestParam("start") String startStr,
-                                  @RequestParam("end") String endStr) {
-        Symbol symbol = Symbol.toSymbol(base, quote);
-        return KlineService.getKLineMap(symbol,
-                                        D_1,
-                                        DateUtils.getTimestamp(startStr),
-                                        DateUtils.getTimestamp(endStr));
-    }
+//    @GetMapping("/kline")
+//    public Map<Long, Kline> kline(@RequestParam("base") Currency base,
+//                                  @RequestParam("quote") Currency quote,
+//                                  @RequestParam("start") String startStr,
+//                                  @RequestParam("end") String endStr) {
+//        Symbol symbol = Symbol.toSymbol(base, quote);
+//        return KlineService.getKLineMap(symbol,
+//                                        D_1,
+//                                        DateUtils.getTimestamp(startStr),
+//                                        DateUtils.getTimestamp(endStr));
+//    }
 }
