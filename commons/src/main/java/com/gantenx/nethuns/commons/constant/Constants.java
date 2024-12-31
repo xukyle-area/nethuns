@@ -12,7 +12,6 @@ public class Constants {
     private static final float LINE_STROKE_WIDTH = 2.0f;
     public static final BasicStroke BASE_STROKE = new BasicStroke(LINE_STROKE_WIDTH);
     public static final String TITLE = "Trading Chart";
-    public static final Symbol CRYPTO_TRADING = ETHUSDT;
     public static final String BINANCE_URL = "https://data-api.binance.vision";
     public static final String TIME = "Time";
     public static final String CANDLE = "Candle";
@@ -23,7 +22,6 @@ public class Constants {
     public static final String TRADE_DETAIL = "trade-detail";
     public static final String ORDER_LIST = "order-list";
     public static final String RECORD_LIST = "record-list";
-    public static final String PROFIT_LIST = "profit-list";
     public static final String LONG_HOLDING_PROFIT_RATE = "long-holding-profit-rate";
     public static final String RESULT = "result";
     public static final String LINES = "lines";

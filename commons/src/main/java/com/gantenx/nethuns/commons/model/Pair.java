@@ -58,12 +58,10 @@ public class Pair<K, V> {
                     }
                 }
 
-                var10000 = false;
-                return var10000;
+                return false;
             }
 
-            var10000 = true;
-            return var10000;
+            return true;
         }
     }
 
@@ -79,6 +77,6 @@ public class Pair<K, V> {
     }
 
     public static <K, V> Pair<K, V> create(K k, V v) {
-        return new Pair(k, v);
+        return new Pair<>(k, v);
     }
 }

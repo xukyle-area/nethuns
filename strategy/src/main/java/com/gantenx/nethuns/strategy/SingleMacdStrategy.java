@@ -1,7 +1,6 @@
 package com.gantenx.nethuns.strategy;
 
 import com.gantenx.nethuns.commons.constant.Period;
-import com.gantenx.nethuns.commons.constant.Proportion;
 import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.commons.model.Kline;
@@ -64,12 +63,6 @@ public class SingleMacdStrategy extends SingleStrategy {
         }
     }
 
-    public boolean isBuy(Color prevColor, Color yesterdayColor) {
-        if (prevColor.equals(Color.GREEN.darker()) && yesterdayColor.equals(Color.GREEN.brighter())) {
-            return true;
-        }
-        return false;
-    }
 
     public boolean isSell(Color prevColor, Color yesterdayColor) {
         if (prevColor.equals(Color.RED) && yesterdayColor.equals(Color.PINK)) {

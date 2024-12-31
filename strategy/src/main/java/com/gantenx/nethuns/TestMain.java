@@ -7,7 +7,6 @@ import com.gantenx.nethuns.strategy.SingleMacdStrategy;
 import com.gantenx.nethuns.strategy.template.BaseStrategy;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.gantenx.nethuns.commons.constant.Period.M_15;
 import static com.gantenx.nethuns.commons.constant.Period.M_30;
 import static com.gantenx.nethuns.commons.constant.Symbol.ETHUSDT;
 
