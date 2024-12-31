@@ -1,9 +1,8 @@
-package com.gantenx.nethuns.calculator;
+package com.gantenx.nethuns.indicator;
 
 
 import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.calculator.base.AbstractIndicator;
-import com.gantenx.nethuns.engine.chart.Chart;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 import org.jfree.chart.JFreeChart;
 
 import java.util.HashMap;

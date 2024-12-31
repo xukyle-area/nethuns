@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.calculator;
+package com.gantenx.nethuns.indicator;
 
 
 import com.gantenx.nethuns.commons.model.Kline;

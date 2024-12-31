@@ -1,6 +1,6 @@
 package com.gantenx.nethuns.strategies;
 
-import com.gantenx.nethuns.calculator.RsiIndicator;
+import com.gantenx.nethuns.indicator.RsiIndicator;
 import com.gantenx.nethuns.commons.constant.Period;
 import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.commons.model.Kline;

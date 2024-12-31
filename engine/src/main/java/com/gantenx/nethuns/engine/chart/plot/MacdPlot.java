@@ -1,7 +1,7 @@
 package com.gantenx.nethuns.engine.chart.plot;
 
 
-import com.gantenx.nethuns.calculator.model.MacdDetail;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;

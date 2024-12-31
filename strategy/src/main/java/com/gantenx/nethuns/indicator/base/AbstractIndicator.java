@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.calculator.base;
+package com.gantenx.nethuns.indicator.base;
 
 import com.gantenx.nethuns.commons.model.Kline;
 import lombok.extern.slf4j.Slf4j;

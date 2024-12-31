@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.calculator.model;
+package com.gantenx.nethuns.indicator.model;
 
 import lombok.Data;
 

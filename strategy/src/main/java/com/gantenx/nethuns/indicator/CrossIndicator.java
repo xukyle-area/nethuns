@@ -1,7 +1,7 @@
-package com.gantenx.nethuns.calculator;
+package com.gantenx.nethuns.indicator;
 
-import com.gantenx.nethuns.calculator.base.AbstractIndicator;
-import com.gantenx.nethuns.calculator.base.Indicator;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
+import com.gantenx.nethuns.indicator.base.Indicator;
 import org.jfree.chart.JFreeChart;
 
 import java.util.HashMap;
@@ -17,12 +17,6 @@ public class CrossIndicator extends AbstractIndicator<Boolean> {
         this.low = low;
         this.up = up;
         super.resultMap = this.calculate();
-    }
-
-    public CrossIndicator(Indicator<Double> up, Double low) {
-        super(up.getKlineMap());
-        this.up = up;
-        this.low = new ConstantIndicator<>(up.getKlineMap(), low);
     }
 
     /**
@@ -48,7 +42,7 @@ public class CrossIndicator extends AbstractIndicator<Boolean> {
             }
 
             // 当前差值
-            Double delta = upValue - lowValue;
+            double delta = upValue - lowValue;
 
             if (delta > 0) {
                 // 上轨大于下轨，无交叉

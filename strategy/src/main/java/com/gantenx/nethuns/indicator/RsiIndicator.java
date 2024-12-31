@@ -1,6 +1,6 @@
-package com.gantenx.nethuns.calculator;
+package com.gantenx.nethuns.indicator;
 
-import com.gantenx.nethuns.calculator.base.AbstractIndicator;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.model.Kline;
 import com.gantenx.nethuns.engine.chart.Chart;

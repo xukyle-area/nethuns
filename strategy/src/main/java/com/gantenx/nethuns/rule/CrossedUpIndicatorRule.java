@@ -1,8 +1,8 @@
 package com.gantenx.nethuns.rule;
 
-import com.gantenx.nethuns.calculator.ConstantIndicator;
-import com.gantenx.nethuns.calculator.CrossIndicator;
-import com.gantenx.nethuns.calculator.base.Indicator;
+import com.gantenx.nethuns.indicator.ConstantIndicator;
+import com.gantenx.nethuns.indicator.CrossIndicator;
+import com.gantenx.nethuns.indicator.base.Indicator;
 import com.gantenx.nethuns.rule.base.AbstractRule;
 
 import java.util.Objects;
