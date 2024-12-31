@@ -17,7 +17,7 @@ public class KlineConverter {
         List<Kline> resultList = new ArrayList<>();
 
         // 遍历时间戳区间
-        for (long timestamp = start; timestamp <= end; timestamp += Period.ONE_DAY.getMillisecond()) {
+        for (long timestamp = start; timestamp <= end; timestamp += Period.D_1.getMillisecond()) {
             Kline baseKline = baseMap.get(timestamp);  // A/USD Kline
             Kline quoteKline = quoteMap.get(timestamp); // B/USD Kline
 

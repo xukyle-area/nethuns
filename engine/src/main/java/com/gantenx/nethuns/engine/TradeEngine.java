@@ -184,7 +184,7 @@ public class TradeEngine {
      */
     public TradeDetail exit() {
         for (Symbol Symbol : klineMap.keySet()) {
-            this.sell(Symbol, 100, "Time up, sell all");
+            this.sell(Symbol, Proportion.PROPORTION_OF_100, "Time up, sell all");
         }
         TradeDetail tradeDetail = new TradeDetail();
         tradeDetail.setBalance(balance);
@@ -258,8 +258,12 @@ public class TradeEngine {
             TradeRecord record = this.buildTradeRecord(position, revenue, sellQuantity);
             records.add(record);
 
-            position.setQuantity(position.getQuantity() - sellQuantity);
+            double newQuantity = position.getQuantity() - sellQuantity;
+            position.setQuantity(newQuantity);
             remainingQuantity -= sellQuantity;
+            if (Math.abs(newQuantity) < EPSILON) {
+                iterator.remove();
+            }
         }
         balance += totalRevenue;
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp, reason));

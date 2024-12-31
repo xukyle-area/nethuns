@@ -109,7 +109,7 @@ public class Position {
         for (Position position : positionList) {
             if (position.getQuantity() > 0 && position.getTimestamp() <= timestamp) {
                 // 将毫秒转换为天
-                double holdingDays = (double) (timestamp - position.getTimestamp()) / (Period.ONE_DAY.getMillisecond());
+                double holdingDays = (double) (timestamp - position.getTimestamp()) / (Period.D_1.getMillisecond());
                 totalDays += holdingDays * position.getQuantity();
                 totalQuantity += position.getQuantity();
             }

@@ -3,9 +3,12 @@ package com.gantenx.nethuns.commons.constant;
 public enum Period {
     // public static final String ONE_DAY = "1d";
     CSV("csv", 1000L * 3600 * 24),
-    ONE_DAY("1d", 1000L * 3600 * 24),
-    FOUR_HOURS("4h", 1000L * 3600 * 4),
-    ONE_HOURS("1h", 1000L * 3600);
+    D_1("1d", 1000L * 3600 * 24),
+    H_4("4h", 1000L * 3600 * 4),
+    H_1("1h", 1000L * 3600),
+    M_1("1m", 1000L * 60),
+    M_15("15m", 1000L * 60 * 15),
+    M_30("30m", 1000L * 60 * 30);
     private final String desc;
     private final long millisecond;
 

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-import static com.gantenx.nethuns.commons.constant.Period.ONE_DAY;
+import static com.gantenx.nethuns.commons.constant.Period.D_1;
 
 
 @Slf4j
@@ -34,7 +34,7 @@ public class AutoTradeController {
                                   @RequestParam("end") String endStr) {
         Symbol symbol = Symbol.toSymbol(base, quote);
         return KlineService.getKLineMap(symbol,
-                                        ONE_DAY,
+                                        D_1,
                                         DateUtils.getTimestamp(startStr),
                                         DateUtils.getTimestamp(endStr));
     }

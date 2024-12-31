@@ -2,10 +2,13 @@ package com.gantenx.nethuns.utils;
 
 import com.gantenx.nethuns.commons.constant.Period;
 import com.gantenx.nethuns.commons.utils.CsvUtils;
+import com.gantenx.nethuns.commons.utils.DateUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class TimeUtils {
     public static List<Long> genTimeList(Period period, long startTimestamp, long endTimestamp) {
         startTimestamp = startTimestamp - startTimestamp % period.getMillisecond();
@@ -13,9 +16,14 @@ public class TimeUtils {
             return CsvUtils.getOpenDayList(startTimestamp, endTimestamp);
         }
         List<Long> list = new ArrayList<>();
-        for (long i = startTimestamp; i <= endTimestamp; i += period.getMillisecond()) {
+        int count = 0;
+        long end = 0L;
+        for (long i = startTimestamp; i <= endTimestamp && count < 1000; i += period.getMillisecond()) {
             list.add(i);
+            end = i;
+            count++;
         }
+        log.info("Time range: from {} to {}", DateUtils.getDateTime(startTimestamp), DateUtils.getDateTime(end));
         return list;
     }
 }
