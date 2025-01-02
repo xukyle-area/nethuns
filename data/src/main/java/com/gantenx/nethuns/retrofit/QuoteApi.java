@@ -1,5 +1,6 @@
 package com.gantenx.nethuns.retrofit;
 
+import com.gantenx.nethuns.converter.OrderListResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -24,6 +25,8 @@ public interface QuoteApi {
             @Query("interval") String interval,
             @Query("startTime") Long startTime,
             @Query("endTime") Long endTime,
-            @Query("limit") Integer limit
-    );
+            @Query("limit") Integer limit);
+
+    @GET("/api/v3/allOrderList")
+    Call<List<OrderListResponse>> getOrders();
 }

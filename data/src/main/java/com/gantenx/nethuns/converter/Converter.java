@@ -5,10 +5,10 @@ import com.gantenx.nethuns.commons.model.Kline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataConverter {
+public class Converter {
 
     // 将 K 线数据转换为 KlineModel 对象
-    public static List<Kline> convertToKlineModels(List<List<Object>> klinesData) {
+    public static List<Kline> kline(List<List<Object>> klinesData) {
         List<Kline> klines = new ArrayList<>();
         for (List<Object> kline : klinesData) {
             Kline model = new Kline((long) ((double) kline.get(0)));
@@ -20,5 +20,9 @@ public class DataConverter {
             klines.add(model);
         }
         return klines;
+    }
+
+    public static <T> T nonOperation(T t) {
+        return t;
     }
 }
