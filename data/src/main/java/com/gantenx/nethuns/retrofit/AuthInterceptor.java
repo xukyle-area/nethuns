@@ -33,6 +33,8 @@ public class AuthInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Invocation invocation = request.tag(Invocation.class);
+
+        // If no AuthRequired annotation or method is not marked, proceed without modifying
         if (invocation == null || !invocation.method().isAnnotationPresent(AuthRequired.class)) {
             return chain.proceed(request);
         }
@@ -42,25 +44,43 @@ public class AuthInterceptor implements Interceptor {
         HttpUrl requestUrl = request.url();
         RequestBody body = request.body();
 
-        Request.Builder builder = request.newBuilder().header(CONTENT_TYPE, APPLICATION_JSON)
+        Request.Builder builder = request.newBuilder()
+                .header(CONTENT_TYPE, APPLICATION_JSON)
                 .header(X_MBX_APIKEY, apiKey);
 
-        if (method.equalsIgnoreCase(GET)) {
-            String signature = signatureGenerator.getSignature(requestUrl.query(), timestamp);
-            HttpUrl httpUrl = requestUrl.newBuilder().addQueryParameter(TIMESTAMP, String.valueOf(timestamp))
-                    .addQueryParameter(SIGNATURE, signature).build();
-            builder.url(httpUrl);
-        } else if (method.equalsIgnoreCase(POST)) {
-            Buffer buffer = new Buffer();
-            assert body != null;
-            body.writeTo(buffer);
-            String requestBody = buffer.readUtf8();
-            String signature = signatureGenerator.getSignature(requestBody, timestamp);
-            HttpUrl httpUrl = requestUrl.newBuilder().addQueryParameter(TIMESTAMP, String.valueOf(timestamp))
-                    .addQueryParameter(SIGNATURE, signature).build();
-            builder.url(httpUrl);
-        }
+        // Generate signature based on request method (GET or POST)
+        String signature = this.generateSignature(method, requestUrl, body, timestamp);
+
+        // Build the URL with the timestamp and signature query parameters
+        HttpUrl httpUrl = this.buildUrlWithParams(requestUrl, timestamp, signature);
+        builder.url(httpUrl);
 
         return chain.proceed(builder.build());
+    }
+
+    private String generateSignature(String method,
+                                     HttpUrl requestUrl,
+                                     RequestBody body,
+                                     long timestamp) throws IOException {
+        if (method.equalsIgnoreCase(GET)) {
+            // For GET requests, use the query part of the URL to generate the signature
+            return signatureGenerator.getSignature(requestUrl.query(), timestamp);
+        } else if (method.equalsIgnoreCase(POST) && body != null) {
+            // For POST requests, read the body and generate the signature
+            Buffer buffer = new Buffer();
+            body.writeTo(buffer);
+            String requestBody = buffer.readUtf8();
+            return signatureGenerator.getSignature(requestBody, timestamp);
+        } else {
+            throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+        }
+    }
+
+    private HttpUrl buildUrlWithParams(HttpUrl originalUrl, long timestamp, String signature) {
+        // Add the timestamp and signature as query parameters to the URL
+        return originalUrl.newBuilder()
+                .addQueryParameter(TIMESTAMP, String.valueOf(timestamp))
+                .addQueryParameter(SIGNATURE, signature)
+                .build();
     }
 }

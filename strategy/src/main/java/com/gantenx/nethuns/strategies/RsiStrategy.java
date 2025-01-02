@@ -42,8 +42,10 @@ public class RsiStrategy {
 //        AccountInfo accountInfo = BinanceService.getAccountInfo();
 //        log.info("{}", JsonUtils.toJson(accountInfo));
 
-
+//        AccountInfo accountInfo = BinanceService.getAccountInfo();
+//        log.info("{}", JsonUtils.toJson(accountInfo));
         OrderResponse orderResponse = BinanceService.orderTest();
         log.info("{}", JsonUtils.toJson(orderResponse));
+
     }
 }
