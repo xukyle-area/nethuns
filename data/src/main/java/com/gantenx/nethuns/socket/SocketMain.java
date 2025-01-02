@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SocketMain {
 
     public static void main(String[] args) {
-        SocketTask socketTask = new SocketTask();
-        socketTask.scheduleConnect();
+        SocketTask.startSocketJob();
     }
 }

@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.binance;
+package com.gantenx.nethuns.socket.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -18,29 +18,37 @@ public abstract class SocketClient extends WebSocketClient {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public SocketClient(String serverUri, ApiCallback callback) throws URISyntaxException {
-        super(new URI(serverUri));
+    public SocketClient(String serverUri, ApiCallback callback) {
+        super(SocketClient.getURI(serverUri));
         this.callback = callback;
     }
 
     @Override
     public void onOpen(ServerHandshake data) {
-        log.info("WebSocket 连接已打开!");
+        log.info("WebSocket connection opened!");
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
         log.info("Connection closed by {}, Code: {}, Reason: {}", (remote ? "remote peer" : "us"), code, reason);
-        log.info("WebSocket连接已关闭, 准备重新连接...");
+        log.info("WebSocket connection closed, preparing to reconnect...");
     }
 
     @Override
     public void onError(Exception ex) {
-        log.error("WebSocket连接发生错误...", ex);
+        log.error("Error occurred in WebSocket connection...", ex);
     }
 
     @Override
     public void onMessage(String message) {
         this.callback.onResponse(message);
+    }
+
+    public static URI getURI(String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URI syntax exception, URI: " + uri);
+        }
     }
 }

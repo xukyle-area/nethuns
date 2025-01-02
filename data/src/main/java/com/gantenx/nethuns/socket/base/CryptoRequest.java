@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.cryptocom;
+package com.gantenx.nethuns.socket.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

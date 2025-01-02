@@ -1,18 +1,14 @@
-package com.gantenx.nethuns.socket.cryptocom;
+package com.gantenx.nethuns.socket.base;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gantenx.nethuns.socket.base.SocketClient;
-import com.gantenx.nethuns.socket.base.ApiCallback;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.URISyntaxException;
 
 @Slf4j
 public class CryptoSocketClient extends SocketClient {
 
     private final static String CRYPTO_URL = "wss://stream.crypto.com/v2/market";
 
-    public CryptoSocketClient(ApiCallback callback) throws URISyntaxException {
+    public CryptoSocketClient(ApiCallback callback) {
         super(CRYPTO_URL, callback);
     }
 

@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.binance;
+package com.gantenx.nethuns.socket.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
