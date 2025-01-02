@@ -1,10 +1,10 @@
 package com.gantenx.nethuns.retrofit;
 
 
+import org.apache.commons.codec.binary.Hex;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Hex;
 
 
 public final class HmacSignatureGenerator implements SignatureGenerator {
@@ -16,7 +16,10 @@ public final class HmacSignatureGenerator implements SignatureGenerator {
         this.apiSecret = apiSecret;
     }
 
-    public String getSignature(String data) {
+    /**
+     * @param data 格式为 a=b&c=d&e=f&g=h
+     */
+    public String getSignature(String data, long timestamp) {
         byte[] hmacSha256;
         try {
             SecretKeySpec secretKeySpec = new SecretKeySpec(apiSecret.getBytes(), HMAC_SHA256);
