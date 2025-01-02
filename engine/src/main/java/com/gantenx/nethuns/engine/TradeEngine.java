@@ -7,8 +7,8 @@ import com.gantenx.nethuns.engine.model.Order;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.engine.model.Position;
-import com.gantenx.nethuns.engine.model.TradeDetail;
 import com.gantenx.nethuns.engine.model.TradeRecord;
+import com.gantenx.nethuns.engine.model.Trade;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class TradeEngine {
     /**
      * 买入和卖出之间的对应记录
      */
-    private final List<TradeRecord> records = new ArrayList<>();
+    private final List<Trade> records = new ArrayList<>();
     /**
      * 开放交易的时间戳列表
      */
@@ -141,10 +141,8 @@ public class TradeEngine {
         this.sell(symbol, sellQuantity);
     }
 
-    public void buyAmount(Symbol symbol, double amount) {
-        if (this.balance < amount) {
-            amount = this.balance;
-        }
+    public void buy(Symbol symbol, Proportion proportion) {
+        double amount = this.balance * proportion.getValue() / 100;
         double maxQuantity = this.getMaxQuantity(symbol, amount);
         this.buy(symbol, maxQuantity);
     }
@@ -180,17 +178,17 @@ public class TradeEngine {
     /**
      * 结束交易，卖出所有持仓，记录结果并导出
      */
-    public TradeDetail exit() {
+    public TradeRecord exit() {
         for (Symbol Symbol : klineMap.keySet()) {
             this.sell(Symbol, Proportion.PROPORTION_OF_100);
         }
-        TradeDetail tradeDetail = new TradeDetail();
-        tradeDetail.setBalance(balance);
-        tradeDetail.setOrders(orders);
-        tradeDetail.setInitialBalance(INITIAL_BALANCE);
-        tradeDetail.setFeeCount(feeCount);
-        tradeDetail.setRecords(records);
-        return tradeDetail;
+        TradeRecord tradeRecord = new TradeRecord();
+        tradeRecord.setBalance(balance);
+        tradeRecord.setOrders(orders);
+        tradeRecord.setInitialBalance(INITIAL_BALANCE);
+        tradeRecord.setFeeCount(feeCount);
+        tradeRecord.setRecords(records);
+        return tradeRecord;
     }
 
     public double getPrice(Symbol symbol) {
@@ -208,7 +206,7 @@ public class TradeEngine {
      * @param symbol   币对
      * @param quantity 数量
      */
-    private void buy(Symbol symbol, double quantity) {
+    public void buy(Symbol symbol, double quantity) {
         double price = this.getPrice(symbol);
         if (quantity <= 0 || price <= 0) {
             return;
@@ -252,7 +250,7 @@ public class TradeEngine {
 
             double revenue = this.calculateRevenue(symbol, sellQuantity);
             totalRevenue += revenue;
-            TradeRecord record = this.buildTradeRecord(position, revenue, sellQuantity);
+            Trade record = this.buildTradeRecord(position, revenue, sellQuantity);
             records.add(record);
 
             double newQuantity = position.getQuantity() - sellQuantity;
@@ -266,13 +264,13 @@ public class TradeEngine {
         orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp));
     }
 
-    private TradeRecord buildTradeRecord(Position position, double revenue, double sellQuantity) {
+    private Trade buildTradeRecord(Position position, double revenue, double sellQuantity) {
         Symbol symbol = position.getSymbol();
         double price = this.getPrice(symbol);
 
         double buyPrice = position.getPrice();
         double profit = revenue - buyPrice * sellQuantity;
-        TradeRecord record = new TradeRecord();
+        Trade record = new Trade();
         record.setId(generateRecordId());
         record.setBuyOrderId(position.getOrderId());
         record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));

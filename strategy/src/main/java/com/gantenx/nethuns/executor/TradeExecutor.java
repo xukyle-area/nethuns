@@ -9,7 +9,7 @@ import com.gantenx.nethuns.engine.TradeEngine;
 import com.gantenx.nethuns.engine.chart.Chart;
 import com.gantenx.nethuns.engine.chart.ExportUtils;
 import com.gantenx.nethuns.engine.chart.plot.CandlePlot;
-import com.gantenx.nethuns.engine.model.TradeDetail;
+import com.gantenx.nethuns.engine.model.TradeRecord;
 import com.gantenx.nethuns.rule.base.Rule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 import static com.gantenx.nethuns.commons.constant.Constants.*;
 
 @Slf4j
-public class Executor {
+public class TradeExecutor {
     protected final Map<Long, Kline> klineMap;
     protected final List<Long> timeList;
     protected final TradeEngine tradeEngine;
     protected final Symbol symbol;
-    protected TradeDetail tradeDetail;
+    protected TradeRecord tradeRecord;
     private final Rule entryRule;
     private final Rule exitRule;
 
-    public Executor(Map<Long, Kline> klineMap, Symbol symbol, Rule entryRule, Rule exitRule) {
+    public TradeExecutor(Map<Long, Kline> klineMap, Symbol symbol, Rule entryRule, Rule exitRule) {
         this.symbol = symbol;
         this.timeList = klineMap.keySet().stream().sorted().collect(Collectors.toList());
         this.tradeEngine = new TradeEngine(timeList, Collections.singletonMap(symbol, klineMap));
@@ -44,20 +44,20 @@ public class Executor {
         while (tradeEngine.hasNext()) {
             long today = tradeEngine.next();
             if (entryRule.isSatisfied(today)) {
-                tradeEngine.buyAmount(symbol, INITIAL_BALANCE / 3);
+                tradeEngine.buy(symbol, Proportion.PROPORTION_OF_100);
             } else if (exitRule.isSatisfied(today)) {
                 tradeEngine.sell(symbol, Proportion.PROPORTION_OF_100);
             }
         }
-        this.tradeDetail = tradeEngine.exit();
+        this.tradeRecord = tradeEngine.exit();
     }
 
     void export() {
         UUID uuid = UUID.randomUUID();
         String uid = uuid.toString().substring(0, 16);
-        Workbook workbook = ExcelUtils.singleSheet(Collections.singletonList(this.tradeDetail), TRADE_DETAIL);
-        ExcelUtils.addDataToNewSheet(workbook, this.tradeDetail.getOrders(), ORDER_LIST);
-        ExcelUtils.addDataToNewSheet(workbook, this.tradeDetail.getRecords(), RECORD_LIST);
+        Workbook workbook = ExcelUtils.singleSheet(Collections.singletonList(this.tradeRecord), TRADE_DETAIL);
+        ExcelUtils.addDataToNewSheet(workbook, this.tradeRecord.getOrders(), ORDER_LIST);
+        ExcelUtils.addDataToNewSheet(workbook, this.tradeRecord.getRecords(), RECORD_LIST);
 
         ExcelUtils.exportWorkbook(workbook, uid);
         ExportUtils.saveJFreeChartAsImage(this.getChart(), uid);
@@ -65,10 +65,10 @@ public class Executor {
 
     public JFreeChart getChart() {
         XYPlot main = CandlePlot.create(Series.getSeries(symbol), klineMap);
-        return Chart.get(main, null, tradeDetail.getOrders());
+        return Chart.get(main, null, tradeRecord.getOrders());
     }
 
-    public static <T extends Executor> void processAndExport(T executor) {
+    public static <T extends TradeExecutor> void processAndExport(T executor) {
         executor.process();
         executor.export();
     }

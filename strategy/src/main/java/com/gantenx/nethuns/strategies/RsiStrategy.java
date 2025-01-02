@@ -6,7 +6,7 @@ import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.commons.model.Kline;
 import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.engine.chart.ExportUtils;
-import com.gantenx.nethuns.executor.Executor;
+import com.gantenx.nethuns.executor.TradeExecutor;
 import com.gantenx.nethuns.rule.CrossedDownIndicatorRule;
 import com.gantenx.nethuns.rule.CrossedUpIndicatorRule;
 import com.gantenx.nethuns.service.KlineService;
@@ -28,8 +28,8 @@ public class RsiStrategy {
         // 跌破 30
         CrossedDownIndicatorRule buyRule = new CrossedDownIndicatorRule(rsiIndicator, 30.0d);
         // 涨破 70
-        CrossedUpIndicatorRule sellRule = new CrossedUpIndicatorRule(rsiIndicator, 30.0d);
-        Executor executor = new Executor(klineMap, symbol, buyRule, sellRule);
-        Executor.processAndExport(executor);
+        CrossedUpIndicatorRule sellRule = new CrossedUpIndicatorRule(rsiIndicator, 70.0d);
+        TradeExecutor tradeExecutor = new TradeExecutor(klineMap, symbol, buyRule, sellRule);
+        TradeExecutor.processAndExport(tradeExecutor);
     }
 }
