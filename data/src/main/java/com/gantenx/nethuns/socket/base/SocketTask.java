@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class SocketTask {
     private static final int SUBSCRIPTION_INITIAL_DELAY = 5;
     private static final int SUBSCRIPTION_FIXED_DELAY = 30;
 
-    private final ApiCallback callback;
+    private final Consumer<String> callback;
     private final Set<Symbol> symbols;
     private final String url;
 
@@ -24,7 +25,7 @@ public class SocketTask {
     private SocketClient curClient = null;
 
     private SocketTask(String url,
-                       ApiCallback callback,
+                       Consumer<String> callback,
                        Set<Symbol> symbols,
                        Function<Set<Symbol>, String> subscribeBuilder) {
         this.url = url;
@@ -63,7 +64,7 @@ public class SocketTask {
     }
 
     public static void startSocketJob(String url,
-                                      ApiCallback callback,
+                                      Consumer<String> callback,
                                       Set<Symbol> symbols,
                                       Function<Set<Symbol>, String> function) {
         SocketTask socketTask = new SocketTask(url, callback, symbols, function);

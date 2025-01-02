@@ -1,24 +1,19 @@
 package com.gantenx.nethuns.socket.base;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
 @Slf4j
 public class SocketClient extends WebSocketClient {
 
-    protected static final ObjectMapper objectMapper = new ObjectMapper();
-    protected final ApiCallback callback;
-    static {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+    private final Consumer<String> callback;
 
-    public SocketClient(String serverUri, ApiCallback callback) {
+    public SocketClient(String serverUri, Consumer<String> callback) {
         super(SocketClient.getURI(serverUri));
         this.callback = callback;
     }
@@ -41,9 +36,12 @@ public class SocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        this.callback.onResponse(message);
+        this.callback.accept(message);
     }
 
+    /**
+     * build object of URI
+     */
     public static URI getURI(String uri) {
         try {
             return new URI(uri);

@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.model;
+package com.gantenx.nethuns.socket.binance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,11 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class BinanceEvent {
+public class Event<T> {
 
     private String stream;
 
     @JsonProperty("data")
-    private BinanceTicker data;
-
+    private T data;
 }
