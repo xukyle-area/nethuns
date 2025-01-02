@@ -20,27 +20,27 @@ public class SocketTask {
     private final Set<Symbol> symbols;
     private final String url;
 
-    private final Function<Set<Symbol>, String> subscribeBuilder;
+    private final Function<Set<Symbol>, String> subscriber;
 
     private SocketClient curClient = null;
 
     private SocketTask(String url,
                        Consumer<String> callback,
                        Set<Symbol> symbols,
-                       Function<Set<Symbol>, String> subscribeBuilder) {
+                       Function<Set<Symbol>, String> subscriber) {
         this.url = url;
         this.callback = callback;
         this.symbols = symbols;
-        this.subscribeBuilder = subscribeBuilder;
+        this.subscriber = subscriber;
     }
 
     private void subscribe() {
         if (Objects.nonNull(curClient) && curClient.isOpen()) {
-            curClient.send(subscribeBuilder.apply(this.symbols));
+            curClient.send(subscriber.apply(this.symbols));
         }
     }
 
-    private synchronized void checkAndReconnect() {
+    private synchronized void check() {
         if (Objects.nonNull(curClient) && curClient.isOpen()) {
             return;
         }
@@ -53,7 +53,7 @@ public class SocketTask {
     }
 
     private void scheduleConnect() {
-        SocketThreadPool.scheduleWithFixedDelay(this::checkAndReconnect,
+        SocketThreadPool.scheduleWithFixedDelay(this::check,
                                                 CHECK_INITIAL_DELAY,
                                                 CHECK_FIXED_DELAY,
                                                 TimeUnit.SECONDS);

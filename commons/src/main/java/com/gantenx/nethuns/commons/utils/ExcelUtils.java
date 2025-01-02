@@ -1,11 +1,5 @@
 package com.gantenx.nethuns.commons.utils;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gantenx.nethuns.commons.annotation.ExcelColumn;
 import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.*;
@@ -15,9 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -26,53 +17,6 @@ import java.util.*;
 import static com.gantenx.nethuns.commons.constant.Constants.joiner;
 
 public class ExcelUtils {
-
-    private static final ObjectMapper objectMapper = configureObjectMapper();
-
-    private static ObjectMapper configureObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.registerModule(new JavaTimeModule());
-        SimpleModule module = new SimpleModule();
-
-        // 配置Double序列化，保留3位小数
-        module.addSerializer(Double.class, new JsonSerializer<Double>() {
-            @Override
-            public void serialize(Double value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                if (value != null) {
-                    gen.writeNumber(new BigDecimal(value).setScale(3, RoundingMode.HALF_UP));
-                }
-            }
-        });
-
-        // 配置枚举序列化，使用name()
-        module.setSerializerModifier(new BeanSerializerModifier() {
-            @Override
-            public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config,
-                                                          JavaType valueType,
-                                                          BeanDescription beanDesc,
-                                                          JsonSerializer<?> serializer) {
-                return new JsonSerializer<Enum<?>>() {
-                    @Override
-                    public void serialize(Enum<?> value,
-                                          JsonGenerator gen,
-                                          SerializerProvider serializers) throws IOException {
-                        if (value != null) {
-                            gen.writeString(value.name());
-                        }
-                    }
-                };
-            }
-        });
-
-        mapper.registerModule(module);
-
-        return mapper;
-    }
-
 
     /**
      * 生成一个包含一个 sheet 的工作簿
@@ -158,12 +102,8 @@ public class ExcelUtils {
                                 isCollectionOrMap(field.getType()) ||
                                 isCustomObject(field.getType())) {
                             // 使用JSON序列化处理数组、集合、Map和自定义对象
-                            try {
-                                String jsonValue = objectMapper.writeValueAsString(value);
-                                cell.setCellValue(jsonValue);
-                            } catch (JsonProcessingException e) {
-                                cell.setCellValue("Error: Failed to serialize to JSON");
-                            }
+                            String jsonValue = JsonUtils.writeValueAsString(value);
+                            cell.setCellValue(jsonValue);
                         } else {
                             cell.setCellValue(value.toString());
                         }

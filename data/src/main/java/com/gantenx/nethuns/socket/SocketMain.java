@@ -15,10 +15,8 @@ public class SocketMain {
     private static final String BINANCE_URL = "wss://stream.binance.com:9443/stream";
     public static void main(String[] args) {
         SocketTask.startSocketJob(BINANCE_URL,
-                                  Callback::tickerCallback,
+                                  Callback::klineCallback,
                                   Collections.singleton(Symbol.BTCUSDT),
-                                  Subscriber::subscribeTicker);
+                                  Subscriber::subscribeKline);
     }
-
-
 }
