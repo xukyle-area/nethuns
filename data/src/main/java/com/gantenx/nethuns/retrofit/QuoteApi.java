@@ -29,4 +29,8 @@ public interface QuoteApi {
 
     @GET("/api/v3/allOrderList")
     Call<List<OrderListResponse>> getOrders();
+
+    @GET("/api/v3/account")
+    Call<AccountInfo> getAccount();
+
 }

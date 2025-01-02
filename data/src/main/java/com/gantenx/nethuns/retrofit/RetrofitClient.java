@@ -12,10 +12,10 @@ public class RetrofitClient {
     private static Retrofit retrofit;
     private static OkHttpClient okHttpClient;
 
-    public static Retrofit getRetrofitInstance(String apiKey, String secretKey) {
+    public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new AuthInterceptor(apiKey, secretKey)).build();
+                    .addInterceptor(new AuthInterceptor()).build();
 
             retrofit = new Retrofit.Builder().baseUrl(BINANCE_URL)
                     .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient)
