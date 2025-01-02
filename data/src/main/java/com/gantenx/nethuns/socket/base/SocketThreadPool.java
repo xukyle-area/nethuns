@@ -1,10 +1,10 @@
-package com.gantenx.nethuns.socket;
+package com.gantenx.nethuns.socket.base;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ScheduledThreadPool {
+public class SocketThreadPool {
     // 私有静态变量，用于保存定时调度线程池实例
     private static final ScheduledExecutorService scheduledExecutor;
     private static final int POOL_SIZE = 3;
@@ -14,7 +14,7 @@ public class ScheduledThreadPool {
     }
 
     // 私有构造函数，防止外部实例化
-    private ScheduledThreadPool() {
+    private SocketThreadPool() {
     }
 
     // 延迟执行任务

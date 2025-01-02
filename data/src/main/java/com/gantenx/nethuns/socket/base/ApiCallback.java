@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket;
+package com.gantenx.nethuns.socket.base;
 
 @FunctionalInterface
 public interface ApiCallback {

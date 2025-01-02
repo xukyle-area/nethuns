@@ -1,20 +1,19 @@
 package com.gantenx.nethuns.socket.cryptocom;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gantenx.nethuns.commons.utils.JsonUtils;
-import com.gantenx.nethuns.socket.AbstractSocketClient;
-import com.gantenx.nethuns.socket.ApiCallback;
+import com.gantenx.nethuns.socket.base.SocketClient;
+import com.gantenx.nethuns.socket.base.ApiCallback;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URISyntaxException;
 
 @Slf4j
-public class CryptoSocketClient extends AbstractSocketClient {
+public class CryptoSocketClient extends SocketClient {
 
     private final static String CRYPTO_URL = "wss://stream.crypto.com/v2/market";
 
-    public CryptoSocketClient() throws URISyntaxException {
-        super(CRYPTO_URL);
+    public CryptoSocketClient(ApiCallback callback) throws URISyntaxException {
+        super(CRYPTO_URL, callback);
     }
 
     @Override
@@ -31,19 +30,5 @@ public class CryptoSocketClient extends AbstractSocketClient {
         } else {
             super.onMessage(message);
         }
-    }
-
-    @Override
-    protected ApiCallback getApiCallback() {
-        return text -> {
-            try {
-                CryptoEvent cryptoEvent = objectMapper.readValue(text, CryptoEvent.class);
-                CryptoEvent.Dat data = cryptoEvent.getResult().getData()[0];
-                String symbol = cryptoEvent.getResult().getSubscription();
-                log.info("{},{}", symbol, JsonUtils.toJson(data));
-            } catch (Exception e) {
-                log.error("error during sink.{}", text, e);
-            }
-        };
     }
 }

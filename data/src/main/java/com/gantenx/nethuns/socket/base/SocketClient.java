@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket;
+package com.gantenx.nethuns.socket.base;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,16 +10,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
-public abstract class AbstractSocketClient extends WebSocketClient {
+public abstract class SocketClient extends WebSocketClient {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
-
+    protected final ApiCallback callback;
     static {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public AbstractSocketClient(String serverUri) throws URISyntaxException {
+    public SocketClient(String serverUri, ApiCallback callback) throws URISyntaxException {
         super(new URI(serverUri));
+        this.callback = callback;
     }
 
     @Override
@@ -38,11 +39,8 @@ public abstract class AbstractSocketClient extends WebSocketClient {
         log.error("WebSocket连接发生错误...", ex);
     }
 
-    protected abstract ApiCallback getApiCallback();
-
     @Override
     public void onMessage(String message) {
-        ApiCallback callback = this.getApiCallback();
-        callback.onResponse(message);
+        this.callback.onResponse(message);
     }
 }
