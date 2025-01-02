@@ -10,7 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
-public abstract class SocketClient extends WebSocketClient {
+public class SocketClient extends WebSocketClient {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
     protected final ApiCallback callback;
