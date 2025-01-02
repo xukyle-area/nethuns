@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ticker {
+public class TickerEvent {
 
     @JsonProperty("e")
     private String eventType;

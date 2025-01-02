@@ -12,7 +12,7 @@ public class Constants {
     private static final float LINE_STROKE_WIDTH = 2.0f;
     public static final BasicStroke BASE_STROKE = new BasicStroke(LINE_STROKE_WIDTH);
     public static final String TITLE = "Trading Chart";
-    public static final String BINANCE_URL = "https://data-api.binance.vision";
+    public static final String BINANCE_URL = "https://api.binance.com";
     public static final String TIME = "Time";
     public static final String CANDLE = "Candle";
     public static final String PRICE = "Price";
