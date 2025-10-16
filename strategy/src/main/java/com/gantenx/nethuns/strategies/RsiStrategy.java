@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RsiStrategy {
 
     public static void main(String[] args) {
-        Symbol symbol = Symbol.BTCUSDT;
+        Symbol symbol = Symbol.QQQUSD;
         String startStr = "20240101";
         String endStr = "20241001";
         long start = DateUtils.getTimestamp(startStr);
