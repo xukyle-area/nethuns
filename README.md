@@ -1,5 +1,12 @@
-# Nethuns - 自动化交易系统
+# Nethuns 🚀
 
+[![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+> 自动化交易系统
+
+## 📋 项目概述
 Nethuns 是一个基于 Java 和 Spring Boot 构建的自动化交易系统，主要用于加密货币交易策略的回测和实盘交易。该系统支持多种技术指标分析，并提供了完整的数据获取、策略执行和图表分析功能。
 
 ## 🚀 主要功能
