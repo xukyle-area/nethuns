@@ -2,11 +2,11 @@ package com.gantenx.nethuns.indicator.base;
 
 
 import java.util.Map;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 
 public interface Indicator<T> {
 
     T getValue(long timestamp);
 
-    Map<Long, Kline> getKlineMap();
+    Map<Long, Candle> getKlineMap();
 }

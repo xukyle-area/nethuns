@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.engine.model.Order;
 
 public class AssetCalculator {
 
-    public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Kline>> klineMap, List<Long> timestampList,
+    public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Candle>> klineMap, List<Long> timestampList,
             List<Order> orders, double init) {
         // 参数验证
         if (CollectionUtils.isEmpty(timestampList) || klineMap == null || init < 0) {
@@ -62,12 +62,12 @@ public class AssetCalculator {
     }
 
     // 抽取持仓市值计算逻辑
-    private static double calculatePositionAsset(Map<Symbol, Double> positions, Map<Symbol, Map<Long, Kline>> klineMap,
+    private static double calculatePositionAsset(Map<Symbol, Double> positions, Map<Symbol, Map<Long, Candle>> klineMap,
             long timestamp) {
         return positions.entrySet().stream().mapToDouble(entry -> {
             Symbol symbol = entry.getKey();
             double quantity = entry.getValue();
-            Kline kline = CollectionUtils.get(klineMap, symbol, timestamp);
+            Candle kline = CollectionUtils.get(klineMap, symbol, timestamp);
             if (kline == null) {
                 throw new IllegalStateException("No kline data found for " + symbol + " at " + timestamp);
             }

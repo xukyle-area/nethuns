@@ -6,14 +6,14 @@ import java.util.Map;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import com.gantenx.nethuns.commons.constant.Series;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.engine.chart.Chart;
 import com.gantenx.nethuns.engine.chart.plot.LinePlot;
 import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 
 public class RsiIndicator extends AbstractIndicator<Double> {
 
-    public RsiIndicator(Map<Long, Kline> klineMap) {
+    public RsiIndicator(Map<Long, Candle> klineMap) {
         super(klineMap);
         super.resultMap = this.calculate();
     }

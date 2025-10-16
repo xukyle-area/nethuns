@@ -1,6 +1,5 @@
-package com.gantenx.nethuns.retrofit;
+package com.gantenx.nethuns.binance.retrofit;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -9,5 +8,3 @@ public class TestBody {
     private String side;
     private String type;
 }
-
-

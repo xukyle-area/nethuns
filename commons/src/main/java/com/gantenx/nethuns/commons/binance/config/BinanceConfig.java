@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.commons.config;
+package com.gantenx.nethuns.commons.binance.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

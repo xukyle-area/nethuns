@@ -1,6 +1,8 @@
-package com.gantenx.nethuns.retrofit;
+package com.gantenx.nethuns.binance.retrofit;
 
 import java.util.List;
+import com.gantenx.nethuns.binance.model.AccountInfo;
+import com.gantenx.nethuns.binance.model.OrderResponse;
 import com.gantenx.nethuns.converter.OrderListResponse;
 import retrofit2.Call;
 import retrofit2.http.*;

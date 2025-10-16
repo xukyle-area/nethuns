@@ -3,7 +3,7 @@ package com.gantenx.nethuns.utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import com.gantenx.nethuns.converter.Converter;
+import com.gantenx.nethuns.converter.CandleConverter;
 import retrofit2.Call;
 
 public class FutureUtils {
@@ -20,7 +20,7 @@ public class FutureUtils {
     }
 
     public static <T> T get(Call<T> call) {
-        return FutureUtils.get(RetrofitUtils.enqueueRequest(call, Converter::nonOperation, NO_OP_CONSUMER));
+        return FutureUtils.get(RetrofitUtils.enqueueRequest(call, CandleConverter::nonOperation, NO_OP_CONSUMER));
     }
 
 }

@@ -1,18 +1,17 @@
 package com.gantenx.nethuns.commons.model;
 
-public class Kline extends Time {
+public class Candle extends Time {
     private double open;
     private double high;
     private double low;
     private double close;
     private double volume;
 
-
-    public Kline(long timestamp) {
+    public Candle(long timestamp) {
         super(timestamp);
     }
 
-    public Kline(long timestamp, double open, double high, double low, double close, double volume) {
+    public Candle(long timestamp, double open, double high, double low, double close, double volume) {
         super(timestamp);
         this.open = open;
         this.high = high;

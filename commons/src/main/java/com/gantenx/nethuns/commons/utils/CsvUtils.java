@@ -1,6 +1,6 @@
 package com.gantenx.nethuns.commons.utils;
 
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CsvUtils {
-    public static List<Kline> getKLineList(String csvFile, long startTime, long endTime) {
-        List<Kline> klineList = new ArrayList<>();
+    public static List<Candle> getKLineList(String csvFile, long startTime, long endTime) {
+        List<Candle> klineList = new ArrayList<>();
         try (InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream(csvFile)) {
             assert is != null;
             try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
@@ -23,7 +23,7 @@ public class CsvUtils {
                     if (timestamp < startTime || timestamp > endTime) {
                         continue;
                     }
-                    Kline kline = new Kline(timestamp);
+                    Candle kline = new Candle(timestamp);
                     kline.setOpen(Double.parseDouble(values[1]));
                     kline.setHigh(Double.parseDouble(values[2]));
                     kline.setLow(Double.parseDouble(values[3]));

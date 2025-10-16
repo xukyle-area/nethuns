@@ -5,20 +5,20 @@ import static com.gantenx.nethuns.commons.constant.Index.EMA;
 import java.awt.Color;
 import java.util.*;
 import com.gantenx.nethuns.commons.constant.Index;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.indicator.model.MacdDetail;
 
 
-public class MacdIndicator {
+public class MacdCalculator {
 
-    public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Kline> klineMap) {
+    public static Map<Long, MacdDetail> calculateMACDWithDetails(Map<Long, Candle> candleMap) {
 
         int fastLength = 12;
         int slowLength = 26;
         int signalLength = 9;
         // Index 包括 DIF 和 EMA
-        Map<Index, Map<Long, Double>> indexMapMap = calculateMACD(klineMap, fastLength, slowLength, signalLength);
+        Map<Index, Map<Long, Double>> indexMapMap = calculateMACD(candleMap, fastLength, slowLength, signalLength);
 
         // 构建 MACD 主线（DIF）
         Map<Long, MacdDetail> resultMap = new HashMap<>();
@@ -73,7 +73,7 @@ public class MacdIndicator {
         }
     }
 
-    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Kline> klineMap, int fastLength,
+    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Candle> klineMap, int fastLength,
             int slowLength, int signalLength) {
         Map<Long, Double> shortEMA = calculateEMA(klineMap, fastLength); // 12日EMA
         Map<Long, Double> longEMA = calculateEMA(klineMap, slowLength); // 26日EMA
@@ -133,8 +133,8 @@ public class MacdIndicator {
     private static double getValue(Object obj) {
         if (obj instanceof Number) {
             return ((Number) obj).doubleValue();
-        } else if (obj instanceof Kline) {
-            return ((Kline) obj).getClose();
+        } else if (obj instanceof Candle) {
+            return ((Candle) obj).getClose();
         }
         throw new IllegalArgumentException("Unsupported data type");
     }

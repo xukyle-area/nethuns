@@ -39,14 +39,14 @@ public class JsonUtils {
         module.setSerializerModifier(new BeanSerializerModifier() {
             @Override
             public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config,
-                                                          JavaType valueType,
-                                                          BeanDescription beanDesc,
-                                                          JsonSerializer<?> serializer) {
+                                                        JavaType valueType,
+                                                        BeanDescription beanDesc,
+                                                        JsonSerializer<?> serializer) {
                 return new JsonSerializer<Enum<?>>() {
                     @Override
                     public void serialize(Enum<?> value,
-                                          JsonGenerator gen,
-                                          SerializerProvider serializers) throws IOException {
+                                        JsonGenerator gen,
+                                        SerializerProvider serializers) throws IOException {
                         if (value != null) {
                             gen.writeString(value.name());
                         }

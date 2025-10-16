@@ -14,7 +14,7 @@ import org.jfree.chart.plot.XYPlot;
 import com.gantenx.nethuns.commons.constant.Proportion;
 import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.ExcelUtils;
 import com.gantenx.nethuns.engine.TradeEngine;
 import com.gantenx.nethuns.engine.chart.Chart;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TradeExecutor {
-    protected final Map<Long, Kline> klineMap;
+    protected final Map<Long, Candle> klineMap;
     protected final List<Long> timeList;
     protected final TradeEngine tradeEngine;
     protected final Symbol symbol;
@@ -34,7 +34,7 @@ public class TradeExecutor {
     private final Rule entryRule;
     private final Rule exitRule;
 
-    public TradeExecutor(Map<Long, Kline> klineMap, Symbol symbol, Rule entryRule, Rule exitRule) {
+    public TradeExecutor(Map<Long, Candle> klineMap, Symbol symbol, Rule entryRule, Rule exitRule) {
         this.symbol = symbol;
         this.timeList = klineMap.keySet().stream().sorted().collect(Collectors.toList());
         this.tradeEngine = new TradeEngine(timeList, Collections.singletonMap(symbol, klineMap));

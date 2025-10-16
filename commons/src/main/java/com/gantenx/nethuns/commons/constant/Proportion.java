@@ -19,7 +19,9 @@ public enum Proportion {
     PROPORTION_OF_25(25),
     PROPORTION_OF_20(20),
     PROPORTION_OF_15(15),
-    PROPORTION_OF_10(10), PROPORTION_OF_5(5), PROPORTION_OF_0(0);
+    PROPORTION_OF_10(10),
+    PROPORTION_OF_5(5),
+    PROPORTION_OF_0(0);
 
     private final int value;
 

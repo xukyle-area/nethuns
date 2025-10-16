@@ -14,7 +14,7 @@ public class CollectionUtils {
 
     public static <T extends Time> Map<Long, List<T>> toListMap(List<T> dataList) {
         return dataList.stream().collect(Collectors.groupingBy(Time::getTimestamp,
-                                                               Collectors.mapping(t -> t, Collectors.toList())));
+                                                            Collectors.mapping(t -> t, Collectors.toList())));
     }
 
     public static double getMaxValue(Map<Long, Double> map) {

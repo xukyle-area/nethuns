@@ -4,24 +4,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.jfree.chart.JFreeChart;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
 public abstract class AbstractIndicator<T> implements Indicator<T> {
 
-    private final Map<Long, Kline> klineMap;
+    private final Map<Long, Candle> klineMap;
     private final List<Long> timestamps;
     protected Map<Long, T> resultMap;
 
-    protected AbstractIndicator(Map<Long, Kline> klineMap) {
+    protected AbstractIndicator(Map<Long, Candle> klineMap) {
         this.klineMap = klineMap;
         this.timestamps = klineMap.keySet().stream().sorted().collect(Collectors.toList());
     }
 
     @Override
-    public Map<Long, Kline> getKlineMap() {
+    public Map<Long, Candle> getKlineMap() {
         return klineMap;
     }
 

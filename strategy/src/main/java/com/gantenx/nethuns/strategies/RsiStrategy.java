@@ -1,8 +1,8 @@
 package com.gantenx.nethuns.strategies;
 
+import com.gantenx.nethuns.binance.model.OrderResponse;
+import com.gantenx.nethuns.binance.service.BinanceService;
 import com.gantenx.nethuns.commons.utils.JsonUtils;
-import com.gantenx.nethuns.retrofit.OrderResponse;
-import com.gantenx.nethuns.service.BinanceService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

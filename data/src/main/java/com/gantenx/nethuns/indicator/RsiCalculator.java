@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,19 +14,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RsiCalculator {
 
-    public static Map<Long, Double> calculateRSI(Map<Long, Kline> klineMap) {
+    public static Map<Long, Double> calculateRSI(Map<Long, Candle> candleMap) {
         Map<Long, Double> rsiMap = new TreeMap<>();
-        List<Long> timestamps = CollectionUtils.getTimestamps(klineMap);
+        List<Long> timestamps = CollectionUtils.getTimestamps(candleMap);
 
         if (timestamps.size() < RSI_PERIOD + 1) {
-            return rsiMap; // 返回空Map如果数据不足
+            // 返回空Map如果数据不足
+            return rsiMap;
         }
 
         // 第一步：计算价格变化
         List<Double> changes = new ArrayList<>();
         for (int i = 1; i < timestamps.size(); i++) {
-            double currentClose = klineMap.get(timestamps.get(i)).getClose();
-            double previousClose = klineMap.get(timestamps.get(i - 1)).getClose();
+            double currentClose = candleMap.get(timestamps.get(i)).getClose();
+            double previousClose = candleMap.get(timestamps.get(i - 1)).getClose();
             changes.add(currentClose - previousClose);
         }
 

@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.retrofit;
+package com.gantenx.nethuns.binance.retrofit;
 
 import java.util.Map;
 import java.util.UUID;

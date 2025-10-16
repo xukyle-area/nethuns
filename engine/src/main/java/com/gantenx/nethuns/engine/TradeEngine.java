@@ -2,7 +2,7 @@ package com.gantenx.nethuns.engine;
 
 import com.gantenx.nethuns.commons.constant.Proportion;
 import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.engine.model.Order;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.commons.utils.DateUtils;
@@ -36,7 +36,7 @@ public class TradeEngine {
     /**
      * 交易的标的的 k 线列表
      */
-    private final Map<Symbol, Map<Long, Kline>> klineMap;
+    private final Map<Symbol, Map<Long, Candle>> klineMap;
 
     /**
      * 初始金额
@@ -69,7 +69,7 @@ public class TradeEngine {
      * @param timestamps 写入交易的时间
      * @param klineMap   写入交易的标的以及在对应的时间段的 K 线
      */
-    public TradeEngine(List<Long> timestamps, Map<Symbol, Map<Long, Kline>> klineMap) {
+    public TradeEngine(List<Long> timestamps, Map<Symbol, Map<Long, Candle>> klineMap) {
         if (timestamps == null || timestamps.isEmpty()) {
             throw new IllegalArgumentException("Trading time list cannot be null or empty");
         }
@@ -192,7 +192,7 @@ public class TradeEngine {
     }
 
     public double getPrice(Symbol symbol) {
-        Kline kline = CollectionUtils.get(klineMap, symbol, timestamp);
+        Candle kline = CollectionUtils.get(klineMap, symbol, timestamp);
         if (Objects.isNull(kline)) {
             throw new IllegalArgumentException("Invalid kline getting parameters: symbol=" + symbol.name() + ", date=" + DateUtils.getDate(
                     timestamp));

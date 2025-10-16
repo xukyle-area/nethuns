@@ -1,12 +1,8 @@
 package com.gantenx.nethuns.commons.constant;
 
 
+import java.awt.BasicStroke;
 import com.google.common.base.Joiner;
-
-import java.awt.*;
-
-import static com.gantenx.nethuns.commons.constant.Symbol.ETHUSDT;
-
 
 public class Constants {
     private static final float LINE_STROKE_WIDTH = 2.0f;

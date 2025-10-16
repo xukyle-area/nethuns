@@ -4,7 +4,7 @@ package com.gantenx.nethuns.indicator;
 import java.util.HashMap;
 import java.util.Map;
 import org.jfree.chart.JFreeChart;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 
 public class ConstantIndicator<T> extends AbstractIndicator<T> {
@@ -17,7 +17,7 @@ public class ConstantIndicator<T> extends AbstractIndicator<T> {
      * @param series the bar series
      * @param t      the constant value
      */
-    public ConstantIndicator(Map<Long, Kline> series, T t) {
+    public ConstantIndicator(Map<Long, Candle> series, T t) {
         super(series);
         this.value = t;
     }

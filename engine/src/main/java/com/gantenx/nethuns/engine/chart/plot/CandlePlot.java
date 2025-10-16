@@ -13,7 +13,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.data.xy.DefaultHighLowDataset;
 import com.gantenx.nethuns.commons.constant.Series;
-import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.model.Pair;
 
 public class CandlePlot {
@@ -25,7 +25,7 @@ public class CandlePlot {
      * @param klineDataMap k 线数据
      * @return k 线图表
      */
-    public static XYPlot create(Series series, Map<Long, Kline> klineDataMap) {
+    public static XYPlot create(Series series, Map<Long, Candle> klineDataMap) {
         DefaultHighLowDataset dataset = CandlePlot.createKlineDataset(series, klineDataMap);
         JFreeChart chart = ChartFactory.createCandlestickChart(CANDLE, TIME, PRICE, dataset, Boolean.FALSE);
 
@@ -47,11 +47,11 @@ public class CandlePlot {
     }
 
 
-    private static Pair<Double, Double> getRange(Map<Long, Kline> map) {
+    private static Pair<Double, Double> getRange(Map<Long, Candle> map) {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
 
-        for (Kline kline : map.values()) {
+        for (Candle kline : map.values()) {
             min = Math.min(min, kline.getLow());
             max = Math.max(max, kline.getHigh());
         }
@@ -59,7 +59,7 @@ public class CandlePlot {
         return Pair.create(min, max);
     }
 
-    private static DefaultHighLowDataset createKlineDataset(Series series, Map<Long, Kline> klineData) {
+    private static DefaultHighLowDataset createKlineDataset(Series series, Map<Long, Candle> klineData) {
         int dataSize = klineData.size();
         Date[] dates = new Date[dataSize];
         double[] high = new double[dataSize];
@@ -69,9 +69,9 @@ public class CandlePlot {
         double[] volume = new double[dataSize];
 
         int i = 0;
-        for (Map.Entry<Long, Kline> entry : klineData.entrySet()) {
+        for (Map.Entry<Long, Candle> entry : klineData.entrySet()) {
             long timestamp = entry.getKey();
-            Kline kline = entry.getValue();
+            Candle kline = entry.getValue();
 
             dates[i] = new Date(timestamp);
             high[i] = kline.getHigh();

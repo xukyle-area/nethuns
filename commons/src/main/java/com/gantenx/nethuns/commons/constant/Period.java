@@ -9,6 +9,7 @@ public enum Period {
     M_1("1m", 1000L * 60),
     M_15("15m", 1000L * 60 * 15),
     M_30("30m", 1000L * 60 * 30);
+
     private final String desc;
     private final long millisecond;
 

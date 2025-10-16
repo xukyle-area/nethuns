@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.retrofit;
+package com.gantenx.nethuns.binance.retrofit;
 
 import static com.gantenx.nethuns.commons.constant.Constants.BINANCE_URL;
 import okhttp3.OkHttpClient;

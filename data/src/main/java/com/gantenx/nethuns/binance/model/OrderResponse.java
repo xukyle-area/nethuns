@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.retrofit;
+package com.gantenx.nethuns.binance.model;
 
 import lombok.Data;
 
