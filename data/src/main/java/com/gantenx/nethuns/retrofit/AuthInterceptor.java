@@ -22,9 +22,49 @@ public class AuthInterceptor implements Interceptor {
     private final HmacSignatureGenerator signatureGenerator;
 
     public AuthInterceptor() {
-        this.apiKey = "lcFnD3shoWVpfrQQElgE2IKekSq1Ahrn3oFzKLZVysYXhC0ocFyVUIR4sHIwZJQX";
-        String secretKey = "FcN8GP4sCJiH9LOeizdpst2Q01Ze9dEPF8MlFwlUbuT1sRSr8Oelpf1qRpfusalx";
-        this.signatureGenerator = new HmacSignatureGenerator(secretKey);
+        // 从环境变量或配置文件读取API密钥
+        this.apiKey = getApiKey();
+        String secretKey = getApiSecret();
+
+        if (apiKey == null || apiKey.isEmpty() || secretKey == null || secretKey.isEmpty()) {
+            log.warn("Binance API credentials not configured. API calls requiring authentication will fail.");
+            log.info(
+                    "Please set BINANCE_API_KEY and BINANCE_API_SECRET environment variables or configure them in application.properties");
+        }
+
+        this.signatureGenerator = new HmacSignatureGenerator(secretKey != null ? secretKey : "");
+    }
+
+    private String getApiKey() {
+        // 优先从环境变量获取
+        String envKey = System.getenv("BINANCE_API_KEY");
+        if (envKey != null && !envKey.isEmpty()) {
+            return envKey;
+        }
+
+        // 从系统属性获取（适用于配置文件注入）
+        String propKey = System.getProperty("binance.api.key");
+        if (propKey != null && !propKey.isEmpty()) {
+            return propKey;
+        }
+
+        return null;
+    }
+
+    private String getApiSecret() {
+        // 优先从环境变量获取
+        String envSecret = System.getenv("BINANCE_API_SECRET");
+        if (envSecret != null && !envSecret.isEmpty()) {
+            return envSecret;
+        }
+
+        // 从系统属性获取（适用于配置文件注入）
+        String propSecret = System.getProperty("binance.api.secret");
+        if (propSecret != null && !propSecret.isEmpty()) {
+            return propSecret;
+        }
+
+        return null;
     }
 
     @NotNull

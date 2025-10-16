@@ -31,3 +31,21 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Environment Variables and Secrets ###
+.env
+.env.local
+.env.production
+.env.staging
+application-*.properties
+!application.properties
+!application-example.properties
+
+### API Keys and Secrets ###
+**/api-keys.txt
+**/secrets.txt
+**/credentials.properties
+
+### Logs ###
+*.log
+logs/

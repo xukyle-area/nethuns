@@ -2,7 +2,9 @@
 
 [![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/xukyle-area/nethuns/pulls)
 
 > 自动化交易系统
 
@@ -12,7 +14,7 @@ Nethuns 是一个基于 Java 和 Spring Boot 构建的自动化交易系统，�
 ## 🚀 主要功能
 
 - **多数据源支持**：支持 Binance API 和 CSV 文件数据源
-- **技术指标分析**：内置 RSI 等多种技术指标
+- **技术指标分析**：内置 RSI、移动平均线、交叉指标等多种技术指标
 - **交易策略**：支持自定义交易规则和策略
 - **实时数据**：WebSocket 实时数据推送
 - **图表分析**：基于 JFreeChart 的可视化图表生成
@@ -96,12 +98,53 @@ nethuns/
    mvn clean install
    ```
 
-3. **配置 API 密钥**（可选）
+3. **配置 API 密钥**（如需实盘交易）
+
+   **方法 1：使用环境变量（推荐）**
+   ```bash
+   export BINANCE_API_KEY=your_api_key_here
+   export BINANCE_API_SECRET=your_api_secret_here
+   ```
    
-   如需使用 Binance 实盘交易功能，请配置相关环境变量或修改配置文件。
+   **方法 2：使用 .env 文件**
+   ```bash
+   # 复制示例文件
+   cp .env.example .env
+   
+   # 编辑 .env 文件，填入真实的 API 密钥
+   # BINANCE_API_KEY=your_api_key_here
+   # BINANCE_API_SECRET=your_api_secret_here
+   ```
+   
+   **方法 3：使用启动脚本**
+   ```bash
+   # 使用提供的启动脚本，会自动加载 .env 文件
+   ./start.sh
+   ```
+   
+   ⚠️ **重要安全提醒**：
+   - 项目已移除所有硬编码的 API 密钥
+   - `.env` 文件已被 `.gitignore` 忽略，不会提交到版本控制
+   - 请勿在任何配置文件中直接写入真实的 API 密钥
+   - 生产环境建议使用专门的密钥管理服务
 
 4. **运行应用**
+   
+   **方法 1：使用启动脚本（推荐）**
    ```bash
+   ./start.sh
+   ```
+   
+   **方法 2：直接使用 Maven**
+   ```bash
+   cd strategy
+   mvn spring-boot:run
+   ```
+   
+   **方法 3：使用环境变量启动**
+   ```bash
+   export BINANCE_API_KEY=your_key
+   export BINANCE_API_SECRET=your_secret
    cd strategy
    mvn spring-boot:run
    ```
@@ -169,19 +212,72 @@ Binance API 配置位于 `Constants.java` 文件中：
 public static final String BINANCE_URL = "https://api.binance.com";
 ```
 
+### 性能参数
+
+关键性能参数配置：
+- **RSI 周期**：6（可在 `Constants.java` 中调整）
+- **初始资金**：10,000 USDT
+- **交易手续费**：0.1%
+- **最大数据天数**：1500天（Binance API 限制）
+
 ## 📁 数据存储
 
 - **导出数据**：`alpha/export/` 目录下按日期和时间组织
 - **CSV 数据**：`data/` 目录存放历史数据文件
 - **日志文件**：`alpha/logs/` 目录
 
-## 🤝 贡献指南
+## � 测试
+
+目前项目暂未包含单元测试，这是一个待改进的方面。建议：
+- 为核心交易逻辑添加单元测试
+- 为技术指标计算添加测试用例
+- 添加集成测试验证 API 调用
+
+## 🔧 故障排除
+
+### 常见问题
+
+**Q: API 调用失败怎么办？**
+A: 检查 API 密钥配置是否正确，确保网络连接正常，查看日志文件获取详细错误信息。
+
+**Q: 回测数据不准确？**
+A: 确认数据源的时间范围不超过1500天，检查 K线数据的完整性。
+
+**Q: 内存使用过高？**
+A: 对于大量历史数据，考虑分批处理或增加 JVM 堆内存大小：`-Xmx2g`
+
+**Q: 图表生成失败？**
+A: 确保系统支持图形界面，或在无头模式下运行：`-Djava.awt.headless=true`
+
+## �🤝 贡献指南
 
 1. Fork 项目
 2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 创建 Pull Request
+
+## 🗺️ 发展路线图
+
+### 已完成
+- ✅ 基础交易系统架构
+- ✅ Binance API 集成
+- ✅ RSI 策略实现
+- ✅ 图表生成和数据导出
+- ✅ WebSocket 实时数据支持
+
+### 进行中
+- 🔄 更多技术指标（MACD、布林带等）
+- 🔄 风险管理模块优化
+- 🔄 Web UI 界面开发
+
+### 计划中
+- 📋 单元测试覆盖
+- 📋 数据库持久化
+- 📋 多交易所支持
+- 📋 机器学习策略集成
+- 📋 实时告警系统
+- 📋 策略回测报告优化
 
 ## ⚠️ 免责声明
 
