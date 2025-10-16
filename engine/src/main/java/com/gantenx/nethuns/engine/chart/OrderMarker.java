@@ -1,6 +1,6 @@
 package com.gantenx.nethuns.engine.chart;
 
-import static com.gantenx.nethuns.commons.constant.Side.BUY;
+import static com.gantenx.nethuns.commons.enums.Side.BUY;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -10,7 +10,7 @@ import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ui.TextAnchor;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.engine.model.Order;

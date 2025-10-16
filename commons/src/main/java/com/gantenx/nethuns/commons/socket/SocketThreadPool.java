@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.commons.base;
+package com.gantenx.nethuns.commons.socket;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

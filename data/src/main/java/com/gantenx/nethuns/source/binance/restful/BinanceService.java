@@ -2,7 +2,7 @@ package com.gantenx.nethuns.source.binance.restful;
 
 import static com.gantenx.nethuns.utils.FutureUtils.NO_OP_CONSUMER;
 import java.util.List;
-import com.gantenx.nethuns.commons.constant.Period;
+import com.gantenx.nethuns.commons.enums.Period;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.converter.CandleConverter;

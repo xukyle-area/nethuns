@@ -1,7 +1,7 @@
 package com.gantenx.nethuns.engine.model;
 
 
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Symbol;
 
 public class ProfitRate {
     private Symbol symbol;

@@ -16,7 +16,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import com.gantenx.nethuns.commons.constant.Series;
+import com.gantenx.nethuns.commons.enums.Series;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 
 public class LinePlot {

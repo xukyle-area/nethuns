@@ -12,7 +12,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.data.xy.DefaultHighLowDataset;
-import com.gantenx.nethuns.commons.constant.Series;
+import com.gantenx.nethuns.commons.enums.Series;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.model.Pair;
 

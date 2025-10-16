@@ -3,8 +3,8 @@ package com.gantenx.nethuns.source.binance.socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import com.gantenx.nethuns.commons.constant.Period;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Period;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.utils.JsonUtils;
 
 public class Subscriber {

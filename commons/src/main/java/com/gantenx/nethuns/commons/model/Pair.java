@@ -29,17 +29,15 @@ public class Pair<K, V> {
         return this.value;
     }
 
+    @SuppressWarnings("rawtypes")
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         } else if (!(o instanceof Pair)) {
             return false;
         } else {
-            boolean var10000;
-            label43:
-            {
-                label29:
-                {
+            label43: {
+                label29: {
                     Pair<?, ?> oP = (Pair) o;
                     if (this.key == null) {
                         if (oP.key != null) {

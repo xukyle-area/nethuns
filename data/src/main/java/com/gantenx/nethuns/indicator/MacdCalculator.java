@@ -1,10 +1,10 @@
 package com.gantenx.nethuns.indicator;
 
-import static com.gantenx.nethuns.commons.constant.Index.DIF;
-import static com.gantenx.nethuns.commons.constant.Index.EMA;
+import static com.gantenx.nethuns.commons.enums.Index.DIF;
+import static com.gantenx.nethuns.commons.enums.Index.EMA;
 import java.awt.Color;
 import java.util.*;
-import com.gantenx.nethuns.commons.constant.Index;
+import com.gantenx.nethuns.commons.enums.Index;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.indicator.model.MacdDetail;

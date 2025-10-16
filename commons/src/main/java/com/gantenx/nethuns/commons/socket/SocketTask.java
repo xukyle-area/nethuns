@@ -1,11 +1,11 @@
-package com.gantenx.nethuns.commons.base;
+package com.gantenx.nethuns.commons.socket;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

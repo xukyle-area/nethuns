@@ -1,8 +1,8 @@
 package com.gantenx.nethuns.engine.chart.plot;
 
 
-import static com.gantenx.nethuns.commons.constant.Index.HISTOGRAM;
-import static com.gantenx.nethuns.commons.constant.Series.MACD_DETAIL;
+import static com.gantenx.nethuns.commons.enums.Index.HISTOGRAM;
+import static com.gantenx.nethuns.commons.enums.Series.MACD_DETAIL;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;

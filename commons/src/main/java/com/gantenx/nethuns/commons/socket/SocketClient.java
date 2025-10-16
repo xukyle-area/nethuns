@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.commons.base;
+package com.gantenx.nethuns.commons.socket;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.commons.constant;
+package com.gantenx.nethuns.commons.enums;
 
 public enum Period {
     // public static final String ONE_DAY = "1d";

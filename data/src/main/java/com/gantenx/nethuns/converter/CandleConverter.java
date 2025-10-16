@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import com.gantenx.nethuns.commons.constant.Period;
+import com.gantenx.nethuns.commons.enums.Period;
 import com.gantenx.nethuns.commons.model.Candle;
 
 

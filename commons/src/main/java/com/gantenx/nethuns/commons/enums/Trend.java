@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.commons.constant;
+package com.gantenx.nethuns.commons.enums;
 
 public enum Trend {
     STRONG_UPTREND("强力上升"),

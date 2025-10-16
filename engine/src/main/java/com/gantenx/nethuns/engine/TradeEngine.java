@@ -1,7 +1,7 @@
 package com.gantenx.nethuns.engine;
 
-import com.gantenx.nethuns.commons.constant.Proportion;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Proportion;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.engine.model.Order;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
@@ -13,8 +13,8 @@ import com.gantenx.nethuns.engine.model.Trade;
 import java.util.*;
 
 import static com.gantenx.nethuns.commons.constant.Constants.*;
-import static com.gantenx.nethuns.commons.constant.Side.BUY;
-import static com.gantenx.nethuns.commons.constant.Side.SELL;
+import static com.gantenx.nethuns.commons.enums.Side.BUY;
+import static com.gantenx.nethuns.commons.enums.Side.SELL;
 
 public class TradeEngine {
     /**

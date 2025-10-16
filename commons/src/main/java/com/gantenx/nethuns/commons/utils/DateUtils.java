@@ -1,13 +1,12 @@
 package com.gantenx.nethuns.commons.utils;
 
 
-import com.gantenx.nethuns.commons.constant.Period;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import com.gantenx.nethuns.commons.enums.Period;
 
 /**
  * 此处方法如果没有特殊说明，都指的是UTC时间，也就是标准时间

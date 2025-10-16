@@ -1,11 +1,11 @@
 package com.gantenx.nethuns;
 
 
-import static com.gantenx.nethuns.commons.constant.From.CSV;
+import static com.gantenx.nethuns.commons.enums.From.CSV;
 import java.util.List;
 import java.util.Map;
-import com.gantenx.nethuns.commons.constant.Period;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Period;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.commons.utils.CsvUtils;

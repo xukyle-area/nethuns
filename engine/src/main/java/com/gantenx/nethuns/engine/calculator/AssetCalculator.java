@@ -1,13 +1,13 @@
 package com.gantenx.nethuns.engine.calculator;
 
 import static com.gantenx.nethuns.commons.constant.Constants.FEE;
-import static com.gantenx.nethuns.commons.constant.Side.BUY;
-import static com.gantenx.nethuns.commons.constant.Side.SELL;
+import static com.gantenx.nethuns.commons.enums.Side.BUY;
+import static com.gantenx.nethuns.commons.enums.Side.SELL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.CollectionUtils;
 import com.gantenx.nethuns.engine.model.Order;

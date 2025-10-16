@@ -1,8 +1,8 @@
-package com.gantenx.nethuns.commons.constant;
+package com.gantenx.nethuns.commons.enums;
 
-import static com.gantenx.nethuns.commons.constant.Currency.*;
-import static com.gantenx.nethuns.commons.constant.From.BINANCE;
-import static com.gantenx.nethuns.commons.constant.From.CSV;
+import static com.gantenx.nethuns.commons.enums.Currency.*;
+import static com.gantenx.nethuns.commons.enums.From.BINANCE;
+import static com.gantenx.nethuns.commons.enums.From.CSV;
 
 public enum Symbol {
     QQQUSD(QQQ, USD, CSV, "data/QQQ.csv"),

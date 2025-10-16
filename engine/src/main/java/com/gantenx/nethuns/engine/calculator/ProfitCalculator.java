@@ -4,7 +4,7 @@ package com.gantenx.nethuns.engine.calculator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.engine.model.ProfitRate;

@@ -1,8 +1,8 @@
 package com.gantenx.nethuns.engine.model;
 
 
-import com.gantenx.nethuns.commons.constant.Side;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Side;
+import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Time;
 
 public class Order extends Time {

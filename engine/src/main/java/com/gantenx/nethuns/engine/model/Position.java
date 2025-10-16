@@ -2,8 +2,8 @@ package com.gantenx.nethuns.engine.model;
 
 
 import java.util.List;
-import com.gantenx.nethuns.commons.constant.Period;
-import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.enums.Period;
+import com.gantenx.nethuns.commons.enums.Symbol;
 
 public class Position {
     // 买入的时候的订单id
