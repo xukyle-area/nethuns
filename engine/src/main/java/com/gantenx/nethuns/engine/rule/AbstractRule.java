@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.rule.base;
+package com.gantenx.nethuns.engine.rule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

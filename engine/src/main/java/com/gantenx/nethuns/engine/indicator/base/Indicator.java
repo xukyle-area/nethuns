@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.indicator.base;
+package com.gantenx.nethuns.engine.indicator.base;
 
 
 import java.util.Map;

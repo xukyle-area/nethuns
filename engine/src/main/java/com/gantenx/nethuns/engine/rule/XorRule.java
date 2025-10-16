@@ -1,6 +1,14 @@
-package com.gantenx.nethuns.rule.base;
+package com.gantenx.nethuns.engine.rule;
 
-public class OrRule extends AbstractRule {
+
+/**
+ * A XOR combination of two {@link Rule rules}.
+ *
+ * <p>
+ * Satisfied if only one of the two rules is satisfied. Not satisfied if no rule
+ * or both rules are satisfied.
+ */
+public class XorRule extends AbstractRule {
 
     private final Rule rule1;
     private final Rule rule2;
@@ -11,14 +19,14 @@ public class OrRule extends AbstractRule {
      * @param rule1 a trading rule
      * @param rule2 another trading rule
      */
-    public OrRule(Rule rule1, Rule rule2) {
+    public XorRule(Rule rule1, Rule rule2) {
         this.rule1 = rule1;
         this.rule2 = rule2;
     }
 
     @Override
     public boolean isSatisfied(long timestamp) {
-        final boolean satisfied = rule1.isSatisfied(timestamp) || rule2.isSatisfied(timestamp);
+        final boolean satisfied = rule1.isSatisfied(timestamp) ^ rule2.isSatisfied(timestamp);
         traceIsSatisfied(timestamp, satisfied);
         return satisfied;
     }

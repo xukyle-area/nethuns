@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.rule.base;
+package com.gantenx.nethuns.engine.rule;
 
 public class NotRule extends AbstractRule {
 

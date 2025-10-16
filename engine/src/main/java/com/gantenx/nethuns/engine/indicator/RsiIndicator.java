@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.indicator;
+package com.gantenx.nethuns.engine.indicator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +9,8 @@ import com.gantenx.nethuns.commons.enums.Series;
 import com.gantenx.nethuns.commons.model.Candle;
 import com.gantenx.nethuns.engine.chart.Chart;
 import com.gantenx.nethuns.engine.chart.plot.LinePlot;
-import com.gantenx.nethuns.indicator.base.AbstractIndicator;
+import com.gantenx.nethuns.engine.indicator.base.AbstractIndicator;
+import com.gantenx.nethuns.indicator.RsiCalculator;
 
 public class RsiIndicator extends AbstractIndicator<Double> {
 

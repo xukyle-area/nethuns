@@ -1,11 +1,11 @@
-package com.gantenx.nethuns.indicator;
+package com.gantenx.nethuns.engine.indicator;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import org.jfree.chart.JFreeChart;
 import com.gantenx.nethuns.commons.model.Candle;
-import com.gantenx.nethuns.indicator.base.AbstractIndicator;
+import com.gantenx.nethuns.engine.indicator.base.AbstractIndicator;
 
 public class ConstantIndicator<T> extends AbstractIndicator<T> {
 
