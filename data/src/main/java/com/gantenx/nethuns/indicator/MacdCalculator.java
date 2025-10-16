@@ -73,14 +73,14 @@ public class MacdCalculator {
         }
     }
 
-    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Candle> klineMap, int fastLength,
+    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Candle> candleMap, int fastLength,
             int slowLength, int signalLength) {
-        Map<Long, Double> shortEMA = calculateEMA(klineMap, fastLength); // 12日EMA
-        Map<Long, Double> longEMA = calculateEMA(klineMap, slowLength); // 26日EMA
+        Map<Long, Double> shortEMA = calculateEMA(candleMap, fastLength); // 12日EMA
+        Map<Long, Double> longEMA = calculateEMA(candleMap, slowLength); // 26日EMA
 
         // 计算MACD线（DIF）
         Map<Long, Double> macdLine = new HashMap<>();
-        for (Long timestamp : klineMap.keySet()) {
+        for (Long timestamp : candleMap.keySet()) {
             if (shortEMA.containsKey(timestamp) && longEMA.containsKey(timestamp)) {
                 double shortValue = shortEMA.get(timestamp);
                 double longValue = longEMA.get(timestamp);

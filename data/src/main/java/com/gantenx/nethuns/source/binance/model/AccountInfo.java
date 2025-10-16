@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.binance.model;
+package com.gantenx.nethuns.source.binance.model;
 
 import java.util.List;
 

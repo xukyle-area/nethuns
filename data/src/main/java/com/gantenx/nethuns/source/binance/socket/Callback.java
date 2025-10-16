@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.binance;
+package com.gantenx.nethuns.source.binance.socket;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gantenx.nethuns.commons.utils.JsonUtils;

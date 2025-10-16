@@ -23,13 +23,13 @@ public class CsvUtils {
                     if (timestamp < startTime || timestamp > endTime) {
                         continue;
                     }
-                    Candle kline = new Candle(timestamp);
-                    kline.setOpen(Double.parseDouble(values[1]));
-                    kline.setHigh(Double.parseDouble(values[2]));
-                    kline.setLow(Double.parseDouble(values[3]));
-                    kline.setClose(Double.parseDouble(values[4]));
-                    kline.setVolume(Double.parseDouble(values[6]));
-                    klineList.add(kline);
+                    Candle candle = new Candle(timestamp);
+                    candle.setOpen(Double.parseDouble(values[1]));
+                    candle.setHigh(Double.parseDouble(values[2]));
+                    candle.setLow(Double.parseDouble(values[3]));
+                    candle.setClose(Double.parseDouble(values[4]));
+                    candle.setVolume(Double.parseDouble(values[6]));
+                    klineList.add(candle);
                 }
             }
         } catch (IOException e) {

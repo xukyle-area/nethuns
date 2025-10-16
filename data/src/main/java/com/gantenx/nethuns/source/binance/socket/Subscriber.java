@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.socket.binance;
+package com.gantenx.nethuns.source.binance.socket;
 
 import java.util.ArrayList;
 import java.util.List;

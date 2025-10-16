@@ -12,7 +12,7 @@ import com.gantenx.nethuns.commons.model.Candle;
 public class CandleConverter {
 
     // 返回转换后的 A/B 的 Kline 列表
-    public static List<Candle> getKline(Map<Long, Candle> baseMap, Map<Long, Candle> quoteMap, long start, long end) {
+    public static List<Candle> getCandle(Map<Long, Candle> baseMap, Map<Long, Candle> quoteMap, long start, long end) {
         List<Candle> resultList = new ArrayList<>();
 
         // 遍历时间戳区间

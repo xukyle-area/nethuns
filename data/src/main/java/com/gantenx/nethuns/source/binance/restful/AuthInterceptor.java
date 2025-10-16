@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.binance.retrofit;
+package com.gantenx.nethuns.source.binance.restful;
 
 import java.io.IOException;
 import org.jetbrains.annotations.NotNull;

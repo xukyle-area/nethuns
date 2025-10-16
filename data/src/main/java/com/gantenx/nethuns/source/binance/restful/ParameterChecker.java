@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.binance.retrofit;
+package com.gantenx.nethuns.source.binance.restful;
 
 import java.util.Map;
 import java.util.UUID;
@@ -6,11 +6,7 @@ import java.util.UUID;
 
 public final class ParameterChecker {
 
-    private ParameterChecker() {
-    }
-
-    private static final int countStart = 0;
-    private static final int countFinal = 1;
+    private ParameterChecker() {}
 
     public static void checkParameter(Map<String, Object> parameters, String parameter, Class<?> t) {
         checkRequiredParameter(parameters, parameter);

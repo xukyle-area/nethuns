@@ -1,11 +1,9 @@
-package com.gantenx.nethuns.socket;
+package com.gantenx.nethuns.source.binance.socket;
 
 
 import java.util.Collections;
+import com.gantenx.nethuns.commons.base.SocketTask;
 import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.socket.base.SocketTask;
-import com.gantenx.nethuns.socket.binance.Callback;
-import com.gantenx.nethuns.socket.binance.Subscriber;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

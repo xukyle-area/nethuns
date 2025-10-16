@@ -1,4 +1,4 @@
-package com.gantenx.nethuns.binance.service;
+package com.gantenx.nethuns.source.binance.utils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
