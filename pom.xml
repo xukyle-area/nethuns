@@ -19,7 +19,6 @@
         <module>data</module>
         <module>strategy</module>
         <module>engine</module>
-        <module>trade</module>
     </modules>
 
     <properties>

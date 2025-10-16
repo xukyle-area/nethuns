@@ -1,320 +1,265 @@
 package com.gantenx.nethuns.engine;
 
+import java.util.List;
+import java.util.Map;
 import com.gantenx.nethuns.commons.enums.Proportion;
 import com.gantenx.nethuns.commons.enums.Symbol;
 import com.gantenx.nethuns.commons.model.Candle;
+import com.gantenx.nethuns.engine.config.TradingConfig;
+import com.gantenx.nethuns.engine.manager.*;
 import com.gantenx.nethuns.engine.model.Order;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-import com.gantenx.nethuns.commons.utils.DateUtils;
 import com.gantenx.nethuns.engine.model.Position;
-import com.gantenx.nethuns.engine.model.TradeRecord;
 import com.gantenx.nethuns.engine.model.Trade;
+import com.gantenx.nethuns.engine.model.TradeRecord;
+import com.gantenx.nethuns.engine.provider.KlinePriceProvider;
+import com.gantenx.nethuns.engine.provider.PriceProvider;
+import com.gantenx.nethuns.engine.result.SellResult;
 
-import java.util.*;
-
-import static com.gantenx.nethuns.commons.constant.Constants.*;
-import static com.gantenx.nethuns.commons.enums.Side.BUY;
-import static com.gantenx.nethuns.commons.enums.Side.SELL;
-
+/**
+ * 重构后的交易引擎
+ * 使用组件化架构，职责分离清晰
+ */
 public class TradeEngine {
-    /**
-     * 当前持仓的仓位列表，每次买入都是单独的记录
-     */
-    private final Map<Symbol, List<Position>> positions = new HashMap<>();
-    /**
-     * 进行交易的订单列表
-     */
-    private final List<Order> orders = new ArrayList<>();
-    /**
-     * 买入和卖出之间的对应记录
-     */
-    private final List<Trade> records = new ArrayList<>();
-    /**
-     * 开放交易的时间戳列表
-     */
-    private final List<Long> timestampList;
-    /**
-     * 交易的标的的 k 线列表
-     */
-    private final Map<Symbol, Map<Long, Candle>> klineMap;
+
+    // 组件管理器
+    private final TimeManager timeManager;
+    private final BalanceManager balanceManager;
+    private final FeeCalculator feeCalculator;
+    private final PriceProvider priceProvider;
+    private final PositionManager positionManager;
+    private final OrderManager orderManager;
+    private final TradingConfig config;
 
     /**
-     * 初始金额
-     */
-    private double balance = INITIAL_BALANCE;
-    /**
-     * 手续费总计
-     */
-    private double feeCount = 0.0;
-    /**
-     * 下一个订单的订单 id
-     */
-    private long orderId = 0;
-    /**
-     * 下一个交易记录的 id
-     */
-    private long recordId = 0;
-    /**
-     * 时间戳对应的在列表中的 index
-     */
-    private int timestampIndex = -1;
-    /**
-     * 当前在进行中的交易的时间戳
-     */
-    private long timestamp;
-
-    /**
-     * 构造方法，构建一个全新的交易引擎
+     * 构造器
      *
-     * @param timestamps 写入交易的时间
-     * @param klineMap   写入交易的标的以及在对应的时间段的 K 线
+     * @param timestamps 交易时间序列
+     * @param klineMap   K线数据
      */
     public TradeEngine(List<Long> timestamps, Map<Symbol, Map<Long, Candle>> klineMap) {
-        if (timestamps == null || timestamps.isEmpty()) {
-            throw new IllegalArgumentException("Trading time list cannot be null or empty");
-        }
-        if (klineMap == null || klineMap.isEmpty()) {
-            throw new IllegalArgumentException("KlineMap cannot be null or empty");
-        }
-        this.timestampList = timestamps;
-        this.klineMap = klineMap;
+        this(timestamps, klineMap, new TradingConfig());
     }
 
     /**
-     * 是否存在下一个交易周期
+     * 构造器（带配置）
+     *
+     * @param timestamps 交易时间序列
+     * @param klineMap   K线数据
+     * @param config     交易配置
+     */
+    public TradeEngine(List<Long> timestamps, Map<Symbol, Map<Long, Candle>> klineMap, TradingConfig config) {
+        this.config = config;
+        this.timeManager = new TimeManager(timestamps);
+        this.balanceManager = new BalanceManager(config.getInitialBalance(), config.getEpsilon());
+        this.feeCalculator = new FeeCalculator(config.getFeeRate());
+        this.priceProvider = new KlinePriceProvider(klineMap);
+        this.positionManager = new PositionManager(config.getEpsilon());
+        this.orderManager = new OrderManager();
+    }
+
+    /**
+     * 是否还有下一个交易周期
      */
     public boolean hasNext() {
-        return timestampIndex + 1 < timestampList.size();
+        return timeManager.hasNext();
     }
 
     /**
      * 开启下一个交易周期
      */
     public long next() {
-        if (!this.hasNext()) {
-            return -1;
-        }
-        if (timestampIndex + 1 >= timestampList.size()) {
-            return -1; // 或抛出异常
-        }
-        timestampIndex++;
-        timestamp = timestampList.get(timestampIndex);
-        return timestamp;
+        return timeManager.next();
     }
 
     /**
-     * 卖出
+     * 按比例买入
      *
-     * @param symbol     标的
-     * @param proportion 占有现在仓位的比例
+     * @param symbol     交易标的
+     * @param proportion 买入比例
+     */
+    public void buy(Symbol symbol, Proportion proportion) {
+        validateTrading();
+
+        double amount = balanceManager.getBalance() * proportion.getValue() / 100.0;
+        double price = getCurrentPrice(symbol);
+        double maxQuantity = feeCalculator.calculateMaxQuantity(amount, price);
+
+        buy(symbol, maxQuantity);
+    }
+
+    /**
+     * 买入指定数量
+     *
+     * @param symbol   交易标的
+     * @param quantity 买入数量
+     */
+    public void buy(Symbol symbol, double quantity) {
+        validateTrading();
+
+        if (quantity <= 0) {
+            return;
+        }
+
+        double price = getCurrentPrice(symbol);
+        double totalCost = feeCalculator.calculateTotalCost(quantity, price);
+
+        if (balanceManager.canAfford(totalCost)) {
+            balanceManager.deduct(totalCost);
+
+            Order buyOrder = orderManager.createBuyOrder(symbol, quantity, price, timeManager.getCurrentTimestamp());
+            positionManager.addPosition(symbol, buyOrder);
+        }
+    }
+
+    /**
+     * 按比例卖出
+     *
+     * @param symbol     交易标的
+     * @param proportion 卖出比例
      */
     public void sell(Symbol symbol, Proportion proportion) {
-        List<Position> positionList = positions.get(symbol);
-        if (positionList == null || positionList.isEmpty()) {
+        validateTrading();
+
+        double totalQuantity = positionManager.getTotalQuantity(symbol);
+        if (totalQuantity <= 0) {
             return;
         }
 
-        double totalQuantity = positionList.stream().mapToDouble(Position::getQuantity).sum();
-        double sellQuantity = totalQuantity * proportion.getValue() / 100;
-
-        if (sellQuantity <= 0) {
-            return;
-        }
-
-        this.sell(symbol, sellQuantity);
+        double sellQuantity = totalQuantity * proportion.getValue() / 100.0;
+        sell(symbol, sellQuantity);
     }
 
     /**
-     * 卖出
+     * 卖出指定数量
      *
-     * @param symbol 标的
-     * @param amount 成交额
+     * @param symbol   交易标的
+     * @param quantity 卖出数量
+     */
+    public void sell(Symbol symbol, double quantity) {
+        validateTrading();
+
+        if (quantity <= 0) {
+            return;
+        }
+
+        double price = getCurrentPrice(symbol);
+        Order sellOrder = orderManager.createSellOrder(symbol, quantity, price, timeManager.getCurrentTimestamp());
+
+        SellResult result = positionManager.sellQuantity(symbol, quantity, price, sellOrder.getOrderId(),
+                timeManager.getCurrentTimestamp());
+
+        // 将交易记录添加到订单管理器
+        for (Trade trade : result.getTrades()) {
+            orderManager.addTrade(trade.getBuyOrderId(), trade.getSellOrderId(), trade.getSymbol(), trade.getQuantity(),
+                    trade.getBuyPrice(), trade.getSellPrice(), trade.getBuyTime(), trade.getSellTime(), trade.getCost(),
+                    trade.getRevenue(), trade.getProfit());
+        }
+
+        // 将收入添加到余额
+        double totalRevenue = result.getTrades().stream()
+                .mapToDouble(trade -> feeCalculator.calculateRevenue(trade.getQuantity(), price)).sum();
+        balanceManager.add(totalRevenue);
+    }
+
+    /**
+     * 按金额卖出
+     *
+     * @param symbol 交易标的
+     * @param amount 卖出金额
      */
     public void sellAmount(Symbol symbol, double amount) {
-        List<Position> positionList = positions.get(symbol);
-        if (positionList == null || positionList.isEmpty()) {
+        validateTrading();
+
+        if (amount <= 0) {
             return;
         }
-        double price = this.getPrice(symbol);
-        double sellQuantity = amount / price;
 
-        this.sell(symbol, sellQuantity);
-    }
-
-    public void buy(Symbol symbol, Proportion proportion) {
-        double amount = this.balance * proportion.getValue() / 100;
-        double maxQuantity = this.getMaxQuantity(symbol, amount);
-        this.buy(symbol, maxQuantity);
-    }
-
-    public double getQuantity(Symbol symbol) {
-        List<Position> positionList = positions.get(symbol);
-        if (positionList == null || positionList.isEmpty()) {
-            return 0d;
-        }
-
-        Optional<Double> optional = positionList.stream().map(Position::getQuantity).reduce(Double::sum);
-        return optional.orElse(0d);
-    }
-
-    public List<Position> getPositions(Symbol symbol) {
-        List<Position> list = positions.get(symbol);
-        return list != null ? new ArrayList<>(list) : new ArrayList<>();
-    }
-
-    public double getBalance() {
-        return this.balance;
-    }
-
-    public double getPositionAsset() {
-        double asset = 0;
-        for (Symbol Symbol : positions.keySet()) {
-            double quantity = this.getQuantity(Symbol);
-            asset += quantity * this.getPrice(Symbol);
-        }
-        return asset;
+        double price = getCurrentPrice(symbol);
+        double quantity = amount / price;
+        sell(symbol, quantity);
     }
 
     /**
-     * 结束交易，卖出所有持仓，记录结果并导出
+     * 获取当前余额
+     */
+    public double getBalance() {
+        return balanceManager.getBalance();
+    }
+
+    /**
+     * 获取指定标的的持仓数量
+     */
+    public double getQuantity(Symbol symbol) {
+        return positionManager.getTotalQuantity(symbol);
+    }
+
+    /**
+     * 获取指定标的的所有仓位
+     */
+    public List<Position> getPositions(Symbol symbol) {
+        return positionManager.getPositions(symbol);
+    }
+
+    /**
+     * 获取持仓总价值
+     */
+    public double getPositionAsset() {
+        return positionManager.getTotalPositionValue(this::getCurrentPrice);
+    }
+
+    /**
+     * 结束交易，清仓并生成交易记录
      */
     public TradeRecord exit() {
-        for (Symbol Symbol : klineMap.keySet()) {
-            this.sell(Symbol, Proportion.PROPORTION_OF_100);
+        // 清仓所有持仓
+        for (Symbol symbol : positionManager.getHeldSymbols()) {
+            sell(symbol, Proportion.PROPORTION_OF_100);
         }
+
+        // 生成交易记录
         TradeRecord tradeRecord = new TradeRecord();
-        tradeRecord.setBalance(balance);
-        tradeRecord.setOrders(orders);
-        tradeRecord.setInitialBalance(INITIAL_BALANCE);
-        tradeRecord.setFeeCount(feeCount);
-        tradeRecord.setRecords(records);
+        tradeRecord.setBalance(balanceManager.getBalance());
+        tradeRecord.setInitialBalance(balanceManager.getInitialBalance());
+        tradeRecord.setFeeCount(feeCalculator.getTotalFees());
+        tradeRecord.setOrders(orderManager.getAllOrders());
+
+        // 获取所有交易记录（从订单管理器中获取）
+        List<Trade> allTrades = orderManager.getAllTrades();
+        tradeRecord.setRecords(allTrades);
+
         return tradeRecord;
     }
 
-    public double getPrice(Symbol symbol) {
-        Candle kline = CollectionUtils.get(klineMap, symbol, timestamp);
-        if (Objects.isNull(kline)) {
-            throw new IllegalArgumentException("Invalid kline getting parameters: symbol=" + symbol.name() + ", date=" + DateUtils.getDate(
-                    timestamp));
-        }
-        return kline.getOpen();
+    /**
+     * 获取当前价格
+     */
+    private double getCurrentPrice(Symbol symbol) {
+        return priceProvider.getPrice(symbol, timeManager.getCurrentTimestamp());
     }
 
     /**
-     * 买入的股数
-     *
-     * @param symbol   币对
-     * @param quantity 数量
+     * 验证交易状态
      */
-    public void buy(Symbol symbol, double quantity) {
-        double price = this.getPrice(symbol);
-        if (quantity <= 0 || price <= 0) {
-            return;
-        }
-
-        double cost = this.calculateTotalCost(symbol, quantity);
-        if (cost >= 1 && balance + EPSILON >= cost) {
-            balance -= cost;
-
-            List<Position> positionList = positions.getOrDefault(symbol, new ArrayList<>());
-            long orderId = generateOrderId();
-            positionList.add(new Position(symbol, orderId, price, quantity, timestamp));
-            positions.put(symbol, positionList);
-            orders.add(new Order(orderId, symbol, BUY, price, quantity, timestamp));
-        }
+    private void validateTrading() {
+        // 这里可以添加交易前的验证逻辑
+        // 例如检查是否在交易时间内等
     }
 
-    public void sell(Symbol symbol, double quantity) {
-        double price = this.getPrice(symbol);
-        if (quantity <= 0 || price <= 0) {
-            return;
-        }
-
-        List<Position> positionList = positions.get(symbol);
-        if (positionList == null || positionList.isEmpty()) {
-            return;
-        }
-
-        double remainingQuantity = quantity;
-        Iterator<Position> iterator = positionList.iterator();
-        double totalRevenue = 0.0;
-
-        long orderId = generateOrderId();
-        while (iterator.hasNext() && remainingQuantity > 0) {
-            Position position = iterator.next();
-            if (Math.abs(position.getQuantity()) < EPSILON) {
-                iterator.remove();
-                continue;
-            }
-            double sellQuantity = Math.min(position.getQuantity(), remainingQuantity);
-
-            double revenue = this.calculateRevenue(symbol, sellQuantity);
-            totalRevenue += revenue;
-            Trade record = this.buildTradeRecord(position, revenue, sellQuantity);
-            records.add(record);
-
-            double newQuantity = position.getQuantity() - sellQuantity;
-            position.setQuantity(newQuantity);
-            remainingQuantity -= sellQuantity;
-            if (Math.abs(newQuantity) < EPSILON) {
-                iterator.remove();
-            }
-        }
-        balance += totalRevenue;
-        orders.add(new Order(orderId, symbol, SELL, price, quantity, timestamp));
+    /**
+     * 获取配置信息
+     */
+    public TradingConfig getConfig() {
+        return config;
     }
 
-    private Trade buildTradeRecord(Position position, double revenue, double sellQuantity) {
-        Symbol symbol = position.getSymbol();
-        double price = this.getPrice(symbol);
-
-        double buyPrice = position.getPrice();
-        double profit = revenue - buyPrice * sellQuantity;
-        Trade record = new Trade();
-        record.setId(generateRecordId());
-        record.setBuyOrderId(position.getOrderId());
-        record.setHoldDays(DateUtils.getDaysBetween(position.getTimestamp(), timestamp));
-        record.setBuyPrice(buyPrice);
-        record.setBuyTime(position.getTimestamp());
-        record.setSellOrderId(orderId);
-        record.setSellPrice(price);
-        record.setSellTime(timestamp);
-        record.setQuantity(sellQuantity);
-        record.setSymbol(symbol);
-        record.setProfit(profit);
-        record.setProfitRate(price / buyPrice);
-        record.setRevenue(revenue);
-        record.setCost(sellQuantity * buyPrice);
-        return record;
-    }
-
-    public double getMaxQuantity(Symbol symbol, double amount) {
-        double price = this.getPrice(symbol);
-        return amount / (price * (1 + FEE));
-    }
-
-    private double calculateTotalCost(Symbol symbol, double quantity) {
-        double cost = this.getPrice(symbol) * quantity;
-        double curFee = cost * FEE;
-        feeCount += curFee;
-        return cost + curFee;
-    }
-
-    private double calculateRevenue(Symbol symbol, double quantity) {
-        double price = this.getPrice(symbol);
-        double revenue = price * quantity;
-        double curFee = revenue * FEE;
-        feeCount += curFee;
-        return revenue - curFee;
-    }
-
-    private long generateOrderId() {
-        orderId++;
-        return orderId;
-    }
-
-    private long generateRecordId() {
-        recordId++;
-        return recordId;
+    /**
+     * 获取交易统计信息
+     */
+    public String getStatistics() {
+        return String.format(
+                "TradeEngine Statistics:\n" + "  %s\n" + "  %s\n" + "  %s\n" + "  %s\n" + "  %s\n"
+                        + "  Progress: %.1f%%",
+                balanceManager.toString(), feeCalculator.toString(), positionManager.toString(),
+                orderManager.toString(), timeManager.toString(), timeManager.getProgress());
     }
 }
