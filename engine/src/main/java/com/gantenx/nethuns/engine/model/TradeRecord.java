@@ -1,8 +1,7 @@
 package com.gantenx.nethuns.engine.model;
 
-import com.gantenx.nethuns.commons.annotation.ExcelColumn;
-
 import java.util.List;
+import com.gantenx.nethuns.commons.annotation.ExcelColumn;
 
 public class TradeRecord {
     private double balance;
@@ -21,8 +20,7 @@ public class TradeRecord {
         this.records = records;
     }
 
-    public TradeRecord() {
-    }
+    public TradeRecord() {}
 
     public double getBalance() {
         return balance;

@@ -1,14 +1,13 @@
 package com.gantenx.nethuns.engine.calculator;
 
 
-import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.engine.model.ProfitRate;
-import com.gantenx.nethuns.commons.utils.DateUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.utils.DateUtils;
+import com.gantenx.nethuns.engine.model.ProfitRate;
 
 public class ProfitCalculator {
     public static List<ProfitRate> calculator(List<Long> timestampList, Map<Symbol, Map<Long, Kline>> klineMap) {
@@ -30,5 +29,4 @@ public class ProfitCalculator {
         }
         return list;
     }
-
 }

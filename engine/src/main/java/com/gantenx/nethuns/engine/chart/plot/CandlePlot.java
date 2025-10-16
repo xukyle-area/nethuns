@@ -1,20 +1,20 @@
 package com.gantenx.nethuns.engine.chart.plot;
 
-import com.gantenx.nethuns.commons.constant.Series;
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.commons.model.Pair;
+import static com.gantenx.nethuns.commons.constant.Constants.CANDLE;
+import static com.gantenx.nethuns.commons.constant.Constants.PRICE;
+import static com.gantenx.nethuns.commons.constant.Constants.TIME;
+import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_LEFT;
+import java.util.Date;
+import java.util.Map;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.data.xy.DefaultHighLowDataset;
-
-import java.util.Date;
-import java.util.Map;
-
-import static com.gantenx.nethuns.commons.constant.Constants.*;
-import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_LEFT;
+import com.gantenx.nethuns.commons.constant.Series;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.model.Pair;
 
 public class CandlePlot {
 

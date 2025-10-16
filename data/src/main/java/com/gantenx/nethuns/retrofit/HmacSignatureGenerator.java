@@ -1,11 +1,10 @@
 package com.gantenx.nethuns.retrofit;
 
 
-import org.apache.commons.codec.binary.Hex;
-
+import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Objects;
+import org.apache.commons.codec.binary.Hex;
 
 
 public final class HmacSignatureGenerator implements SignatureGenerator {

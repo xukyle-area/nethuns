@@ -1,16 +1,14 @@
 package com.gantenx.nethuns.indicator;
 
 
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-import lombok.extern.slf4j.Slf4j;
-
+import static com.gantenx.nethuns.commons.constant.Constants.RSI_PERIOD;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static com.gantenx.nethuns.commons.constant.Constants.RSI_PERIOD;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j

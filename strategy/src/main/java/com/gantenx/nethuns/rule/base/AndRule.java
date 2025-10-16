@@ -42,7 +42,7 @@ public class AndRule extends AbstractRule {
     }
 
     @Override
-    public boolean isSatisfied(long timestamp){
+    public boolean isSatisfied(long timestamp) {
         return false;
     }
 }

@@ -1,11 +1,10 @@
 package com.gantenx.nethuns.indicator;
 
-import com.gantenx.nethuns.indicator.base.AbstractIndicator;
-import com.gantenx.nethuns.indicator.base.Indicator;
-import org.jfree.chart.JFreeChart;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jfree.chart.JFreeChart;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
+import com.gantenx.nethuns.indicator.base.Indicator;
 
 public class CrossIndicator extends AbstractIndicator<Boolean> {
 

@@ -1,12 +1,11 @@
 package com.gantenx.nethuns.socket.base;
 
-import lombok.extern.slf4j.Slf4j;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.function.Consumer;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SocketClient extends WebSocketClient {

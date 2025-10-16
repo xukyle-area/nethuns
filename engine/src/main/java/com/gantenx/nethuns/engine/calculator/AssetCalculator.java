@@ -1,25 +1,21 @@
 package com.gantenx.nethuns.engine.calculator;
 
-import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.engine.model.Order;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-
+import static com.gantenx.nethuns.commons.constant.Constants.FEE;
+import static com.gantenx.nethuns.commons.constant.Side.BUY;
+import static com.gantenx.nethuns.commons.constant.Side.SELL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static com.gantenx.nethuns.commons.constant.Constants.FEE;
-import static com.gantenx.nethuns.commons.constant.Side.BUY;
-import static com.gantenx.nethuns.commons.constant.Side.SELL;
+import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import com.gantenx.nethuns.engine.model.Order;
 
 public class AssetCalculator {
 
-    public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Kline>> klineMap,
-                                                      List<Long> timestampList,
-                                                      List<Order> orders,
-                                                      double init) {
+    public static Map<Long, Double> calculateAssetMap(Map<Symbol, Map<Long, Kline>> klineMap, List<Long> timestampList,
+            List<Order> orders, double init) {
         // 参数验证
         if (CollectionUtils.isEmpty(timestampList) || klineMap == null || init < 0) {
             throw new IllegalArgumentException("Invalid input parameters");
@@ -66,9 +62,8 @@ public class AssetCalculator {
     }
 
     // 抽取持仓市值计算逻辑
-    private static double calculatePositionAsset(Map<Symbol, Double> positions,
-                                                 Map<Symbol, Map<Long, Kline>> klineMap,
-                                                 long timestamp) {
+    private static double calculatePositionAsset(Map<Symbol, Double> positions, Map<Symbol, Map<Long, Kline>> klineMap,
+            long timestamp) {
         return positions.entrySet().stream().mapToDouble(entry -> {
             Symbol symbol = entry.getKey();
             double quantity = entry.getValue();

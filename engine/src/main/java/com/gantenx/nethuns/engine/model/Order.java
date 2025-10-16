@@ -6,10 +6,10 @@ import com.gantenx.nethuns.commons.constant.Symbol;
 import com.gantenx.nethuns.commons.model.Time;
 
 public class Order extends Time {
-    private final Symbol symbol;    // 标的符号
-    private final Side type;       // "buy" or "sell"
-    private final double price;      // 价格
-    private final double quantity;   // 数量
+    private final Symbol symbol; // 标的符号
+    private final Side type; // "buy" or "sell"
+    private final double price; // 价格
+    private final double quantity; // 数量
     private long orderId;
 
     public Order(long orderId, Symbol symbol, Side side, double price, double quantity, long timestamp) {
@@ -47,11 +47,7 @@ public class Order extends Time {
 
     @Override
     public String toString() {
-        return "Order{" +
-                "type='" + type + '\'' +
-                ", price=" + price +
-                ", quantity=" + quantity +
-                ", timestamp=" + super.getTimestamp() +
-                '}';
+        return "Order{" + "type='" + type + '\'' + ", price=" + price + ", quantity=" + quantity + ", timestamp="
+                + super.getTimestamp() + '}';
     }
 }

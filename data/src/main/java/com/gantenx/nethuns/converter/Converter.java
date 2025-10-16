@@ -1,9 +1,8 @@
 package com.gantenx.nethuns.converter;
 
-import com.gantenx.nethuns.commons.model.Kline;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.gantenx.nethuns.commons.model.Kline;
 
 public class Converter {
 

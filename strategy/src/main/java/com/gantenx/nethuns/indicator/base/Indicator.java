@@ -1,9 +1,8 @@
 package com.gantenx.nethuns.indicator.base;
 
 
-import com.gantenx.nethuns.commons.model.Kline;
-
 import java.util.Map;
+import com.gantenx.nethuns.commons.model.Kline;
 
 public interface Indicator<T> {
 

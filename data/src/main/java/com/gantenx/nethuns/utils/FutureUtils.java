@@ -1,11 +1,10 @@
 package com.gantenx.nethuns.utils;
 
-import com.gantenx.nethuns.converter.Converter;
-import retrofit2.Call;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import com.gantenx.nethuns.converter.Converter;
+import retrofit2.Call;
 
 public class FutureUtils {
 

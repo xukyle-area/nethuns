@@ -1,8 +1,14 @@
 package com.gantenx.nethuns.engine.chart.plot;
 
 
-import com.gantenx.nethuns.commons.constant.Series;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import static com.gantenx.nethuns.commons.constant.Constants.BASE_STROKE;
+import static com.gantenx.nethuns.commons.constant.Constants.DATA;
+import static com.gantenx.nethuns.commons.constant.Constants.TIME;
+import static com.gantenx.nethuns.commons.constant.Constants.TITLE;
+import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_LEFT;
+import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_RIGHT;
+import java.awt.Color;
+import java.util.Map;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -10,13 +16,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
-import java.awt.*;
-import java.util.Map;
-
-import static com.gantenx.nethuns.commons.constant.Constants.*;
-import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_LEFT;
-import static org.jfree.chart.axis.AxisLocation.BOTTOM_OR_RIGHT;
+import com.gantenx.nethuns.commons.constant.Series;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
 
 public class LinePlot {
 

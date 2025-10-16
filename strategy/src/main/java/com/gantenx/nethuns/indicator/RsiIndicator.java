@@ -1,16 +1,15 @@
 package com.gantenx.nethuns.indicator;
 
-import com.gantenx.nethuns.indicator.base.AbstractIndicator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
 import com.gantenx.nethuns.commons.constant.Series;
 import com.gantenx.nethuns.commons.model.Kline;
 import com.gantenx.nethuns.engine.chart.Chart;
 import com.gantenx.nethuns.engine.chart.plot.LinePlot;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.XYPlot;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 
 public class RsiIndicator extends AbstractIndicator<Double> {
 

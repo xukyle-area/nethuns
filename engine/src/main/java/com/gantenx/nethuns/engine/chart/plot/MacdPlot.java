@@ -1,7 +1,14 @@
 package com.gantenx.nethuns.engine.chart.plot;
 
 
-import com.gantenx.nethuns.indicator.model.MacdDetail;
+import static com.gantenx.nethuns.commons.constant.Index.HISTOGRAM;
+import static com.gantenx.nethuns.commons.constant.Series.MACD_DETAIL;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Paint;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
@@ -11,19 +18,11 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.Layer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.Map;
-import java.util.Objects;
-
-import static com.gantenx.nethuns.commons.constant.Index.HISTOGRAM;
-import static com.gantenx.nethuns.commons.constant.Series.MACD_DETAIL;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
 
 public class MacdPlot {
 
-    public static XYBarRenderer createHistogramRenderer(Map<Long, MacdDetail> subDataMap,
-                                                        XYSeries histogramSeries) {
+    public static XYBarRenderer createHistogramRenderer(Map<Long, MacdDetail> subDataMap, XYSeries histogramSeries) {
         return new XYBarRenderer() {
             @Override
             public Paint getItemPaint(int row, int column) {

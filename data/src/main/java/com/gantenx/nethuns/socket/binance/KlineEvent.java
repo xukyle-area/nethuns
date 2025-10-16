@@ -8,13 +8,13 @@ public class KlineEvent {
     private String eventType; // 事件类型
 
     @JsonProperty("E")
-    private long eventTime;   // 事件时间
+    private long eventTime; // 事件时间
 
     @JsonProperty("s")
-    private String symbol;    // 交易对
+    private String symbol; // 交易对
 
     @JsonProperty("k")
-    private Kline kline;  // K线数据
+    private Kline kline; // K线数据
 
     // Getters and Setters
     public String getEventType() {
@@ -55,10 +55,10 @@ public class KlineEvent {
         private long startTime; // 这根K线的起始时间
 
         @JsonProperty("T")
-        private long endTime;   // 这根K线的结束时间
+        private long endTime; // 这根K线的结束时间
 
         @JsonProperty("s")
-        private String symbol;  // 交易对
+        private String symbol; // 交易对
 
         @JsonProperty("i")
         private String interval; // K线间隔
@@ -67,28 +67,28 @@ public class KlineEvent {
         private long firstTradeId; // 这根K线期间第一笔成交ID
 
         @JsonProperty("L")
-        private long lastTradeId;  // 这根K线期间末一笔成交ID
+        private long lastTradeId; // 这根K线期间末一笔成交ID
 
         @JsonProperty("o")
-        private String openPrice;  // 这根K线期间第一笔成交价
+        private String openPrice; // 这根K线期间第一笔成交价
 
         @JsonProperty("c")
         private String closePrice; // 这根K线期间末一笔成交价
 
         @JsonProperty("h")
-        private String highPrice;  // 这根K线期间最高成交价
+        private String highPrice; // 这根K线期间最高成交价
 
         @JsonProperty("l")
-        private String lowPrice;   // 这根K线期间最低成交价
+        private String lowPrice; // 这根K线期间最低成交价
 
         @JsonProperty("v")
-        private String volume;     // 这根K线期间成交量
+        private String volume; // 这根K线期间成交量
 
         @JsonProperty("n")
-        private int tradeCount;    // 这根K线期间成交数量
+        private int tradeCount; // 这根K线期间成交数量
 
         @JsonProperty("x")
-        private boolean isClosed;  // 这根K线是否完结
+        private boolean isClosed; // 这根K线是否完结
 
         @JsonProperty("q")
         private String quoteVolume; // 这根K线期间成交额

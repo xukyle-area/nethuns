@@ -1,16 +1,13 @@
 package com.gantenx.nethuns.indicator;
 
-import com.gantenx.nethuns.commons.constant.Index;
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.indicator.model.MacdDetail;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-
 import static com.gantenx.nethuns.commons.constant.Index.DIF;
 import static com.gantenx.nethuns.commons.constant.Index.EMA;
+import java.awt.Color;
+import java.util.*;
+import com.gantenx.nethuns.commons.constant.Index;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import com.gantenx.nethuns.indicator.model.MacdDetail;
 
 
 public class MacdIndicator {
@@ -58,9 +55,8 @@ public class MacdIndicator {
         return resultMap;
     }
 
-    private static Color determineHistogramColor(Long previousTimestamp,
-                                                 MacdDetail macdDetail,
-                                                 Map<Long, MacdDetail> resultMap) {
+    private static Color determineHistogramColor(Long previousTimestamp, MacdDetail macdDetail,
+            Map<Long, MacdDetail> resultMap) {
         if (previousTimestamp == null) {
             return Color.GRAY; // 没有前一个时间点，返回默认颜色
         } else {
@@ -77,12 +73,10 @@ public class MacdIndicator {
         }
     }
 
-    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Kline> klineMap,
-                                                               int fastLength,
-                                                               int slowLength,
-                                                               int signalLength) {
-        Map<Long, Double> shortEMA = calculateEMA(klineMap, fastLength);  // 12日EMA
-        Map<Long, Double> longEMA = calculateEMA(klineMap, slowLength);   // 26日EMA
+    private static Map<Index, Map<Long, Double>> calculateMACD(Map<Long, Kline> klineMap, int fastLength,
+            int slowLength, int signalLength) {
+        Map<Long, Double> shortEMA = calculateEMA(klineMap, fastLength); // 12日EMA
+        Map<Long, Double> longEMA = calculateEMA(klineMap, slowLength); // 26日EMA
 
         // 计算MACD线（DIF）
         Map<Long, Double> macdLine = new HashMap<>();

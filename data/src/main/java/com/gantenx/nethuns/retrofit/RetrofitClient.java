@@ -1,10 +1,9 @@
 package com.gantenx.nethuns.retrofit;
 
+import static com.gantenx.nethuns.commons.constant.Constants.BINANCE_URL;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.gantenx.nethuns.commons.constant.Constants.BINANCE_URL;
 
 
 public class RetrofitClient {
@@ -14,12 +13,10 @@ public class RetrofitClient {
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
-            okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new AuthInterceptor()).build();
+            okHttpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor()).build();
 
-            retrofit = new Retrofit.Builder().baseUrl(BINANCE_URL)
-                    .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient)
-                    .build();
+            retrofit = new Retrofit.Builder().baseUrl(BINANCE_URL).addConverterFactory(GsonConverterFactory.create())
+                    .client(okHttpClient).build();
         }
         return retrofit;
     }

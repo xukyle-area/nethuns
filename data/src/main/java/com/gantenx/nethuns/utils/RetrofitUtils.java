@@ -1,18 +1,15 @@
 package com.gantenx.nethuns.utils;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 public class RetrofitUtils {
 
-    public static <T, R> CompletableFuture<R> enqueueRequest(
-            Call<T> call,
-            Function<T, R> successHandler,
+    public static <T, R> CompletableFuture<R> enqueueRequest(Call<T> call, Function<T, R> successHandler,
             Consumer<String> errorHandler) {
 
         CompletableFuture<R> future = new CompletableFuture<>();

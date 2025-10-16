@@ -1,12 +1,11 @@
 package com.gantenx.nethuns.retrofit;
 
+import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okio.Buffer;
-import org.jetbrains.annotations.NotNull;
 import retrofit2.Invocation;
-
-import java.io.IOException;
 
 @Slf4j
 public class AuthInterceptor implements Interceptor {
@@ -44,9 +43,8 @@ public class AuthInterceptor implements Interceptor {
         HttpUrl requestUrl = request.url();
         RequestBody body = request.body();
 
-        Request.Builder builder = request.newBuilder()
-                .header(CONTENT_TYPE, APPLICATION_JSON)
-                .header(X_MBX_APIKEY, apiKey);
+        Request.Builder builder =
+                request.newBuilder().header(CONTENT_TYPE, APPLICATION_JSON).header(X_MBX_APIKEY, apiKey);
 
         // Generate signature based on request method (GET or POST)
         String signature = this.generateSignature(method, requestUrl, body, timestamp);
@@ -58,10 +56,8 @@ public class AuthInterceptor implements Interceptor {
         return chain.proceed(builder.build());
     }
 
-    private String generateSignature(String method,
-                                     HttpUrl requestUrl,
-                                     RequestBody body,
-                                     long timestamp) throws IOException {
+    private String generateSignature(String method, HttpUrl requestUrl, RequestBody body, long timestamp)
+            throws IOException {
         if (method.equalsIgnoreCase(GET)) {
             // For GET requests, use the query part of the URL to generate the signature
             return signatureGenerator.getSignature(requestUrl.query(), timestamp);
@@ -78,9 +74,7 @@ public class AuthInterceptor implements Interceptor {
 
     private HttpUrl buildUrlWithParams(HttpUrl originalUrl, long timestamp, String signature) {
         // Add the timestamp and signature as query parameters to the URL
-        return originalUrl.newBuilder()
-                .addQueryParameter(TIMESTAMP, String.valueOf(timestamp))
-                .addQueryParameter(SIGNATURE, signature)
-                .build();
+        return originalUrl.newBuilder().addQueryParameter(TIMESTAMP, String.valueOf(timestamp))
+                .addQueryParameter(SIGNATURE, signature).build();
     }
 }

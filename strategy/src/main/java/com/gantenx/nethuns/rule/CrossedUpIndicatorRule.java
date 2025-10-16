@@ -1,11 +1,10 @@
 package com.gantenx.nethuns.rule;
 
+import java.util.Objects;
 import com.gantenx.nethuns.indicator.ConstantIndicator;
 import com.gantenx.nethuns.indicator.CrossIndicator;
 import com.gantenx.nethuns.indicator.base.Indicator;
 import com.gantenx.nethuns.rule.base.AbstractRule;
-
-import java.util.Objects;
 
 /**
  * the value of the second one.

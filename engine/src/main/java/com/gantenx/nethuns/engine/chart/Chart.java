@@ -1,7 +1,12 @@
 package com.gantenx.nethuns.engine.chart;
 
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-import com.gantenx.nethuns.engine.model.Order;
+import static com.gantenx.nethuns.commons.constant.Constants.CHART_HEIGHT;
+import static com.gantenx.nethuns.commons.constant.Constants.CHART_WIDTH;
+import static com.gantenx.nethuns.commons.constant.Constants.TITLE;
+import java.awt.Dimension;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Objects;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
@@ -9,13 +14,8 @@ import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.ui.ApplicationFrame;
-
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Objects;
-
-import static com.gantenx.nethuns.commons.constant.Constants.*;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import com.gantenx.nethuns.engine.model.Order;
 
 
 public class Chart extends ApplicationFrame {
@@ -34,8 +34,8 @@ public class Chart extends ApplicationFrame {
     private void setupChartPanel() {
         ChartPanel chartPanel = new ChartPanel(combinedChart);
         chartPanel.setPreferredSize(new Dimension(CHART_WIDTH, CHART_HEIGHT));
-        chartPanel.setMouseWheelEnabled(false);  // 禁用鼠标滚轮
-        chartPanel.setMouseZoomable(false);      // 禁用鼠标缩放
+        chartPanel.setMouseWheelEnabled(false); // 禁用鼠标滚轮
+        chartPanel.setMouseZoomable(false); // 禁用鼠标缩放
         // 不设置内容面板为图表，可避免窗口跳转
         this.setVisible(false); // 隐藏窗口
         this.setContentPane(chartPanel); // 保留渲染内容

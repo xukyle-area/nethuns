@@ -1,13 +1,12 @@
 package com.gantenx.nethuns.converter;
 
 
-import com.gantenx.nethuns.commons.constant.Period;
-import com.gantenx.nethuns.commons.model.Kline;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import com.gantenx.nethuns.commons.constant.Period;
+import com.gantenx.nethuns.commons.model.Kline;
 
 
 public class KlineConverter {
@@ -18,7 +17,7 @@ public class KlineConverter {
 
         // 遍历时间戳区间
         for (long timestamp = start; timestamp <= end; timestamp += Period.D_1.getMillisecond()) {
-            Kline baseKline = baseMap.get(timestamp);  // A/USD Kline
+            Kline baseKline = baseMap.get(timestamp); // A/USD Kline
             Kline quoteKline = quoteMap.get(timestamp); // B/USD Kline
 
             // 如果基准数据和目标数据都存在，则进行转换

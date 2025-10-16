@@ -1,20 +1,19 @@
 package com.gantenx.nethuns.engine.chart;
 
-import com.gantenx.nethuns.commons.constant.Symbol;
-import com.gantenx.nethuns.engine.model.Order;
-import com.gantenx.nethuns.commons.utils.CollectionUtils;
-import com.gantenx.nethuns.commons.utils.DateUtils;
+import static com.gantenx.nethuns.commons.constant.Side.BUY;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ui.TextAnchor;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.gantenx.nethuns.commons.constant.Side.BUY;
+import com.gantenx.nethuns.commons.constant.Symbol;
+import com.gantenx.nethuns.commons.utils.CollectionUtils;
+import com.gantenx.nethuns.commons.utils.DateUtils;
+import com.gantenx.nethuns.engine.model.Order;
 
 
 public class OrderMarker {
@@ -44,8 +43,7 @@ public class OrderMarker {
             return;
         }
 
-        Map<Long, List<Order>> ordersByTimestamp = orders.stream()
-                .collect(Collectors.groupingBy(Order::getTimestamp));
+        Map<Long, List<Order>> ordersByTimestamp = orders.stream().collect(Collectors.groupingBy(Order::getTimestamp));
 
         List<Long> sortedTimestamps = CollectionUtils.getTimestamps(ordersByTimestamp);
 
@@ -61,22 +59,14 @@ public class OrderMarker {
         Color lineColor = isBuyOrder ? BUY_COLOR : SELL_COLOR;
 
         // 添加竖直线到 mainPlot
-        XYLineAnnotation mainLine = new XYLineAnnotation(
-                timestamp, mainPlot.getRangeAxis().getLowerBound(),
-                timestamp, mainPlot.getRangeAxis().getUpperBound(),
-                createDashedStroke(),
-                lineColor
-        );
+        XYLineAnnotation mainLine = new XYLineAnnotation(timestamp, mainPlot.getRangeAxis().getLowerBound(), timestamp,
+                mainPlot.getRangeAxis().getUpperBound(), createDashedStroke(), lineColor);
         mainPlot.addAnnotation(mainLine);
 
         // 添加竖直线到 rsiPlot
         if (Objects.nonNull(subPlot)) {
-            XYLineAnnotation rsiLine = new XYLineAnnotation(timestamp,
-                                                            subPlot.getRangeAxis().getLowerBound(),
-                                                            timestamp,
-                                                            subPlot.getRangeAxis().getUpperBound(),
-                                                            createDashedStroke(),
-                                                            lineColor);
+            XYLineAnnotation rsiLine = new XYLineAnnotation(timestamp, subPlot.getRangeAxis().getLowerBound(),
+                    timestamp, subPlot.getRangeAxis().getUpperBound(), createDashedStroke(), lineColor);
             subPlot.addAnnotation(rsiLine);
         }
 
@@ -85,14 +75,8 @@ public class OrderMarker {
     }
 
     private BasicStroke createDashedStroke() {
-        return new BasicStroke(
-                LINE_WIDTH,
-                BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_MITER,
-                10.0f,
-                new float[]{10.0f},
-                0.0f
-        );
+        return new BasicStroke(LINE_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f},
+                0.0f);
     }
 
     private void addOrderTag(Long timestamp, List<Order> orders) {
@@ -144,7 +128,8 @@ public class OrderMarker {
         boolean isTopPosition = timestampId % 2 == 0;
         int tiers = timestampId % 3 + 1;
         // 动态计算基础 Y 坐标
-        double baseY = isTopPosition ? yUpper - (tiers * 0.05 * range) : yLower + (tiers * 0.05 * range); // 10% 的上方或下方偏移
+        double baseY = isTopPosition ? yUpper - (tiers * 0.05 * range) : yLower + (tiers * 0.05 * range); // 10%
+                                                                                                          // 的上方或下方偏移
 
         // 动态计算间距
         double spacing = 0.03 * range; // 3% 的范围作为间距
@@ -154,11 +139,8 @@ public class OrderMarker {
     }
 
     private String formatOrderInfo(Order order) {
-        return String.format("%s %s\n%s@%.2f",
-                             order.getSymbol(),
-                             DateUtils.getDateForOrderMarker(order.getTimestamp()),
-                             order.getType().name(),
-                             order.getPrice());
+        return String.format("%s %s\n%s@%.2f", order.getSymbol(), DateUtils.getDateForOrderMarker(order.getTimestamp()),
+                order.getType().name(), order.getPrice());
     }
 
     private void styleAnnotation(XYTextAnnotation annotation, Color color) {

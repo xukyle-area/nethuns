@@ -1,12 +1,11 @@
 package com.gantenx.nethuns.indicator;
 
 
-import com.gantenx.nethuns.commons.model.Kline;
-import com.gantenx.nethuns.indicator.base.AbstractIndicator;
-import org.jfree.chart.JFreeChart;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jfree.chart.JFreeChart;
+import com.gantenx.nethuns.commons.model.Kline;
+import com.gantenx.nethuns.indicator.base.AbstractIndicator;
 
 public class ConstantIndicator<T> extends AbstractIndicator<T> {
 

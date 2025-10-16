@@ -8,15 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 public class Callback {
 
     public static void tickerCallback(String text) {
-        Event<TickerEvent> event = JsonUtils.readValue(text, new TypeReference<Event<TickerEvent>>() {
-        });
+        Event<TickerEvent> event = JsonUtils.readValue(text, new TypeReference<Event<TickerEvent>>() {});
         TickerEvent tickerEvent = event.getData();
         log.info("ticker:{}", JsonUtils.toJson(tickerEvent));
     }
 
     public static void klineCallback(String text) {
-        Event<KlineEvent> event = JsonUtils.readValue(text, new TypeReference<Event<KlineEvent>>() {
-        });
+        Event<KlineEvent> event = JsonUtils.readValue(text, new TypeReference<Event<KlineEvent>>() {});
         KlineEvent klineEvent = event.getData();
         log.info("kline:{}", JsonUtils.toJson(klineEvent.getKline()));
     }
